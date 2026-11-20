@@ -33,17 +33,18 @@
         header {
             background: linear-gradient(180deg, rgba(77, 0, 0, 0.95) 0%, rgba(30, 4, 8, 0.95) 100%);
             border-bottom: 2px solid var(--bsu-gold);
-            padding: 0.85rem 2rem; display: flex; justify-content: space-between; align-items: center;
+            padding: 0.75rem 2rem; display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 4px 25px rgba(128, 0, 0, 0.4);
             position: sticky; top: 0; z-index: 100;
         }
         .brand-container { display: flex; align-items: center; gap: 1rem; }
-        .univ-seal {
-            width: 48px; height: 48px; border-radius: 50%;
-            background: radial-gradient(circle, var(--bsu-gold) 20%, var(--bsu-maroon) 85%);
-            border: 2px solid var(--bsu-gold); display: flex; align-items: center; justify-content: center;
+        .univ-seal-img {
+            width: 50px; height: 50px; border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--bsu-gold);
+            background: #fff;
+            box-shadow: 0 0 15px rgba(255, 199, 44, 0.4);
         }
-        .univ-seal i { font-size: 1.7rem; color: #fff; }
         .brand-title h1 { font-size: 1.15rem; font-weight: 800; letter-spacing: 0.8px; color: var(--bsu-white); }
         .brand-title p { font-size: 0.72rem; color: var(--bsu-gold); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
 
@@ -73,6 +74,13 @@
             border: 2px solid var(--border-glass); border-radius: var(--radius-main);
             padding: 2.25rem; box-shadow: 0 15px 40px rgba(0,0,0,0.6); backdrop-filter: blur(12px);
         }
+        .auth-seal-logo {
+            width: 80px; height: 80px; border-radius: 50%;
+            object-fit: cover; border: 2px solid var(--bsu-gold);
+            background: #fff;
+            box-shadow: 0 0 20px rgba(255, 199, 44, 0.4);
+            margin: 0 auto 0.75rem auto; display: block;
+        }
         .auth-tab-bar { display: flex; border-bottom: 1px solid var(--border-glass); margin-bottom: 1.5rem; }
         .auth-tab-bar button {
             flex: 1; padding: 0.75rem; background: none; border: none; color: var(--text-secondary);
@@ -89,7 +97,7 @@
         }
         .form-control:focus { border-color: var(--bsu-gold); box-shadow: 0 0 10px rgba(255, 199, 44, 0.2); }
 
-        /* ================= STATS SECTION (CLICKABLE) ================= */
+        /* ================= STATS SECTION ================= */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
         .stat-card {
             background: var(--card-surface); border: 1px solid var(--border-glass);
@@ -144,10 +152,10 @@
 </head>
 <body>
 
-    <!-- Header -->
+    <!-- Header Navigation -->
     <header>
         <div class="brand-container">
-            <div class="univ-seal"><i class='bx bx-plus-medical'></i></div>
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/5/52/Batangas_State_University_seal.png/300px-Batangas_State_University_seal.png" alt="BatStateU Seal" class="univ-seal-img">
             <div class="brand-title">
                 <h1 class="cinzel">BATANGAS STATE UNIVERSITY</h1>
                 <p>Medical Clinic • Red Spartan Triage</p>
@@ -164,11 +172,11 @@
 
     <div class="page-container">
 
-        <!-- ================= 1. AUTHENTICATION (LOGIN & REGISTRATION) ================= -->
+        <!-- ================= 1. AUTHENTICATION GATE ================= -->
         <section id="authGate">
             <div class="auth-box">
                 <div style="text-align: center; margin-bottom: 1.5rem;">
-                    <i class='bx bxs-user-badge' style="font-size: 3rem; color: var(--bsu-gold);"></i>
+                    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/5/52/Batangas_State_University_seal.png/300px-Batangas_State_University_seal.png" alt="BatStateU Seal" class="auth-seal-logo">
                     <h2 class="cinzel" style="font-size: 1.3rem; margin-top: 0.5rem;">Clinic Portal Access</h2>
                     <p style="font-size: 0.8rem; color: var(--text-secondary);">Red Spartan Health Information System</p>
                 </div>
@@ -188,13 +196,9 @@
                         <label>Password</label>
                         <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
                     </div>
-                    <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.8rem;">
+                    <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.85rem; margin-top: 0.5rem;">
                         <i class='bx bx-log-in'></i> Sign In to Account
                     </button>
-                    <div style="margin-top: 1.25rem; font-size: 0.75rem; color: var(--text-secondary); text-align: center;">
-                        <span>Demo Admin: <code>ADMIN</code> / <code>batstateu411</code></span><br>
-                        <span>Demo Student: <code>24-09303</code> / <code>student123</code></span>
-                    </div>
                 </form>
 
                 <!-- STUDENT REGISTRATION FORM (CREATE OWN ACCOUNT) -->
@@ -224,7 +228,7 @@
                         <label>Set Password</label>
                         <input type="password" id="regPassword" class="form-control" placeholder="••••••••" required>
                     </div>
-                    <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.8rem;">
+                    <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.85rem; margin-top: 0.5rem;">
                         <i class='bx bx-user-check'></i> Register Student Account
                     </button>
                 </form>
@@ -324,7 +328,6 @@
         </section>
 
         <!-- ================= 4. CLINIC STAFF / ADMIN VIEW ================= -->
-        <!-- Registration Form is completely removed from this view -->
         <section id="adminView" style="display: none;">
             <div class="card">
                 <div class="tabs">
@@ -414,7 +417,7 @@
                     <label>Confidential Symptoms / Chief Complaint</label>
                     <textarea id="reqSymptoms" class="form-control" rows="3" placeholder="Describe symptoms or reasons for visit..." required></textarea>
                 </div>
-                <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.8rem;">
+                <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.85rem; margin-top: 0.5rem;">
                     <i class='bx bx-plus-circle'></i> Submit & Enter Queue
                 </button>
             </form>
