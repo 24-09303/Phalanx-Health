@@ -3,14 +3,14 @@ from datetime import datetime
 from flask import Flask, render_template, request, jsonify, session
 
 app = Flask(__name__)
-app.secret_key = 'batstateu_cpe411_medtriage_secret_key_2025'
+app.secret_key = 'batstateu_spartan_medtriage_key_2025'
 
 # ==============================================================================
-# DATA STRUCTURE IMPLEMENTATIONS (DSA REQUIREMENTS)
+# DATA STRUCTURES (CPE 411 REQUIREMENTS)
 # ==============================================================================
 
 class MaxHeap:
-    """Max-Heap for Emergency Triage Queue (Priority Queue)."""
+    """Max-Heap Priority Queue for Emergency Triage cases."""
     def __init__(self):
         self.heap = []
 
@@ -23,14 +23,10 @@ class MaxHeap:
             return None
         if len(self.heap) == 1:
             return self.heap.pop()
-        
         root = self.heap[0]
         self.heap[0] = self.heap.pop()
         self._heapify_down(0)
         return root
-
-    def peek(self):
-        return self.heap[0] if self.heap else None
 
     def _heapify_up(self, index):
         parent = (index - 1) // 2
@@ -40,15 +36,13 @@ class MaxHeap:
 
     def _heapify_down(self, index):
         largest = index
-        left = 2 * index + 1
-        right = 2 * index + 2
+        left, right = 2 * index + 1, 2 * index + 2
         size = len(self.heap)
 
         if left < size and self.heap[left]['severity'] > self.heap[largest]['severity']:
             largest = left
         if right < size and self.heap[right]['severity'] > self.heap[largest]['severity']:
             largest = right
-
         if largest != index:
             self.heap[index], self.heap[largest] = self.heap[largest], self.heap[index]
             self._heapify_down(largest)
@@ -56,12 +50,24 @@ class MaxHeap:
     def get_all(self):
         return sorted(self.heap, key=lambda x: x['severity'], reverse=True)
 
+    def remove_by_id(self, patient_id):
+        for idx, p in enumerate(self.heap):
+            if p['id'] == patient_id:
+                removed = self.heap.pop(idx)
+                # Rebuild heap structure
+                temp = list(self.heap)
+                self.heap = []
+                for item in temp:
+                    self.insert(item)
+                return removed
+        return None
+
     def size(self):
         return len(self.heap)
 
 
 class PatientQueue:
-    """FIFO Queue for Routine Non-Emergency Patients."""
+    """FIFO Queue for Routine Non-Emergency Consultations."""
     def __init__(self):
         self.queue = []
 
@@ -69,12 +75,13 @@ class PatientQueue:
         self.queue.append(patient)
 
     def dequeue(self):
-        if not self.queue:
-            return None
-        return self.queue.pop(0)
+        return self.queue.pop(0) if self.queue else None
 
-    def peek(self):
-        return self.queue[0] if self.queue else None
+    def remove_by_id(self, patient_id):
+        for idx, p in enumerate(self.queue):
+            if p['id'] == patient_id:
+                return self.queue.pop(idx)
+        return None
 
     def get_all(self):
         return list(self.queue)
@@ -84,7 +91,6 @@ class PatientQueue:
 
 
 class BSTNode:
-    """Binary Search Tree Node for Patient Records."""
     def __init__(self, patient):
         self.patient = patient
         self.left = None
@@ -92,7 +98,7 @@ class BSTNode:
 
 
 class PatientBST:
-    """Binary Search Tree for O(log n) Patient ID Lookup."""
+    """Binary Search Tree for fast O(log N) patient record lookup."""
     def __init__(self):
         self.root = None
 
@@ -101,11 +107,10 @@ class PatientBST:
         if not self.root:
             self.root = new_node
             return True
-        
         curr = self.root
         while True:
             if patient['id'] == curr.patient['id']:
-                return False  # Duplicate ID
+                return False  # Prevent Duplicate SR-Code
             elif patient['id'] < curr.patient['id']:
                 if curr.left is None:
                     curr.left = new_node
@@ -119,33 +124,28 @@ class PatientBST:
 
     def search(self, patient_id):
         curr = self.root
-        comparisons = 0
         while curr:
-            comparisons += 1
             if patient_id == curr.patient['id']:
-                return curr.patient, comparisons
+                return curr.patient
             elif patient_id < curr.patient['id']:
                 curr = curr.left
             else:
                 curr = curr.right
-        return None, comparisons
+        return None
 
-    def to_dict(self, node=None):
-        if node is None:
+    def get_inorder(self, node=None, result=None):
+        if result is None:
+            result = []
             node = self.root
-        if not node:
-            return None
-        return {
-            'id': node.patient['id'],
-            'name': node.patient['name'],
-            'severity': node.patient['severity'],
-            'left': self.to_dict(node.left) if node.left else None,
-            'right': self.to_dict(node.right) if node.right else None
-        }
+        if node:
+            self.get_inorder(node.left, result)
+            result.append(node.patient)
+            self.get_inorder(node.right, result)
+        return result
 
 
 # ==============================================================================
-# GLOBAL STATE INITIALIZATION
+# GLOBAL STATE & INITIAL SEED DATA
 # ==============================================================================
 
 triage_heap = MaxHeap()
@@ -160,295 +160,312 @@ stats = {
     'routine_handled': 0
 }
 
-# Add default seed data for demonstration
+# Seed Accounts (Admins + Demo Students)
+accounts = {
+    "ADMIN": {
+        "password": "batstateu411",
+        "role": "admin",
+        "name": "Head Clinic Physician"
+    },
+    "24-09303": {
+        "password": "student123",
+        "role": "patient",
+        "name": "Maria Santos"
+    }
+}
+
+# Pre-load initial patients
 seed_patients = [
-    {"name": "Juan Dela Cruz", "id": "21-01234", "type": "Emergency", "severity": 9, "symptoms": "Chest pain, shortness of breath", "age": 21, "gender": "Male", "contact": "09171234567"},
-    {"name": "Maria Santos", "id": "22-05678", "type": "Routine", "severity": 3, "symptoms": "Mild headache and fatigue", "age": 19, "gender": "Female", "contact": "09189876543"},
-    {"name": "Carlos Reyes", "id": "20-09988", "type": "Emergency", "severity": 7, "symptoms": "High fever with chills", "age": 22, "gender": "Male", "contact": "09205554433"},
-    {"name": "Ana Lim", "id": "23-04321", "type": "Routine", "severity": 2, "symptoms": "Medical certificate request", "age": 20, "gender": "Female", "contact": "09191112233"}
+    {
+        "id": "24-09303",
+        "name": "Maria Santos",
+        "age": 20,
+        "gender": "Female",
+        "type": "Emergency",
+        "ticket": "E-101",
+        "severity": 9,
+        "symptoms": "Severe abdominal trauma and difficulty breathing",
+        "comments": ["Admitted to Bed 1. Administered oxygen."],
+        "registered_at": "08:15 AM",
+        "status": "Waiting"
+    },
+    {
+        "id": "23-01824",
+        "name": "Juan Dela Cruz",
+        "age": 21,
+        "gender": "Male",
+        "type": "Routine",
+        "ticket": "R-201",
+        "severity": 2,
+        "symptoms": "Annual OJT medical clearance physical exam",
+        "comments": [],
+        "registered_at": "08:30 AM",
+        "status": "Waiting"
+    },
+    {
+        "id": "22-04512",
+        "name": "Carlos Gomez",
+        "age": 19,
+        "gender": "Male",
+        "type": "Emergency",
+        "ticket": "E-102",
+        "severity": 7,
+        "symptoms": "Sprained ankle during varsity practice, intense swelling",
+        "comments": ["Ice pack applied at triage entrance."],
+        "registered_at": "08:45 AM",
+        "status": "Waiting"
+    }
 ]
 
 for p in seed_patients:
-    p['registered_at'] = datetime.now().strftime('%I:%M:%S %p')
-    if patient_bst.insert(p):
-        stats['total_registered'] += 1
-        if p['type'] == 'Emergency':
-            triage_heap.insert(p)
-        else:
-            routine_queue.enqueue(p)
+    patient_bst.insert(p)
+    stats['total_registered'] += 1
+    if p['type'] == 'Emergency':
+        triage_heap.insert(p)
+    else:
+        routine_queue.enqueue(p)
+
+
+def mask_sr_code(code):
+    """Masks SR-Code for student privacy (e.g. 24-09303 -> 24-*****)."""
+    if '-' in code:
+        parts = code.split('-')
+        return f"{parts[0]}-*****"
+    return code[:3] + "*****" if len(code) > 3 else "*****"
+
 
 # ==============================================================================
-# ROUTES & CONTROLLERS
+# ROUTING & API ENDPOINTS
 # ==============================================================================
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
-# --- AUTHENTICATION ENDPOINTS ---
 
 @app.route('/api/login', methods=['POST'])
-def login():
+def api_login():
     data = request.json or {}
-    username = data.get('username', '').strip()
+    sr_code = data.get('sr_code', '').strip().upper()
     password = data.get('password', '').strip()
 
-    if username == 'admin' and password == 'batstateu411':
-        session['role'] = 'admin'
-        return jsonify({'success': True, 'role': 'admin', 'message': 'Welcome, Administrator!'})
-    else:
-        return jsonify({'success': False, 'message': 'Invalid admin credentials!'}), 401
+    if sr_code in accounts and accounts[sr_code]['password'] == password:
+        session['user_id'] = sr_code
+        session['role'] = accounts[sr_code]['role']
+        session['user_name'] = accounts[sr_code]['name']
+        return jsonify({
+            'success': True,
+            'role': session['role'],
+            'sr_code': sr_code,
+            'name': session['user_name']
+        })
+    return jsonify({'success': False, 'message': 'Invalid SR-Code or Password!'}), 401
 
 
 @app.route('/api/logout', methods=['POST'])
-def logout():
-    session.pop('role', None)
-    return jsonify({'success': True, 'message': 'Logged out successfully.'})
+def api_logout():
+    session.clear()
+    return jsonify({'success': True})
 
 
-@app.route('/api/auth_status', methods=['GET'])
-def auth_status():
-    return jsonify({
-        'role': session.get('role', 'patient'),
-        'is_admin': session.get('role') == 'admin'
-    })
+@app.route('/api/session', methods=['GET'])
+def get_session():
+    if 'user_id' in session:
+        return jsonify({
+            'logged_in': True,
+            'role': session.get('role'),
+            'sr_code': session.get('user_id'),
+            'name': session.get('user_name')
+        })
+    return jsonify({'logged_in': False})
 
 
-# --- PUBLIC / PATIENT ENDPOINTS ---
-
-@app.route('/api/add_patient', methods=['POST'])
-def add_patient():
+@app.route('/api/register_student', methods=['POST'])
+def register_student():
+    """Allows a student to self-register for clinic triage."""
     data = request.json or {}
-    
-    if not data.get('name') or not data.get('id'):
-        return jsonify({'success': False, 'error': 'Name and Student ID are required!'}), 400
+    sr_code = data.get('id', '').strip().upper()
+    name = data.get('name', '').strip()
+    password = data.get('password', '').strip() or 'student123'
+    c_type = data.get('type', 'Routine')
+    severity = int(data.get('severity', 3 if c_type == 'Routine' else 7))
+    symptoms = data.get('symptoms', 'None provided')
+    age = data.get('age', 20)
+    gender = data.get('gender', 'Male')
+
+    if not sr_code or not name:
+        return jsonify({'success': False, 'message': 'SR-Code and Full Name are required.'}), 400
+
+    # Generate Queue Ticket Number
+    ticket = f"{'E' if c_type == 'Emergency' else 'R'}-{stats['total_registered'] + 101}"
 
     patient = {
-        'name': data.get('name'),
-        'id': data.get('id'),
-        'type': data.get('type', 'Routine'),
-        'severity': int(data.get('severity', 1)),
-        'symptoms': data.get('symptoms', 'None specified'),
-        'age': data.get('age', 'N/A'),
-        'gender': data.get('gender', 'N/A'),
-        'contact': data.get('contact', 'N/A'),
-        'registered_at': datetime.now().strftime('%I:%M:%S %p')
+        'id': sr_code,
+        'name': name,
+        'age': age,
+        'gender': gender,
+        'type': c_type,
+        'ticket': ticket,
+        'severity': severity,
+        'symptoms': symptoms,
+        'comments': [],
+        'registered_at': datetime.now().strftime('%I:%M %p'),
+        'status': 'Waiting'
     }
 
     if not patient_bst.insert(patient):
-        return jsonify({'success': False, 'error': f"Student ID '{patient['id']}' is already registered!"}), 400
+        return jsonify({'success': False, 'message': f'SR-Code {sr_code} is already registered in the system!'}), 400
+
+    # Save to user login registry
+    accounts[sr_code] = {
+        'password': password,
+        'role': 'patient',
+        'name': name
+    }
 
     stats['total_registered'] += 1
 
-    if patient['type'] == 'Emergency':
+    if c_type == 'Emergency':
         triage_heap.insert(patient)
     else:
         routine_queue.enqueue(patient)
 
-    return jsonify({'success': True, 'message': f"Patient {patient['name']} registered successfully!", 'patient': patient})
+    return jsonify({'success': True, 'ticket': ticket, 'patient': patient})
 
 
-@app.route('/api/my_status', methods=['POST'])
-def my_status():
-    """Allows a patient to securely look up their own current queue status."""
-    data = request.json or {}
-    patient_id = data.get('id', '').strip()
-
-    if not patient_id:
-        return jsonify({'success': False, 'error': 'Please enter a Student ID.'}), 400
-
-    patient, _ = patient_bst.search(patient_id)
-    if not patient:
-        return jsonify({'success': False, 'found': False, 'message': 'No record found for this Student ID.'})
-
-    # Check if already treated
-    treated_record = next((t for t in treatment_history if t['id'] == patient_id), None)
-    if treated_record:
-        return jsonify({
-            'success': True,
-            'found': True,
-            'status': 'Treated',
-            'patient': patient,
-            'treated_at': treated_record.get('treated_at')
+@app.route('/api/public_queue', methods=['GET'])
+def public_queue():
+    """Confidential Queue Board: Returns only tickets and masked codes. NO SYMPTOMS."""
+    emergencies = []
+    for p in triage_heap.get_all():
+        emergencies.append({
+            'ticket': p['ticket'],
+            'masked_id': mask_sr_code(p['id']),
+            'type': p['type'],
+            'registered_at': p['registered_at'],
+            'status': p['status']
         })
 
-    # Find position in Emergency Heap
+    routines = []
+    for p in routine_queue.get_all():
+        routines.append({
+            'ticket': p['ticket'],
+            'masked_id': mask_sr_code(p['id']),
+            'type': p['type'],
+            'registered_at': p['registered_at'],
+            'status': p['status']
+        })
+
+    return jsonify({
+        'stats': {
+            'registered': stats['total_registered'],
+            'emergency_count': len(emergencies),
+            'routine_count': len(routines),
+            'treated_count': stats['total_treated']
+        },
+        'emergencies': emergencies,
+        'routines': routines
+    })
+
+
+@app.route('/api/my_status', methods=['GET'])
+def patient_my_status():
+    """Returns confidential details strictly for the currently logged-in student."""
+    sr_code = session.get('user_id')
+    if not sr_code or session.get('role') != 'patient':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    patient = patient_bst.search(sr_code)
+    if not patient:
+        return jsonify({'success': False, 'message': 'Record not found.'})
+
+    # Determine place in queue
+    pos = "Completed"
     if patient['type'] == 'Emergency':
         heap_list = triage_heap.get_all()
-        pos = next((i + 1 for i, p in enumerate(heap_list) if p['id'] == patient_id), None)
-        return jsonify({
-            'success': True,
-            'found': True,
-            'status': 'Waiting (Emergency Triage)',
-            'position': pos,
-            'queue_size': len(heap_list),
-            'patient': patient
-        })
+        for idx, p in enumerate(heap_list):
+            if p['id'] == sr_code:
+                pos = f"#{idx + 1} in Urgent Priority Triage"
+                break
+    else:
+        q_list = routine_queue.get_all()
+        for idx, p in enumerate(q_list):
+            if p['id'] == sr_code:
+                pos = f"#{idx + 1} in General Consultation Line"
+                break
 
-    # Find position in Routine Queue
-    routine_list = routine_queue.get_all()
-    pos = next((i + 1 for i, p in enumerate(routine_list) if p['id'] == patient_id), None)
-    return jsonify({
-        'success': True,
-        'found': True,
-        'status': 'Waiting (Routine Queue)',
-        'position': pos,
-        'queue_size': len(routine_list),
-        'patient': patient
-    })
+    return jsonify({'success': True, 'patient': patient, 'queue_position': pos})
 
 
-@app.route('/api/get_stats', methods=['GET'])
-def get_stats():
-    return jsonify({
-        'stats': stats,
-        'emergency_queue': triage_heap.get_all(),
-        'routine_queue': routine_queue.get_all(),
-        'history': treatment_history,
-        'is_admin': session.get('role') == 'admin'
-    })
+# ==============================================================================
+# CLINIC STAFF / ADMIN ONLY APIS
+# ==============================================================================
 
-
-# --- ADMIN ONLY ENDPOINTS ---
-
-def require_admin():
+def verify_admin():
     return session.get('role') == 'admin'
 
 
-@app.route('/api/next_emergency', methods=['POST'])
-def next_emergency():
-    if not require_admin():
-        return jsonify({'success': False, 'error': 'Admin authorization required!'}), 403
-
-    patient = triage_heap.extract_max()
-    if not patient:
-        return jsonify({'success': False, 'error': 'No emergency patients in queue!'}), 404
-
-    patient['treated_at'] = datetime.now().strftime('%I:%M:%S %p')
-    treatment_history.insert(0, patient)
-    stats['total_treated'] += 1
-    stats['emergencies_handled'] += 1
-
-    return jsonify({'success': True, 'patient': patient})
-
-
-@app.route('/api/next_routine', methods=['POST'])
-def next_routine():
-    if not require_admin():
-        return jsonify({'success': False, 'error': 'Admin authorization required!'}), 403
-
-    patient = routine_queue.dequeue()
-    if not patient:
-        return jsonify({'success': False, 'error': 'No routine patients in queue!'}), 404
-
-    patient['treated_at'] = datetime.now().strftime('%I:%M:%S %p')
-    treatment_history.insert(0, patient)
-    stats['total_treated'] += 1
-    stats['routine_handled'] += 1
-
-    return jsonify({'success': True, 'patient': patient})
-
-
-@app.route('/api/search_patient', methods=['POST'])
-def search_patient():
-    if not require_admin():
-        return jsonify({'success': False, 'error': 'Admin authorization required!'}), 403
-
-    patient_id = (request.json or {}).get('id', '').strip()
-    
-    # BST Search
-    t0 = time.perf_counter()
-    patient_bst_res, bst_comps = patient_bst.search(patient_id)
-    t1 = time.perf_counter()
-    bst_time = (t1 - t0) * 1000  # ms
-
-    # Linear Search on history + current
-    all_patients = triage_heap.get_all() + routine_queue.get_all() + treatment_history
-    t2 = time.perf_counter()
-    linear_res = None
-    linear_comps = 0
-    for p in all_patients:
-        linear_comps += 1
-        if p['id'] == patient_id:
-            linear_res = p
-            break
-    t3 = time.perf_counter()
-    linear_time = (t3 - t2) * 1000  # ms
+@app.route('/api/admin/all_data', methods=['GET'])
+def admin_all_data():
+    if not verify_admin():
+        return jsonify({'error': 'Unauthorized'}), 403
 
     return jsonify({
-        'found': patient_bst_res is not None,
-        'patient': patient_bst_res,
-        'metrics': {
-            'bst_time_ms': round(bst_time, 5),
-            'bst_comparisons': bst_comps,
-            'linear_time_ms': round(linear_time, 5),
-            'linear_comparisons': linear_comps
-        }
+        'stats': {
+            'registered': stats['total_registered'],
+            'emergency_count': triage_heap.size(),
+            'routine_count': routine_queue.size(),
+            'treated_count': stats['total_treated']
+        },
+        'emergency_queue': triage_heap.get_all(),
+        'routine_queue': routine_queue.get_all(),
+        'all_records': patient_bst.get_inorder(),
+        'history': treatment_history
     })
 
 
-@app.route('/api/benchmark', methods=['POST'])
-def benchmark():
-    if not require_admin():
-        return jsonify({'success': False, 'error': 'Admin authorization required!'}), 403
+@app.route('/api/admin/call_next', methods=['POST'])
+def admin_call_next():
+    if not verify_admin():
+        return jsonify({'error': 'Unauthorized'}), 403
 
-    sizes = [100, 1000, 10000]
-    results = []
+    data = request.json or {}
+    q_type = data.get('type', 'emergency')
 
-    for size in sizes:
-        dataset = list(range(0, size * 2, 2))
-        target = dataset[-1]
+    patient = triage_heap.extract_max() if q_type == 'emergency' else routine_queue.dequeue()
 
-        # Linear Search Worst Case
-        t0 = time.perf_counter()
-        linear_found = False
-        lin_comps = 0
-        for x in dataset:
-            lin_comps += 1
-            if x == target:
-                linear_found = True
-                break
-        t1 = time.perf_counter()
-        linear_time = (t1 - t0) * 1000
+    if not patient:
+        return jsonify({'success': False, 'message': 'Queue is empty!'}), 404
 
-        # Binary Search Worst Case
-        t2 = time.perf_counter()
-        low, high = 0, len(dataset) - 1
-        bin_comps = 0
-        bin_found = False
-        while low <= high:
-            bin_comps += 1
-            mid = (low + high) // 2
-            if dataset[mid] == target:
-                bin_found = True
-                break
-            elif dataset[mid] < target:
-                low = mid + 1
-            else:
-                high = mid - 1
-        t3 = time.perf_counter()
-        binary_time = (t3 - t2) * 1000
+    patient['status'] = 'Treated'
+    patient['treated_at'] = datetime.now().strftime('%I:%M %p')
+    treatment_history.insert(0, patient)
+    stats['total_treated'] += 1
 
-        speedup = round(linear_time / binary_time, 2) if binary_time > 0 else "N/A"
-
-        results.append({
-            'size': size,
-            'linear_ms': round(linear_time, 4),
-            'linear_comps': lin_comps,
-            'binary_ms': round(binary_time, 4),
-            'binary_comps': bin_comps,
-            'speedup': speedup
-        })
-
-    return jsonify({'results': results})
+    return jsonify({'success': True, 'patient': patient})
 
 
-@app.route('/api/get_tree', methods=['GET'])
-def get_tree():
-    if not require_admin():
-        return jsonify({'success': False, 'error': 'Admin authorization required!'}), 403
+@app.route('/api/admin/add_comment', methods=['POST'])
+def admin_add_comment():
+    if not verify_admin():
+        return jsonify({'error': 'Unauthorized'}), 403
 
-    return jsonify({'tree': patient_bst.to_dict()})
+    data = request.json or {}
+    sr_code = data.get('id', '').strip()
+    comment = data.get('comment', '').strip()
+
+    if not sr_code or not comment:
+        return jsonify({'success': False, 'message': 'Missing SR-Code or Comment'}), 400
+
+    patient = patient_bst.search(sr_code)
+    if not patient:
+        return jsonify({'success': False, 'message': 'Student record not found in BST'}), 404
+
+    timestamp = datetime.now().strftime('%I:%M %p')
+    note_entry = f"[{timestamp}] Dr. Assessment: {comment}"
+    patient['comments'].append(note_entry)
+
+    return jsonify({'success': True, 'comments': patient['comments']})
 
 
 if __name__ == '__main__':
