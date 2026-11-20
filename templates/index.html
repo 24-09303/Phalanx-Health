@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batangas State University • Smart Campus Triage System</title>
+    <title>BatStateU • Red Spartan Medical Triage Portal</title>
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
@@ -16,8 +16,8 @@
             --bsu-gold: #FFC72C;
             --bsu-gold-hover: #e0ac1e;
             --bsu-white: #FFFFFF;
-            --bg-canvas: #0e0406;
-            --card-surface: rgba(26, 8, 12, 0.85);
+            --bg-canvas: #0d0305;
+            --card-surface: rgba(28, 8, 12, 0.88);
             --border-glass: rgba(255, 199, 44, 0.22);
             --text-primary: #FFFFFF;
             --text-secondary: #d8c7c9;
@@ -25,7 +25,7 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg-canvas); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
+        body { background: var(--bg-canvas); color: var(--text-primary); min-height: 100vh; }
         .mono { font-family: 'JetBrains Mono', monospace; }
         .cinzel { font-family: 'Cinzel', serif; }
 
@@ -33,8 +33,7 @@
         header {
             background: linear-gradient(180deg, rgba(77, 0, 0, 0.95) 0%, rgba(30, 4, 8, 0.95) 100%);
             border-bottom: 2px solid var(--bsu-gold);
-            padding: 0.85rem 2rem;
-            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.85rem 2rem; display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 4px 25px rgba(128, 0, 0, 0.4);
             position: sticky; top: 0; z-index: 100;
         }
@@ -43,11 +42,13 @@
             width: 48px; height: 48px; border-radius: 50%;
             background: radial-gradient(circle, var(--bsu-gold) 20%, var(--bsu-maroon) 85%);
             border: 2px solid var(--bsu-gold); display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 15px rgba(255, 199, 44, 0.4);
         }
         .univ-seal i { font-size: 1.7rem; color: #fff; }
         .brand-title h1 { font-size: 1.15rem; font-weight: 800; letter-spacing: 0.8px; color: var(--bsu-white); }
-        .brand-title p { font-size: 0.72rem; color: var(--bsu-gold); text-transform: uppercase; letter-spacing: 1.2px; font-weight: 600; }
+        .brand-title p { font-size: 0.72rem; color: var(--bsu-gold); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+        /* Container */
+        .page-container { max-width: 1350px; margin: 0 auto; padding: 2rem; }
 
         /* Buttons */
         .btn {
@@ -62,26 +63,23 @@
         .btn-outline { background: transparent; border: 1px solid var(--border-glass); color: #fff; }
         .btn-outline:hover { background: rgba(255,255,255,0.06); }
 
-        /* Container */
-        .page-container { max-width: 1350px; margin: 0 auto; padding: 2rem; }
-
-        /* ================= AUTHENTICATION GATE SCREEN ================= */
+        /* ================= AUTHENTICATION GATE ================= */
         #authGate {
-            min-height: 82vh; display: flex; align-items: center; justify-content: center;
-            background: radial-gradient(circle at center, rgba(128, 0, 0, 0.25) 0%, transparent 70%);
+            min-height: 80vh; display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at center, rgba(128, 0, 0, 0.3) 0%, transparent 70%);
         }
-        .auth-card {
-            width: 100%; max-width: 480px; background: var(--card-surface);
+        .auth-box {
+            width: 100%; max-width: 460px; background: var(--card-surface);
             border: 2px solid var(--border-glass); border-radius: var(--radius-main);
             padding: 2.25rem; box-shadow: 0 15px 40px rgba(0,0,0,0.6); backdrop-filter: blur(12px);
         }
-        .auth-nav { display: flex; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-glass); }
-        .auth-nav button {
+        .auth-tab-bar { display: flex; border-bottom: 1px solid var(--border-glass); margin-bottom: 1.5rem; }
+        .auth-tab-bar button {
             flex: 1; padding: 0.75rem; background: none; border: none; color: var(--text-secondary);
             font-weight: 700; font-size: 0.9rem; cursor: pointer; border-bottom: 3px solid transparent;
         }
-        .auth-nav button.active { color: var(--bsu-gold); border-bottom-color: var(--bsu-gold); }
-        
+        .auth-tab-bar button.active { color: var(--bsu-gold); border-bottom-color: var(--bsu-gold); }
+
         .form-group { margin-bottom: 1.15rem; }
         .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--bsu-gold); margin-bottom: 0.4rem; text-transform: uppercase; }
         .form-control {
@@ -91,7 +89,7 @@
         }
         .form-control:focus { border-color: var(--bsu-gold); box-shadow: 0 0 10px rgba(255, 199, 44, 0.2); }
 
-        /* ================= STATS CARDS (CLICKABLE) ================= */
+        /* ================= STATS SECTION (CLICKABLE) ================= */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
         .stat-card {
             background: var(--card-surface); border: 1px solid var(--border-glass);
@@ -104,47 +102,37 @@
             box-shadow: 0 8px 25px rgba(255, 199, 44, 0.2);
         }
         .stat-card .val { font-size: 2.2rem; font-weight: 800; color: var(--bsu-white); }
-        .stat-card .lbl { font-size: 0.75rem; color: var(--bsu-gold); font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+        .stat-card .lbl { font-size: 0.75rem; color: var(--bsu-gold); font-weight: 700; text-transform: uppercase; }
         .stat-card i { font-size: 2.5rem; color: var(--bsu-gold); opacity: 0.85; }
 
-        /* Views */
-        .portal-view { display: none; }
-        .portal-view.active { display: block; }
-
-        /* Admin Layout */
-        .admin-layout { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+        /* Cards & Tabs */
         .card {
             background: var(--card-surface); border: 1px solid var(--border-glass);
             border-radius: var(--radius-main); padding: 1.5rem; backdrop-filter: blur(8px);
         }
-
-        /* Navigation Tabs in Admin */
-        .admin-tabs { display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border-glass); margin-bottom: 1.5rem; }
-        .tab-item {
+        .tabs { display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border-glass); margin-bottom: 1.5rem; }
+        .tab-btn {
             padding: 0.75rem 1.4rem; background: none; border: none; color: var(--text-secondary);
             font-weight: 700; font-size: 0.9rem; cursor: pointer; border-bottom: 3px solid transparent;
             display: flex; align-items: center; gap: 0.5rem;
         }
-        .tab-item.active { color: var(--bsu-gold); border-bottom-color: var(--bsu-gold); background: rgba(255, 199, 44, 0.05); }
+        .tab-btn.active { color: var(--bsu-gold); border-bottom-color: var(--bsu-gold); background: rgba(255, 199, 44, 0.05); }
 
-        /* Table & Lists */
+        /* Tables & Badges */
         .custom-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
         .custom-table th {
-            text-align: left; padding: 0.85rem; background: rgba(128, 0, 0, 0.4);
+            text-align: left; padding: 0.85rem; background: rgba(128, 0, 0, 0.45);
             color: var(--bsu-gold); font-weight: 700; border-bottom: 1px solid var(--border-glass);
         }
         .custom-table td { padding: 0.85rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        .custom-table tr:hover { background: rgba(255, 255, 255, 0.03); }
-
-        /* Badge Styles */
         .tag { padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
         .tag-emergency { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
         .tag-routine { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
         .tag-treated { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
 
-        /* Modal Inspector */
+        /* Modals */
         .modal-wrap {
-            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.82);
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 1000;
         }
         .modal-wrap.show { display: flex; }
@@ -152,81 +140,72 @@
             background: #140508; border: 2px solid var(--bsu-gold); border-radius: var(--radius-main);
             width: 95%; max-width: 600px; padding: 2rem; box-shadow: 0 15px 50px rgba(0,0,0,0.8);
         }
-
-        /* Patient Confidential Card */
-        .patient-ticket-card {
-            background: linear-gradient(135deg, rgba(128,0,0,0.4) 0%, rgba(20,4,7,0.9) 100%);
-            border: 2px solid var(--bsu-gold); border-radius: var(--radius-main);
-            padding: 2rem; margin-bottom: 2rem; text-align: center;
-        }
     </style>
 </head>
 <body>
 
-    <!-- Header Navigation -->
+    <!-- Header -->
     <header>
         <div class="brand-container">
-            <div class="univ-seal">
-                <i class='bx bx-plus-medical'></i>
-            </div>
+            <div class="univ-seal"><i class='bx bx-plus-medical'></i></div>
             <div class="brand-title">
                 <h1 class="cinzel">BATANGAS STATE UNIVERSITY</h1>
-                <p>University Medical Clinic • Smart Triage System</p>
+                <p>Medical Clinic • Red Spartan Triage</p>
             </div>
         </div>
 
-        <div id="headerUserActions" style="display: flex; align-items: center; gap: 1rem;">
-            <span id="roleIndicator" class="tag tag-routine" style="display: none;">Guest</span>
-            <button id="logoutBtn" class="btn btn-outline" style="display: none;" onclick="triggerLogout()">
-                <i class='bx bx-log-out'></i> Exit System
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="navUserBadge" class="tag tag-routine" style="display: none;">Guest</span>
+            <button id="navLogoutBtn" class="btn btn-outline" style="display: none;" onclick="handleLogout()">
+                <i class='bx bx-log-out'></i> Sign Out
             </button>
         </div>
     </header>
 
     <div class="page-container">
 
-        <!-- ================= 1. AUTHENTICATION GATE ================= -->
+        <!-- ================= 1. AUTHENTICATION (LOGIN & REGISTRATION) ================= -->
         <section id="authGate">
-            <div class="auth-card">
+            <div class="auth-box">
                 <div style="text-align: center; margin-bottom: 1.5rem;">
-                    <i class='bx bxs-shield-plus' style="font-size: 3rem; color: var(--bsu-gold);"></i>
+                    <i class='bx bxs-user-badge' style="font-size: 3rem; color: var(--bsu-gold);"></i>
                     <h2 class="cinzel" style="font-size: 1.3rem; margin-top: 0.5rem;">Clinic Portal Access</h2>
                     <p style="font-size: 0.8rem; color: var(--text-secondary);">Red Spartan Health Information System</p>
                 </div>
 
-                <div class="auth-nav">
-                    <button id="btnTabLogin" class="active" onclick="toggleAuthTab('login')">Account Login</button>
-                    <button id="btnTabRegister" onclick="toggleAuthTab('register')">New Patient Triage</button>
+                <div class="auth-tab-bar">
+                    <button id="tabBtnLogin" class="active" onclick="switchAuthTab('login')">Sign In</button>
+                    <button id="tabBtnRegister" onclick="switchAuthTab('register')">Create Student Account</button>
                 </div>
 
-                <!-- LOGIN FORM -->
-                <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+                <!-- SIGN IN FORM -->
+                <form id="signInForm" onsubmit="handleLogin(event)">
                     <div class="form-group">
-                        <label>SR-Code / Staff ID</label>
-                        <input type="text" id="loginId" class="form-control mono" placeholder="e.g. 24-09303 or ADMIN" required>
+                        <label>SR-Code or Staff ID</label>
+                        <input type="text" id="loginSrCode" class="form-control mono" placeholder="e.g. 24-09303 or ADMIN" required>
                     </div>
                     <div class="form-group">
                         <label>Password</label>
-                        <input type="password" id="loginPass" class="form-control" placeholder="••••••••" required>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
                     </div>
-                    <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.85rem;">
-                        <i class='bx bx-key'></i> Sign In to Portal
+                    <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.8rem;">
+                        <i class='bx bx-log-in'></i> Sign In to Account
                     </button>
                     <div style="margin-top: 1.25rem; font-size: 0.75rem; color: var(--text-secondary); text-align: center;">
-                        <span>Clinic Staff Demo: <code>ADMIN</code> | <code>batstateu411</code></span><br>
-                        <span>Demo Student: <code>24-09303</code> | <code>student123</code></span>
+                        <span>Demo Admin: <code>ADMIN</code> / <code>batstateu411</code></span><br>
+                        <span>Demo Student: <code>24-09303</code> / <code>student123</code></span>
                     </div>
                 </form>
 
-                <!-- PATIENT REGISTRATION FORM (ONLY ON PUBLIC/ENTRY) -->
-                <form id="registerForm" style="display: none;" onsubmit="handleRegistrationSubmit(event)">
+                <!-- STUDENT REGISTRATION FORM (CREATE OWN ACCOUNT) -->
+                <form id="signUpForm" style="display: none;" onsubmit="handleRegister(event)">
                     <div class="form-group">
                         <label>Student SR-Code</label>
-                        <input type="text" id="regId" class="form-control mono" placeholder="e.g. 24-09303" required>
+                        <input type="text" id="regSrCode" class="form-control mono" placeholder="e.g. 24-09303" required>
                     </div>
                     <div class="form-group">
                         <label>Full Name</label>
-                        <input type="text" id="regName" class="form-control" placeholder="e.g. Juan P. Dela Cruz" required>
+                        <input type="text" id="regFullName" class="form-control" placeholder="e.g. Juan P. Dela Cruz" required>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
                         <div class="form-group">
@@ -242,54 +221,40 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Consultation Type</label>
-                        <select id="regType" class="form-control" onchange="toggleTriageSlider()">
-                            <option value="Routine">Routine Consultation / Medical Certificate</option>
-                            <option value="Emergency">Emergency / Acute Triage Care</option>
-                        </select>
+                        <label>Set Password</label>
+                        <input type="password" id="regPassword" class="form-control" placeholder="••••••••" required>
                     </div>
-                    <div class="form-group" id="severityGroup" style="display: none;">
-                        <label>Urgency Severity (1 = Minor, 10 = Critical)</label>
-                        <input type="range" id="regSeverity" min="1" max="10" value="7" class="form-control" oninput="document.getElementById('sevVal').innerText = this.value">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--bsu-gold); margin-top: 3px;">
-                            <span>Mild</span><span class="mono" id="sevVal">7</span><span>Life Threatening</span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Confidential Symptoms / Chief Complaint</label>
-                        <textarea id="regSymptoms" class="form-control" rows="2" placeholder="Strictly confidential: Describe symptoms..." required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.85rem;">
-                        <i class='bx bx-check-shield'></i> Register & Join Triage Queue
+                    <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.8rem;">
+                        <i class='bx bx-user-check'></i> Register Student Account
                     </button>
                 </form>
             </div>
         </section>
 
         <!-- ================= 2. INTERACTIVE STAT CARDS ================= -->
-        <section id="statsSection" class="stats-grid" style="display: none;">
-            <div class="stat-card" onclick="handleCardNav('directory')">
+        <section id="statSection" class="stats-grid" style="display: none;">
+            <div class="stat-card" onclick="handleStatCardClick('directory')">
                 <div>
                     <div class="lbl">Total Registered</div>
                     <div class="val mono" id="statRegistered">0</div>
                 </div>
                 <i class='bx bx-id-card'></i>
             </div>
-            <div class="stat-card" onclick="handleCardNav('emergency')">
+            <div class="stat-card" onclick="handleStatCardClick('emergency')">
                 <div>
                     <div class="lbl">Emergency Waiting</div>
                     <div class="val mono" id="statEmergency" style="color: #ef4444;">0</div>
                 </div>
                 <i class='bx bx-pulse' style="color: #ef4444;"></i>
             </div>
-            <div class="stat-card" onclick="handleCardNav('routine')">
+            <div class="stat-card" onclick="handleStatCardClick('routine')">
                 <div>
                     <div class="lbl">Routine Waiting</div>
                     <div class="val mono" id="statRoutine" style="color: #60a5fa;">0</div>
                 </div>
                 <i class='bx bx-time' style="color: #60a5fa;"></i>
             </div>
-            <div class="stat-card" onclick="handleCardNav('treated')">
+            <div class="stat-card" onclick="handleStatCardClick('treated')">
                 <div>
                     <div class="lbl">Total Treated</div>
                     <div class="val mono" id="statTreated" style="color: #4ade80;">0</div>
@@ -298,171 +263,219 @@
             </div>
         </section>
 
-        <!-- ================= 3. PATIENT VIEW (CONFIDENTIAL) ================= -->
-        <section id="patientView" class="portal-view">
-            <!-- Patient's Personal Live Status Card -->
-            <div class="patient-ticket-card">
-                <span class="tag tag-routine" id="pMyType">General Consultation</span>
-                <h2 style="font-size: 3rem; margin: 0.5rem 0; color: var(--bsu-gold);" class="mono" id="pMyTicket">---</h2>
-                <h3 id="pMyName" style="color: #fff; font-size: 1.3rem;">Student Patient</h3>
-                <p id="pMyStatus" style="font-size: 1rem; color: var(--text-secondary); margin-top: 0.5rem;">Loading queue position...</p>
-                <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.75rem;">
-                    <i class='bx bx-lock-alt'></i> Your symptoms are kept strictly confidential between you and the University Medical Officer.
+        <!-- ================= 3. PERSONAL PATIENT VIEW ================= -->
+        <section id="patientView" style="display: none;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                
+                <!-- MY ACTIVE TICKET STATUS -->
+                <div class="card" style="border: 2px solid var(--bsu-gold);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 class="cinzel" style="color: var(--bsu-gold);"><i class='bx bx-receipt'></i> My Active Consultation Ticket</h3>
+                        <span id="ticketBadge" class="tag tag-routine">No Active Ticket</span>
+                    </div>
+
+                    <div id="activeTicketDisplay">
+                        <div style="text-align: center; padding: 2rem 1rem;">
+                            <i class='bx bx-info-circle' style="font-size: 2.5rem; color: var(--text-secondary);"></i>
+                            <p style="margin-top: 0.5rem; color: var(--text-secondary);">You are not currently in the triage queue.</p>
+                            <button class="btn btn-gold" style="margin-top: 1rem;" onclick="openTicketModal()">
+                                <i class='bx bx-plus-circle'></i> Request Consultation / Join Queue
+                            </button>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- MY PRIVATE MEDICAL HISTORY & DOCTOR NOTES -->
+                <div class="card">
+                    <h3 class="cinzel" style="color: var(--bsu-gold); margin-bottom: 1rem;">
+                        <i class='bx bx-shield-quarter'></i> My Confidential Medical Records
+                    </h3>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                        Records and physician assessments are strictly confidential to your student account.
+                    </p>
+                    <div id="patientHistoryList" style="max-height: 250px; overflow-y: auto;"></div>
+                </div>
+
             </div>
 
-            <!-- Public Calling Queue (WITHOUT SICKNESS/SYMPTOMS) -->
+            <!-- CONFIDENTIAL CALLING BOARD (NO SYMPTOMS SHOWN) -->
             <div class="card">
-                <h3 class="cinzel" style="color: var(--bsu-gold); margin-bottom: 1rem;">
-                    <i class='bx bx-broadcast'></i> Live Clinic Calling Board (Confidential View)
-                </h3>
-                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
-                    To protect patient privacy, health details and full identity are concealed on public displays.
-                </p>
-
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 class="cinzel" style="color: var(--bsu-gold);">
+                        <i class='bx bx-broadcast'></i> Live Clinic Calling Board (Confidential View)
+                    </h3>
+                    <span style="font-size: 0.75rem; color: var(--text-secondary);">Symptoms & Full Names Concealed</span>
+                </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                    <!-- Urgent Queue -->
                     <div>
                         <h4 style="color: #f87171; margin-bottom: 0.75rem; font-size: 0.9rem;">
-                            <i class='bx bx-first-aid'></i> Urgent / Emergency Priority
+                            <i class='bx bx-pulse'></i> Urgent Emergency Line
                         </h4>
-                        <div id="publicEmergencyList"></div>
+                        <div id="pubEmergencyList"></div>
                     </div>
-                    <!-- Routine Queue -->
                     <div>
                         <h4 style="color: #60a5fa; margin-bottom: 0.75rem; font-size: 0.9rem;">
-                            <i class='bx bx-walk'></i> Routine Consultations
+                            <i class='bx bx-time'></i> Routine Consultation Line
                         </h4>
-                        <div id="publicRoutineList"></div>
+                        <div id="pubRoutineList"></div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- ================= 4. CLINIC STAFF / ADMIN VIEW ================= -->
-        <!-- Note: Patient registration form is completely removed here! -->
-        <section id="adminView" class="portal-view">
-            <div class="admin-layout">
-                <div class="card">
-                    <!-- Nav Tabs inside Admin -->
-                    <div class="admin-tabs">
-                        <button class="tab-item active" id="tabBtn-emergency" onclick="switchAdminTab('emergency')">
-                            <i class='bx bx-pulse'></i> Emergency Heap (Max-Heap)
-                        </button>
-                        <button class="tab-item" id="tabBtn-routine" onclick="switchAdminTab('routine')">
-                            <i class='bx bx-list-ol'></i> Routine Queue (FIFO)
-                        </button>
-                        <button class="tab-item" id="tabBtn-directory" onclick="switchAdminTab('directory')">
-                            <i class='bx bx-folder-open'></i> Master Directory (BST)
-                        </button>
-                        <button class="tab-item" id="tabBtn-treated" onclick="switchAdminTab('treated')">
-                            <i class='bx bx-history'></i> Treatment History
-                        </button>
-                    </div>
+        <!-- Registration Form is completely removed from this view -->
+        <section id="adminView" style="display: none;">
+            <div class="card">
+                <div class="tabs">
+                    <button class="tab-btn active" id="tabBtn-emergency" onclick="switchAdminTab('emergency')">
+                        <i class='bx bx-pulse'></i> Emergency Heap (Max-Heap)
+                    </button>
+                    <button class="tab-btn" id="tabBtn-routine" onclick="switchAdminTab('routine')">
+                        <i class='bx bx-list-ol'></i> Routine Queue (FIFO)
+                    </button>
+                    <button class="tab-btn" id="tabBtn-directory" onclick="switchAdminTab('directory')">
+                        <i class='bx bx-folder-open'></i> Master Directory (BST)
+                    </button>
+                    <button class="tab-btn" id="tabBtn-treated" onclick="switchAdminTab('treated')">
+                        <i class='bx bx-history'></i> Treatment History
+                    </button>
+                </div>
 
-                    <!-- TAB 1: EMERGENCY MAX-HEAP -->
-                    <div id="adminPanel-emergency" class="admin-panel">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
-                            <div>
-                                <h3 style="color: var(--bsu-gold);">Emergency Triage Queue</h3>
-                                <p style="font-size: 0.8rem; color: var(--text-secondary);">Sorted by Max-Heap Priority (Severity 10 down to 1)</p>
-                            </div>
-                            <button class="btn btn-maroon" onclick="callNextPatient('emergency')">
-                                <i class='bx bx-bell'></i> Admit Next Emergency Patient
-                            </button>
+                <!-- ADMIN TAB 1: EMERGENCY MAX-HEAP -->
+                <div id="adminPanel-emergency" class="admin-panel">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                        <div>
+                            <h3 style="color: var(--bsu-gold);">Emergency Triage Queue</h3>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary);">Sorted by Max-Heap Priority (Severity 10 down to 1)</p>
                         </div>
-                        <div id="adminEmergencyTableContainer"></div>
+                        <button class="btn btn-maroon" onclick="callNextPatient('emergency')">
+                            <i class='bx bx-bell'></i> Admit Next Emergency Patient
+                        </button>
                     </div>
+                    <div id="adminEmergencyTable"></div>
+                </div>
 
-                    <!-- TAB 2: ROUTINE FIFO QUEUE -->
-                    <div id="adminPanel-routine" class="admin-panel" style="display: none;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
-                            <div>
-                                <h3 style="color: var(--bsu-gold);">Routine Consultation Queue</h3>
-                                <p style="font-size: 0.8rem; color: var(--text-secondary);">First-In, First-Out Queue O(1)</p>
-                            </div>
-                            <button class="btn btn-gold" onclick="callNextPatient('routine')">
-                                <i class='bx bx-user-check'></i> Call Next Patient
-                            </button>
+                <!-- ADMIN TAB 2: ROUTINE FIFO -->
+                <div id="adminPanel-routine" class="admin-panel" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                        <div>
+                            <h3 style="color: var(--bsu-gold);">Routine Consultation Queue</h3>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary);">First-In, First-Out Queue O(1)</p>
                         </div>
-                        <div id="adminRoutineTableContainer"></div>
+                        <button class="btn btn-gold" onclick="callNextPatient('routine')">
+                            <i class='bx bx-user-check'></i> Call Next Patient
+                        </button>
                     </div>
+                    <div id="adminRoutineTable"></div>
+                </div>
 
-                    <!-- TAB 3: MASTER DIRECTORY (BST) -->
-                    <div id="adminPanel-directory" class="admin-panel" style="display: none;">
-                        <h3 style="color: var(--bsu-gold); margin-bottom: 0.25rem;">Student Records Directory</h3>
-                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">Stored in Binary Search Tree O(log n)</p>
-                        <div id="adminDirectoryTableContainer"></div>
-                    </div>
+                <!-- ADMIN TAB 3: BST DIRECTORY -->
+                <div id="adminPanel-directory" class="admin-panel" style="display: none;">
+                    <h3 style="color: var(--bsu-gold); margin-bottom: 0.25rem;">Student Records Directory</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">Managed via Binary Search Tree O(log n)</p>
+                    <div id="adminDirectoryTable"></div>
+                </div>
 
-                    <!-- TAB 4: TREATMENT HISTORY -->
-                    <div id="adminPanel-treated" class="admin-panel" style="display: none;">
-                        <h3 style="color: var(--bsu-gold); margin-bottom: 0.25rem;">Completed Treatments Log</h3>
-                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">History of completed consultations with doctor notes</p>
-                        <div id="adminHistoryTableContainer"></div>
-                    </div>
-
+                <!-- ADMIN TAB 4: HISTORY -->
+                <div id="adminPanel-treated" class="admin-panel" style="display: none;">
+                    <h3 style="color: var(--bsu-gold); margin-bottom: 0.25rem;">Completed Treatments Log</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">Log of completed consultations with doctor notes</p>
+                    <div id="adminHistoryTable"></div>
                 </div>
             </div>
         </section>
 
     </div>
 
-    <!-- ================= MODAL: PATIENT INSPECTOR & DOCTOR COMMENTS ================= -->
-    <div id="patientModal" class="modal-wrap">
+    <!-- ================= MODAL: SUBMIT CONSULTATION TICKET ================= -->
+    <div id="ticketModal" class="modal-wrap">
+        <div class="modal-body">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <h3 class="cinzel" style="color: var(--bsu-gold);">Request Medical Consultation</h3>
+                <button class="btn btn-outline" onclick="closeTicketModal()"><i class='bx bx-x'></i> Cancel</button>
+            </div>
+            <form onsubmit="handleJoinQueue(event)">
+                <div class="form-group">
+                    <label>Consultation Type</label>
+                    <select id="reqType" class="form-control" onchange="toggleReqSeverity()">
+                        <option value="Routine">Routine Consultation / Medical Certificate</option>
+                        <option value="Emergency">Emergency / Acute Triage Care</option>
+                    </select>
+                </div>
+                <div class="form-group" id="reqSeverityGroup" style="display: none;">
+                    <label>Severity Score (1 = Minor, 10 = Critical)</label>
+                    <input type="range" id="reqSeverity" min="1" max="10" value="7" class="form-control" oninput="document.getElementById('sevVal').innerText = this.value">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--bsu-gold); margin-top: 3px;">
+                        <span>Mild</span><span class="mono" id="sevVal">7</span><span>Critical</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Confidential Symptoms / Chief Complaint</label>
+                    <textarea id="reqSymptoms" class="form-control" rows="3" placeholder="Describe symptoms or reasons for visit..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.8rem;">
+                    <i class='bx bx-plus-circle'></i> Submit & Enter Queue
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: PATIENT INSPECTOR & DOCTOR NOTES (ADMIN) ================= -->
+    <div id="inspectorModal" class="modal-wrap">
         <div class="modal-body">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-glass); padding-bottom: 0.75rem;">
                 <div>
-                    <h3 class="cinzel" id="modalStudentName" style="color: var(--bsu-gold);">Patient File</h3>
-                    <span class="mono" id="modalStudentId" style="font-size: 0.85rem; color: #fff;"></span>
+                    <h3 class="cinzel" id="inspName" style="color: var(--bsu-gold);">Student Medical File</h3>
+                    <span class="mono" id="inspSrCode" style="font-size: 0.85rem; color: #fff;"></span>
                 </div>
-                <button class="btn btn-outline" onclick="closeModal()"><i class='bx bx-x'></i> Close</button>
+                <button class="btn btn-outline" onclick="closeInspectorModal()"><i class='bx bx-x'></i> Close</button>
             </div>
 
             <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.85rem; margin-bottom: 0.75rem;">
-                    <div><strong>Ticket:</strong> <span class="mono" id="modalTicket"></span></div>
-                    <div><strong>Severity Level:</strong> <span class="mono" id="modalSeverity"></span></div>
-                    <div><strong>Age / Gender:</strong> <span id="modalAgeGender"></span></div>
-                    <div><strong>Service Type:</strong> <span id="modalType"></span></div>
+                    <div><strong>Ticket:</strong> <span class="mono" id="inspTicket"></span></div>
+                    <div><strong>Severity:</strong> <span class="mono" id="inspSeverity"></span></div>
+                    <div><strong>Age / Gender:</strong> <span id="inspAgeGender"></span></div>
+                    <div><strong>Service Type:</strong> <span id="inspType"></span></div>
                 </div>
                 <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.5rem;">
                     <div style="font-size: 0.75rem; color: var(--bsu-gold); text-transform: uppercase; font-weight: 700;">Confidential Symptoms:</div>
-                    <p id="modalSymptoms" style="font-size: 0.9rem; color: #fecaca; margin-top: 0.25rem;"></p>
+                    <p id="inspSymptoms" style="font-size: 0.9rem; color: #fecaca; margin-top: 0.25rem;"></p>
                 </div>
             </div>
 
-            <!-- Comments / Clinical Notes Section -->
+            <!-- Doctor Notes / Comments -->
             <div>
                 <h4 style="font-size: 0.85rem; color: var(--bsu-gold); text-transform: uppercase; margin-bottom: 0.5rem;">
                     <i class='bx bx-notepad'></i> Doctor's Clinical Assessments
                 </h4>
-                <div id="modalCommentHistory" style="max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 6px; padding: 0.5rem; margin-bottom: 0.75rem; font-size: 0.8rem;"></div>
+                <div id="inspCommentsList" style="max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 6px; padding: 0.5rem; margin-bottom: 0.75rem; font-size: 0.8rem;"></div>
                 
                 <div style="display: flex; gap: 0.5rem;">
-                    <input type="text" id="newDoctorComment" class="form-control" placeholder="Write medical note, diagnosis, or prescription...">
-                    <button class="btn btn-gold" onclick="submitDoctorComment()"><i class='bx bx-check'></i> Add</button>
+                    <input type="text" id="newCommentInput" class="form-control" placeholder="Write medical note, diagnosis, or prescription...">
+                    <button class="btn btn-gold" onclick="submitComment()"><i class='bx bx-check'></i> Add</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Application JavaScript -->
+    <!-- Application Script -->
     <script>
-        let currentRole = null;
-        let inspectingPatientId = null;
+        let userRole = null;
+        let selectedStudentSrCode = null;
 
         window.onload = function() {
-            checkCurrentSession();
+            checkSession();
         };
 
-        function checkCurrentSession() {
-            fetch('/api/session')
+        function checkSession() {
+            fetch('/api/auth/session')
                 .then(r => r.json())
-                .then(data => {
-                    if (data.logged_in) {
-                        currentRole = data.role;
-                        setupViewForRole(data.role, data.name, data.sr_code);
+                .then(d => {
+                    if (d.logged_in) {
+                        userRole = d.role;
+                        renderRoleUI(d.role, d.name, d.sr_code);
                     } else {
                         showAuthGate();
                     }
@@ -471,91 +484,63 @@
 
         function showAuthGate() {
             document.getElementById('authGate').style.display = 'flex';
-            document.getElementById('statsSection').style.display = 'none';
-            document.getElementById('patientView').classList.remove('active');
-            document.getElementById('adminView').classList.remove('active');
-            document.getElementById('logoutBtn').style.display = 'none';
-            document.getElementById('roleIndicator').style.display = 'none';
+            document.getElementById('statSection').style.display = 'none';
+            document.getElementById('patientView').style.display = 'none';
+            document.getElementById('adminView').style.display = 'none';
+            document.getElementById('navUserBadge').style.display = 'none';
+            document.getElementById('navLogoutBtn').style.display = 'none';
         }
 
-        function setupViewForRole(role, name, srCode) {
+        function renderRoleUI(role, name, srCode) {
             document.getElementById('authGate').style.display = 'none';
-            document.getElementById('statsSection').style.display = 'grid';
-            document.getElementById('logoutBtn').style.display = 'inline-flex';
-            
-            const badge = document.getElementById('roleIndicator');
+            document.getElementById('statSection').style.display = 'grid';
+            document.getElementById('navLogoutBtn').style.display = 'inline-flex';
+
+            const badge = document.getElementById('navUserBadge');
             badge.style.display = 'inline-block';
 
             if (role === 'admin') {
-                badge.innerText = 'Clinic Physician (Admin)';
                 badge.className = 'tag tag-emergency';
-                document.getElementById('adminView').classList.add('active');
-                document.getElementById('patientView').classList.remove('active');
+                badge.innerText = `Physician: ${name}`;
+                document.getElementById('adminView').style.display = 'block';
+                document.getElementById('patientView').style.display = 'none';
                 loadAdminData();
             } else {
-                badge.innerText = `Student: ${srCode}`;
                 badge.className = 'tag tag-routine';
-                document.getElementById('patientView').classList.add('active');
-                document.getElementById('adminView').classList.remove('active');
-                loadPatientPersonalStatus();
+                badge.innerText = `Student: ${srCode}`;
+                document.getElementById('patientView').style.display = 'block';
+                document.getElementById('adminView').style.display = 'none';
+                loadPatientPortal();
                 loadPublicQueue();
             }
         }
 
-        // ================= AUTH HANDLERS =================
-        function toggleAuthTab(tab) {
+        // ================= AUTH SWITCHING & LOGIC =================
+        function switchAuthTab(tab) {
             if (tab === 'login') {
-                document.getElementById('btnTabLogin').classList.add('active');
-                document.getElementById('btnTabRegister').classList.remove('active');
-                document.getElementById('loginForm').style.display = 'block';
-                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('tabBtnLogin').classList.add('active');
+                document.getElementById('tabBtnRegister').classList.remove('active');
+                document.getElementById('signInForm').style.display = 'block';
+                document.getElementById('signUpForm').style.display = 'none';
             } else {
-                document.getElementById('btnTabRegister').classList.add('active');
-                document.getElementById('btnTabLogin').classList.remove('active');
-                document.getElementById('registerForm').style.display = 'block';
-                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('tabBtnRegister').classList.add('active');
+                document.getElementById('tabBtnLogin').classList.remove('active');
+                document.getElementById('signUpForm').style.display = 'block';
+                document.getElementById('signInForm').style.display = 'none';
             }
         }
 
-        function toggleTriageSlider() {
-            const isEmg = document.getElementById('regType').value === 'Emergency';
-            document.getElementById('severityGroup').style.display = isEmg ? 'block' : 'none';
-        }
-
-        function handleLoginSubmit(e) {
-            e.preventDefault();
-            const id = document.getElementById('loginId').value.trim();
-            const pw = document.getElementById('loginPass').value.trim();
-
-            fetch('/api/login', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({sr_code: id, password: pw})
-            })
-            .then(r => r.json())
-            .then(res => {
-                if (res.success) {
-                    currentRole = res.role;
-                    setupViewForRole(res.role, res.name, res.sr_code);
-                } else {
-                    alert(res.message);
-                }
-            });
-        }
-
-        function handleRegistrationSubmit(e) {
+        function handleRegister(e) {
             e.preventDefault();
             const data = {
-                id: document.getElementById('regId').value.trim(),
-                name: document.getElementById('regName').value.trim(),
+                sr_code: document.getElementById('regSrCode').value.trim(),
+                name: document.getElementById('regFullName').value.trim(),
                 age: document.getElementById('regAge').value,
                 gender: document.getElementById('regGender').value,
-                type: document.getElementById('regType').value,
-                severity: document.getElementById('regSeverity').value,
-                symptoms: document.getElementById('regSymptoms').value
+                password: document.getElementById('regPassword').value.trim()
             };
 
-            fetch('/api/register_student', {
+            fetch('/api/auth/register', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
@@ -563,33 +548,96 @@
             .then(r => r.json())
             .then(res => {
                 if (res.success) {
-                    alert(`Registration Complete! Your Ticket Number is: ${res.ticket}`);
-                    toggleAuthTab('login');
-                    document.getElementById('loginId').value = data.id;
-                    document.getElementById('loginPass').value = 'student123';
+                    alert(res.message);
+                    switchAuthTab('login');
+                    document.getElementById('loginSrCode').value = data.sr_code;
                 } else {
                     alert(res.message);
                 }
             });
         }
 
-        function triggerLogout() {
-            fetch('/api/logout', {method: 'POST'}).then(() => {
-                location.reload();
+        function handleLogin(e) {
+            e.preventDefault();
+            const sr = document.getElementById('loginSrCode').value.trim();
+            const pw = document.getElementById('loginPassword').value.trim();
+
+            fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({sr_code: sr, password: pw})
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    userRole = res.role;
+                    renderRoleUI(res.role, res.name, res.sr_code);
+                } else {
+                    alert(res.message);
+                }
             });
         }
 
-        // ================= PATIENT DATA FUNCTIONS =================
-        function loadPatientPersonalStatus() {
-            fetch('/api/my_status')
+        function handleLogout() {
+            fetch('/api/auth/logout', {method: 'POST'}).then(() => location.reload());
+        }
+
+        // ================= PATIENT PORTAL FUNCTIONS =================
+        function loadPatientPortal() {
+            fetch('/api/patient/my_portal')
                 .then(r => r.json())
-                .then(res => {
-                    if (res.success) {
-                        const p = res.patient;
-                        document.getElementById('pMyTicket').innerText = p.ticket;
-                        document.getElementById('pMyName').innerText = p.name;
-                        document.getElementById('pMyType').innerText = p.type;
-                        document.getElementById('pMyStatus').innerHTML = `<strong>Current Position:</strong> ${res.queue_position}`;
+                .then(data => {
+                    const disp = document.getElementById('activeTicketDisplay');
+                    const badge = document.getElementById('ticketBadge');
+
+                    if (data.active_ticket) {
+                        const t = data.active_ticket;
+                        badge.className = t.type === 'Emergency' ? 'tag tag-emergency' : 'tag tag-routine';
+                        badge.innerText = t.status;
+
+                        disp.innerHTML = `
+                            <div style="background: rgba(128,0,0,0.25); border: 1px solid var(--bsu-gold); border-radius: 8px; padding: 1.5rem; text-align: center;">
+                                <span class="tag ${t.type === 'Emergency' ? 'tag-emergency' : 'tag-routine'}">${t.type} Consultation</span>
+                                <h1 class="mono cinzel" style="font-size: 2.75rem; color: var(--bsu-gold); margin: 0.5rem 0;">${t.ticket}</h1>
+                                <p style="font-weight: 700; color: #fff;">${data.user.name} <span class="mono" style="color:var(--text-secondary);">(${data.user.sr_code})</span></p>
+                                <p style="font-size: 0.95rem; color: #93c5fd; margin-top: 0.5rem;"><strong>Queue Status:</strong> ${data.queue_pos}</p>
+                                <div style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.5rem; font-size: 0.85rem; color: #fca5a5;">
+                                    <strong>My Symptoms:</strong> ${t.symptoms}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        badge.className = 'tag tag-routine';
+                        badge.innerText = 'No Active Ticket';
+                        disp.innerHTML = `
+                            <div style="text-align: center; padding: 2rem 1rem;">
+                                <i class='bx bx-info-circle' style="font-size: 2.5rem; color: var(--text-secondary);"></i>
+                                <p style="margin-top: 0.5rem; color: var(--text-secondary);">You are not currently in the triage queue.</p>
+                                <button class="btn btn-gold" style="margin-top: 1rem;" onclick="openTicketModal()">
+                                    <i class='bx bx-plus-circle'></i> Request Consultation / Join Queue
+                                </button>
+                            </div>
+                        `;
+                    }
+
+                    // Render personal medical history
+                    const histWrap = document.getElementById('patientHistoryList');
+                    if (!data.history || !data.history.length) {
+                        histWrap.innerHTML = `<p style="color: var(--text-secondary); font-size: 0.85rem;">No previous medical visits recorded on this account.</p>`;
+                    } else {
+                        histWrap.innerHTML = data.history.map(h => `
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <strong class="mono" style="color: var(--bsu-gold);">${h.ticket}</strong>
+                                    <span style="font-size: 0.75rem; color: var(--text-secondary);">${h.date}</span>
+                                </div>
+                                <div style="font-size: 0.85rem; color: #fecaca; margin-top: 4px;"><strong>Chief Complaint:</strong> ${h.symptoms}</div>
+                                ${h.comments && h.comments.length ? `
+                                    <div style="margin-top: 6px; font-size: 0.8rem; color: #86efac; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 4px;">
+                                        ${h.comments.map(c => `<div>${c}</div>`).join('')}
+                                    </div>` : ''}
+                            </div>
+                        `).join('');
                     }
                 });
         }
@@ -597,114 +645,173 @@
         function loadPublicQueue() {
             fetch('/api/public_queue')
                 .then(r => r.json())
-                .then(data => {
-                    updateStatsUI(data.stats);
+                .then(d => {
+                    updateStatNumbers(d.stats);
 
-                    // Render Emergency (CONFIDENTIAL - No symptoms)
-                    const emgList = document.getElementById('publicEmergencyList');
-                    emgList.innerHTML = data.emergencies.length ? data.emergencies.map(p => `
-                        <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <span class="mono" style="font-weight: 800; color: #fca5a5;">${p.ticket}</span>
-                                <span style="font-size: 0.8rem; color: #cbd5e1; margin-left: 0.5rem;">(${p.masked_id})</span>
-                            </div>
-                            <span class="tag tag-emergency">${p.status}</span>
+                    const emg = document.getElementById('pubEmergencyList');
+                    emg.innerHTML = d.emergency_list.length ? d.emergency_list.map(p => `
+                        <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 8px; padding: 0.6rem 0.85rem; margin-bottom: 0.4rem; display: flex; justify-content: space-between;">
+                            <div><strong class="mono" style="color:#f87171;">${p.ticket}</strong> <span style="font-size:0.8rem; color:#cbd5e1; margin-left:0.5rem;">(${p.masked_sr})</span></div>
+                            <span class="tag tag-emergency">Waiting</span>
                         </div>
-                    `).join('') : '<p style="color: #64748b; font-size: 0.85rem;">No emergency patients waiting.</p>';
+                    `).join('') : '<p style="color:var(--text-secondary); font-size:0.85rem;">No emergencies waiting.</p>';
 
-                    // Render Routine (CONFIDENTIAL - No symptoms)
-                    const rtnList = document.getElementById('publicRoutineList');
-                    rtnList.innerHTML = data.routines.length ? data.routines.map(p => `
-                        <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <span class="mono" style="font-weight: 800; color: #93c5fd;">${p.ticket}</span>
-                                <span style="font-size: 0.8rem; color: #cbd5e1; margin-left: 0.5rem;">(${p.masked_id})</span>
-                            </div>
-                            <span class="tag tag-routine">${p.status}</span>
+                    const rtn = document.getElementById('pubRoutineList');
+                    rtn.innerHTML = d.routine_list.length ? d.routine_list.map(p => `
+                        <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 8px; padding: 0.6rem 0.85rem; margin-bottom: 0.4rem; display: flex; justify-content: space-between;">
+                            <div><strong class="mono" style="color:#93c5fd;">${p.ticket}</strong> <span style="font-size:0.8rem; color:#cbd5e1; margin-left:0.5rem;">(${p.masked_sr})</span></div>
+                            <span class="tag tag-routine">Waiting</span>
                         </div>
-                    `).join('') : '<p style="color: #64748b; font-size: 0.85rem;">No routine patients in line.</p>';
+                    `).join('') : '<p style="color:var(--text-secondary); font-size:0.85rem;">No routine patients in line.</p>';
                 });
         }
 
-        // ================= ADMIN DATA FUNCTIONS =================
+        function openTicketModal() { document.getElementById('ticketModal').classList.add('show'); }
+        function closeTicketModal() { document.getElementById('ticketModal').classList.remove('show'); }
+        function toggleReqSeverity() {
+            const isEmg = document.getElementById('reqType').value === 'Emergency';
+            document.getElementById('reqSeverityGroup').style.display = isEmg ? 'block' : 'none';
+        }
+
+        function handleJoinQueue(e) {
+            e.preventDefault();
+            const data = {
+                type: document.getElementById('reqType').value,
+                severity: document.getElementById('reqSeverity').value,
+                symptoms: document.getElementById('reqSymptoms').value
+            };
+
+            fetch('/api/patient/join_queue', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    alert(`Consultation Ticket Created: ${res.ticket.ticket}!`);
+                    closeTicketModal();
+                    loadPatientPortal();
+                    loadPublicQueue();
+                } else {
+                    alert(res.message);
+                }
+            });
+        }
+
+        // ================= ADMIN FUNCTIONS =================
         function loadAdminData() {
             fetch('/api/admin/all_data')
                 .then(r => r.json())
                 .then(d => {
-                    updateStatsUI(d.stats);
-                    renderAdminTable('adminEmergencyTableContainer', d.emergency_queue, true);
-                    renderAdminTable('adminRoutineTableContainer', d.routine_queue, false);
-                    renderAdminTable('adminDirectoryTableContainer', d.all_records, false, true);
-                    renderAdminTable('adminHistoryTableContainer', d.history, false, false, true);
+                    updateStatNumbers(d.stats);
+                    renderAdminQueueTable('adminEmergencyTable', d.emergency_queue, true);
+                    renderAdminQueueTable('adminRoutineTable', d.routine_queue, false);
+                    renderDirectoryTable('adminDirectoryTable', d.all_records);
+                    renderHistoryTable('adminHistoryTable', d.history);
                 });
         }
 
-        function updateStatsUI(s) {
-            document.getElementById('statRegistered').innerText = s.registered;
+        function updateStatNumbers(s) {
+            document.getElementById('statRegistered').innerText = s.total_registered;
             document.getElementById('statEmergency').innerText = s.emergency_count;
             document.getElementById('statRoutine').innerText = s.routine_count;
-            document.getElementById('statTreated').innerText = s.treated_count;
+            document.getElementById('statTreated').innerText = s.total_treated;
         }
 
-        function renderAdminTable(containerId, list, isEmergency = false, isDirectory = false, isHistory = false) {
-            const container = document.getElementById(containerId);
+        function renderAdminQueueTable(containerId, list, isEmergency) {
+            const wrap = document.getElementById(containerId);
             if (!list || !list.length) {
-                container.innerHTML = `<p style="padding: 1.5rem; text-align: center; color: var(--text-secondary);">No records available.</p>`;
+                wrap.innerHTML = `<p style="padding: 1.5rem; text-align: center; color: var(--text-secondary);">Queue is currently empty.</p>`;
                 return;
             }
 
             let html = `<table class="custom-table">
-                <thead>
-                    <tr>
-                        <th>Ticket</th>
-                        <th>SR-Code</th>
-                        <th>Full Name</th>
-                        <th>${isEmergency ? 'Severity' : 'Type'}</th>
-                        <th>Clinical Symptoms</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>`;
+                <thead><tr>
+                    <th>Ticket</th><th>SR-Code</th><th>Name</th><th>${isEmergency ? 'Severity' : 'Type'}</th><th>Chief Symptoms</th><th>Action</th>
+                </tr></thead><tbody>`;
 
             list.forEach(p => {
-                html += `
-                    <tr>
-                        <td class="mono" style="font-weight: 700; color: var(--bsu-gold);">${p.ticket}</td>
-                        <td class="mono">${p.id}</td>
-                        <td><strong>${p.name}</strong> (${p.age}/${p.gender})</td>
-                        <td>
-                            ${isEmergency ? 
-                                `<span class="tag tag-emergency">Lv ${p.severity}</span>` : 
-                                `<span class="tag ${p.status === 'Treated' ? 'tag-treated' : 'tag-routine'}">${p.type}</span>`}
-                        </td>
-                        <td style="color: #fca5a5; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                            ${p.symptoms}
-                        </td>
-                        <td>
-                            <button class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick='openPatientModal(${JSON.stringify(p)})'>
-                                <i class='bx bx-search-alt'></i> View / Comment
-                            </button>
-                        </td>
-                    </tr>
-                `;
+                html += `<tr>
+                    <td class="mono" style="font-weight:700; color:var(--bsu-gold);">${p.ticket}</td>
+                    <td class="mono">${p.sr_code}</td>
+                    <td><strong>${p.name}</strong> (${p.age}/${p.gender})</td>
+                    <td>${isEmergency ? `<span class="tag tag-emergency">Lv ${p.severity}</span>` : `<span class="tag tag-routine">${p.type}</span>`}</td>
+                    <td style="color:#fca5a5; max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${p.symptoms}</td>
+                    <td>
+                        <button class="btn btn-outline" style="padding:0.3rem 0.65rem; font-size:0.75rem;" onclick='openInspectorModal(${JSON.stringify(p)})'>
+                            <i class='bx bx-search-alt'></i> View / Comment
+                        </button>
+                    </td>
+                </tr>`;
             });
-
             html += `</tbody></table>`;
-            container.innerHTML = html;
+            wrap.innerHTML = html;
+        }
+
+        function renderDirectoryTable(containerId, list) {
+            const wrap = document.getElementById(containerId);
+            if (!list || !list.length) {
+                wrap.innerHTML = `<p style="padding: 1.5rem; text-align: center; color: var(--text-secondary);">No student records found in BST.</p>`;
+                return;
+            }
+            let html = `<table class="custom-table"><thead><tr>
+                <th>SR-Code</th><th>Full Name</th><th>Age / Gender</th><th>Last Ticket</th><th>Current Status</th>
+            </tr></thead><tbody>`;
+
+            list.forEach(r => {
+                html += `<tr>
+                    <td class="mono" style="font-weight:700; color:var(--bsu-gold);">${r.sr_code}</td>
+                    <td><strong>${r.name}</strong></td>
+                    <td>${r.age} y/o, ${r.gender}</td>
+                    <td class="mono">${r.last_ticket}</td>
+                    <td><span class="tag tag-routine">${r.status}</span></td>
+                </tr>`;
+            });
+            html += `</tbody></table>`;
+            wrap.innerHTML = html;
+        }
+
+        function renderHistoryTable(containerId, list) {
+            const wrap = document.getElementById(containerId);
+            if (!list || !list.length) {
+                wrap.innerHTML = `<p style="padding: 1.5rem; text-align: center; color: var(--text-secondary);">No completed treatments yet.</p>`;
+                return;
+            }
+            let html = `<table class="custom-table"><thead><tr>
+                <th>Ticket</th><th>SR-Code</th><th>Name</th><th>Treated At</th><th>Clinical Assessment</th><th>Action</th>
+            </tr></thead><tbody>`;
+
+            list.forEach(p => {
+                html += `<tr>
+                    <td class="mono" style="font-weight:700; color:var(--bsu-gold);">${p.ticket}</td>
+                    <td class="mono">${p.sr_code}</td>
+                    <td>${p.name}</td>
+                    <td class="mono">${p.treated_at}</td>
+                    <td style="color:#86efac; max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        ${p.comments.length ? p.comments[p.comments.length - 1] : 'No notes added'}
+                    </td>
+                    <td>
+                        <button class="btn btn-outline" style="padding:0.3rem 0.65rem; font-size:0.75rem;" onclick='openInspectorModal(${JSON.stringify(p)})'>
+                            <i class='bx bx-notepad'></i> View File
+                        </button>
+                    </td>
+                </tr>`;
+            });
+            html += `</tbody></table>`;
+            wrap.innerHTML = html;
         }
 
         // ================= INTERACTIVE STAT CARD NAVIGATION =================
-        function handleCardNav(target) {
-            if (currentRole === 'admin') {
-                switchAdminTab(target);
-            } else {
-                alert(`Viewing clinic data. You are currently logged in as a student.`);
+        function handleStatCardClick(tabName) {
+            if (userRole === 'admin') {
+                switchAdminTab(tabName);
             }
         }
 
         function switchAdminTab(tabName) {
             document.querySelectorAll('.admin-panel').forEach(p => p.style.display = 'none');
-            document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
 
             const panel = document.getElementById(`adminPanel-${tabName}`);
             const btn = document.getElementById(`tabBtn-${tabName}`);
@@ -714,23 +821,23 @@
             }
         }
 
-        // ================= PATIENT INSPECTOR & DOCTOR COMMENTS =================
-        function openPatientModal(patient) {
-            inspectingPatientId = patient.id;
-            document.getElementById('modalStudentName').innerText = patient.name;
-            document.getElementById('modalStudentId').innerText = `SR-Code: ${patient.id}`;
-            document.getElementById('modalTicket').innerText = patient.ticket;
-            document.getElementById('modalSeverity').innerText = `${patient.severity} / 10`;
-            document.getElementById('modalAgeGender').innerText = `${patient.age} y/o, ${patient.gender}`;
-            document.getElementById('modalType').innerText = patient.type;
-            document.getElementById('modalSymptoms').innerText = patient.symptoms;
+        // ================= INSPECTOR & DOCTOR COMMENTS =================
+        function openInspectorModal(p) {
+            selectedStudentSrCode = p.sr_code;
+            document.getElementById('inspName').innerText = p.name;
+            document.getElementById('inspSrCode').innerText = `SR-Code: ${p.sr_code}`;
+            document.getElementById('inspTicket').innerText = p.ticket || 'N/A';
+            document.getElementById('inspSeverity').innerText = p.severity ? `${p.severity} / 10` : 'N/A';
+            document.getElementById('inspAgeGender').innerText = `${p.age} y/o, ${p.gender}`;
+            document.getElementById('inspType').innerText = p.type || 'Routine';
+            document.getElementById('inspSymptoms').innerText = p.symptoms || 'None specified';
 
-            renderModalComments(patient.comments || []);
-            document.getElementById('patientModal').classList.add('show');
+            renderInspectorComments(p.comments || []);
+            document.getElementById('inspectorModal').classList.add('show');
         }
 
-        function renderModalComments(comments) {
-            const wrap = document.getElementById('modalCommentHistory');
+        function renderInspectorComments(comments) {
+            const wrap = document.getElementById('inspCommentsList');
             if (!comments.length) {
                 wrap.innerHTML = `<span style="color: #9ca3af;">No clinical notes recorded yet.</span>`;
                 return;
@@ -738,20 +845,20 @@
             wrap.innerHTML = comments.map(c => `<div style="margin-bottom: 4px; color: #e2e8f0;">• ${c}</div>`).join('');
         }
 
-        function submitDoctorComment() {
-            const comment = document.getElementById('newDoctorComment').value.trim();
+        function submitComment() {
+            const comment = document.getElementById('newCommentInput').value.trim();
             if (!comment) return;
 
             fetch('/api/admin/add_comment', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({id: inspectingPatientId, comment: comment})
+                body: JSON.stringify({sr_code: selectedStudentSrCode, comment: comment})
             })
             .then(r => r.json())
             .then(res => {
                 if (res.success) {
-                    renderModalComments(res.comments);
-                    document.getElementById('newDoctorComment').value = '';
+                    renderInspectorComments(res.comments);
+                    document.getElementById('newCommentInput').value = '';
                     loadAdminData();
                 } else {
                     alert(res.message);
@@ -759,9 +866,9 @@
             });
         }
 
-        function closeModal() {
-            document.getElementById('patientModal').classList.remove('show');
-            inspectingPatientId = null;
+        function closeInspectorModal() {
+            document.getElementById('inspectorModal').classList.remove('show');
+            selectedStudentSrCode = null;
         }
 
         function callNextPatient(type) {
