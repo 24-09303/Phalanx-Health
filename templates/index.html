@@ -38,12 +38,15 @@
             position: sticky; top: 0; z-index: 100;
         }
         .brand-container { display: flex; align-items: center; gap: 1.25rem; }
+        
+        /* Spartan Logo Styling */
         .univ-seal-img {
-            width: 60px; height: 60px;
+            width: 65px; height: 65px;
             object-fit: contain;
-            filter: drop-shadow(0 0 8px rgba(255, 199, 44, 0.4));
+            filter: drop-shadow(0 0 8px rgba(255, 199, 44, 0.5));
         }
-        .brand-title h1 { font-size: 1.6rem; font-weight: 800; letter-spacing: 2px; color: var(--bsu-white); }
+
+        .brand-title h1 { font-size: 1.7rem; font-weight: 800; letter-spacing: 2px; color: var(--bsu-white); }
         .brand-title p { font-size: 0.72rem; color: var(--bsu-gold); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
 
         /* Container */
@@ -72,12 +75,15 @@
             border: 2px solid var(--border-glass); border-radius: var(--radius-main);
             padding: 2.25rem; box-shadow: 0 15px 40px rgba(0,0,0,0.6); backdrop-filter: blur(12px);
         }
+        
+        /* Spartan Logo on Login */
         .auth-seal-logo {
             width: 150px; height: auto;
             object-fit: contain;
             margin: 0 auto 1rem auto; display: block;
             filter: drop-shadow(0 0 15px rgba(255, 199, 44, 0.3));
         }
+
         .auth-tab-bar { display: flex; border-bottom: 1px solid var(--border-glass); margin-bottom: 1.5rem; }
         .auth-tab-bar button {
             flex: 1; padding: 0.75rem; background: none; border: none; color: var(--text-secondary);
@@ -94,7 +100,7 @@
         }
         .form-control:focus { border-color: var(--bsu-gold); box-shadow: 0 0 10px rgba(255, 199, 44, 0.2); }
 
-        /* ================= STATS SECTION ================= */
+        /* ... (rest of the CSS remains identical) ... */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
         .stat-card {
             background: var(--card-surface); border: 1px solid var(--border-glass);
@@ -102,49 +108,27 @@
             align-items: center; justify-content: space-between; cursor: pointer;
             transition: all 0.25s ease;
         }
-        .stat-card:hover {
-            transform: translateY(-3px); border-color: var(--bsu-gold);
-            box-shadow: 0 8px 25px rgba(255, 199, 44, 0.2);
-        }
+        .stat-card:hover { transform: translateY(-3px); border-color: var(--bsu-gold); box-shadow: 0 8px 25px rgba(255, 199, 44, 0.2); }
         .stat-card .val { font-size: 2.2rem; font-weight: 800; color: var(--bsu-white); }
         .stat-card .lbl { font-size: 0.75rem; color: var(--bsu-gold); font-weight: 700; text-transform: uppercase; }
         .stat-card i { font-size: 2.5rem; color: var(--bsu-gold); opacity: 0.85; }
 
-        /* Cards & Tabs */
-        .card {
-            background: var(--card-surface); border: 1px solid var(--border-glass);
-            border-radius: var(--radius-main); padding: 1.5rem; backdrop-filter: blur(8px);
-        }
+        .card { background: var(--card-surface); border: 1px solid var(--border-glass); border-radius: var(--radius-main); padding: 1.5rem; backdrop-filter: blur(8px); }
         .tabs { display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border-glass); margin-bottom: 1.5rem; }
-        .tab-btn {
-            padding: 0.75rem 1.4rem; background: none; border: none; color: var(--text-secondary);
-            font-weight: 700; font-size: 0.9rem; cursor: pointer; border-bottom: 3px solid transparent;
-            display: flex; align-items: center; gap: 0.5rem;
-        }
+        .tab-btn { padding: 0.75rem 1.4rem; background: none; border: none; color: var(--text-secondary); font-weight: 700; font-size: 0.9rem; cursor: pointer; border-bottom: 3px solid transparent; display: flex; align-items: center; gap: 0.5rem; }
         .tab-btn.active { color: var(--bsu-gold); border-bottom-color: var(--bsu-gold); background: rgba(255, 199, 44, 0.05); }
 
-        /* Tables & Badges */
         .custom-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-        .custom-table th {
-            text-align: left; padding: 0.85rem; background: rgba(128, 0, 0, 0.45);
-            color: var(--bsu-gold); font-weight: 700; border-bottom: 1px solid var(--border-glass);
-        }
+        .custom-table th { text-align: left; padding: 0.85rem; background: rgba(128, 0, 0, 0.45); color: var(--bsu-gold); font-weight: 700; border-bottom: 1px solid var(--border-glass); }
         .custom-table td { padding: 0.85rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
         .tag { padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
         .tag-emergency { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
         .tag-routine { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
         .tag-treated { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
 
-        /* Modals */
-        .modal-wrap {
-            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 1000;
-        }
+        .modal-wrap { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 1000; }
         .modal-wrap.show { display: flex; }
-        .modal-body {
-            background: #140508; border: 2px solid var(--bsu-gold); border-radius: var(--radius-main);
-            width: 95%; max-width: 600px; padding: 2rem; box-shadow: 0 15px 50px rgba(0,0,0,0.8);
-        }
+        .modal-body { background: #140508; border: 2px solid var(--bsu-gold); border-radius: var(--radius-main); width: 95%; max-width: 600px; padding: 2rem; box-shadow: 0 15px 50px rgba(0,0,0,0.8); }
     </style>
 </head>
 <body>
@@ -152,6 +136,7 @@
     <!-- Header Navigation -->
     <header>
         <div class="brand-container">
+            <!-- Spartan Logo Stays Here -->
             <img src="/static/logo.png" alt="Spartan Logo" class="univ-seal-img" onerror="this.src='https://img.icons8.com/color/96/spartan-helmet.png'">
             <div class="brand-title">
                 <h1 class="cinzel">PHALANX HEALTH</h1>
@@ -173,6 +158,7 @@
         <section id="authGate">
             <div class="auth-box">
                 <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <!-- Spartan Logo Stays Here too -->
                     <img src="/static/logo.png" alt="Spartan Logo" class="auth-seal-logo" onerror="this.src='https://img.icons8.com/color/96/spartan-helmet.png'">
                     <h2 class="cinzel" style="font-size: 1.5rem; margin-top: 0.5rem; color: var(--bsu-white); letter-spacing: 2px;">PHALANX HEALTH</h2>
                     <p style="font-size: 0.8rem; color: var(--bsu-gold); font-weight: 600;">Red Spartan Information System</p>
@@ -232,159 +218,51 @@
             </div>
         </section>
 
-        <!-- ================= 2. STATS SECTION ================= -->
+        <!-- (REST OF THE BODY REMAINS THE SAME...) -->
         <section id="statSection" class="stats-grid" style="display: none;">
             <div class="stat-card" onclick="handleStatCardClick('directory')">
-                <div>
-                    <div class="lbl">Total Registered</div>
-                    <div class="val mono" id="statRegistered">0</div>
-                </div>
-                <i class='bx bx-id-card'></i>
+                <div><div class="lbl">Total Registered</div><div class="val mono" id="statRegistered">0</div></div><i class='bx bx-id-card'></i>
             </div>
             <div class="stat-card" onclick="handleStatCardClick('emergency')">
-                <div>
-                    <div class="lbl">Urgent / Emergency</div>
-                    <div class="val mono" id="statEmergency" style="color: #ef4444;">0</div>
-                </div>
-                <i class='bx bx-pulse' style="color: #ef4444;"></i>
+                <div><div class="lbl">Urgent / Emergency</div><div class="val mono" id="statEmergency" style="color: #ef4444;">0</div></div><i class='bx bx-pulse' style="color: #ef4444;"></i>
             </div>
             <div class="stat-card" onclick="handleStatCardClick('routine')">
-                <div>
-                    <div class="lbl">Routine Wait</div>
-                    <div class="val mono" id="statRoutine" style="color: #60a5fa;">0</div>
-                </div>
-                <i class='bx bx-time' style="color: #60a5fa;"></i>
+                <div><div class="lbl">Routine Wait</div><div class="val mono" id="statRoutine" style="color: #60a5fa;">0</div></div><i class='bx bx-time' style="color: #60a5fa;"></i>
             </div>
             <div class="stat-card" onclick="handleStatCardClick('treated')">
-                <div>
-                    <div class="lbl">Total Handled</div>
-                    <div class="val mono" id="statTreated" style="color: #4ade80;">0</div>
-                </div>
-                <i class='bx bx-check-shield' style="color: #4ade80;"></i>
+                <div><div class="lbl">Total Handled</div><div class="val mono" id="statTreated" style="color: #4ade80;">0</div></div><i class='bx bx-check-shield' style="color: #4ade80;"></i>
             </div>
         </section>
 
-        <!-- ================= 3. PERSONAL PATIENT VIEW ================= -->
         <section id="patientView" style="display: none;">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
-                <!-- ACTIVE TICKET -->
                 <div class="card" style="border: 2px solid var(--bsu-gold);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 class="cinzel" style="color: var(--bsu-gold);"><i class='bx bx-receipt'></i> Active Ticket</h3>
-                        <span id="ticketBadge" class="tag tag-routine">No Active Ticket</span>
-                    </div>
-                    <div id="activeTicketDisplay">
-                        <div style="text-align: center; padding: 2rem 1rem;">
-                            <i class='bx bx-info-circle' style="font-size: 2.5rem; color: var(--text-secondary);"></i>
-                            <p style="margin-top: 0.5rem; color: var(--text-secondary);">You are not currently in the queue.</p>
-                            <button class="btn btn-gold" style="margin-top: 1rem;" onclick="openTicketModal()">
-                                <i class='bx bx-plus-circle'></i> Join Triage Queue
-                            </button>
-                        </div>
-                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;"><h3 class="cinzel" style="color: var(--bsu-gold);"><i class='bx bx-receipt'></i> My Ticket</h3><span id="ticketBadge" class="tag tag-routine">None</span></div>
+                    <div id="activeTicketDisplay"><div style="text-align:center; padding:2rem;"><p>You are not in the queue.</p><button class="btn btn-gold" onclick="openTicketModal()">Join Queue</button></div></div>
                 </div>
-                <!-- MEDICAL HISTORY -->
-                <div class="card">
-                    <h3 class="cinzel" style="color: var(--bsu-gold); margin-bottom: 1rem;">
-                        <i class='bx bx-shield-quarter'></i> Private Records
-                    </h3>
-                    <div id="patientHistoryList" style="max-height: 250px; overflow-y: auto;"></div>
-                </div>
+                <div class="card"><h3 class="cinzel" style="color: var(--bsu-gold); margin-bottom: 1rem;">Records</h3><div id="patientHistoryList"></div></div>
             </div>
-            <!-- CALLING BOARD -->
-            <div class="card">
-                <h3 class="cinzel" style="color: var(--bsu-gold); margin-bottom: 1rem;">
-                    <i class='bx bx-broadcast'></i> Triage Calling Board
-                </h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                    <div>
-                        <h4 style="color: #f87171; margin-bottom: 0.75rem; font-size: 0.9rem;"><i class='bx bx-pulse'></i> Urgent</h4>
-                        <div id="pubEmergencyList"></div>
-                    </div>
-                    <div>
-                        <h4 style="color: #60a5fa; margin-bottom: 0.75rem; font-size: 0.9rem;"><i class='bx bx-time'></i> Routine</h4>
-                        <div id="pubRoutineList"></div>
-                    </div>
-                </div>
-            </div>
+            <div class="card"><h3 class="cinzel" style="color: var(--bsu-gold); margin-bottom: 1rem;">Calling Board</h3><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;"><div><h4>Urgent</h4><div id="pubEmergencyList"></div></div><div><h4>Routine</h4><div id="pubRoutineList"></div></div></div></div>
         </section>
 
-        <!-- ================= 4. ADMIN VIEW ================= -->
         <section id="adminView" style="display: none;">
             <div class="card">
-                <div class="tabs">
-                    <button class="tab-btn active" id="tabBtn-emergency" onclick="switchAdminTab('emergency')">Emergency Heap</button>
-                    <button class="tab-btn" id="tabBtn-routine" onclick="switchAdminTab('routine')">Routine Queue</button>
-                    <button class="tab-btn" id="tabBtn-directory" onclick="switchAdminTab('directory')">BST Directory</button>
-                    <button class="tab-btn" id="tabBtn-treated" onclick="switchAdminTab('treated')">History</button>
-                </div>
-                <div id="adminPanel-emergency" class="admin-panel">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 style="color: var(--bsu-gold);">Emergency Triage</h3>
-                        <button class="btn btn-maroon" onclick="callNextPatient('emergency')">Call Emergency</button>
-                    </div>
-                    <div id="adminEmergencyTable"></div>
-                </div>
-                <div id="adminPanel-routine" class="admin-panel" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 style="color: var(--bsu-gold);">Routine Queue</h3>
-                        <button class="btn btn-gold" onclick="callNextPatient('routine')">Call Patient</button>
-                    </div>
-                    <div id="adminRoutineTable"></div>
-                </div>
-                <div id="adminPanel-directory" class="admin-panel" style="display: none;">
-                    <h3 style="color: var(--bsu-gold); margin-bottom: 1rem;">Student BST Directory</h3>
-                    <div id="adminDirectoryTable"></div>
-                </div>
-                <div id="adminPanel-treated" class="admin-panel" style="display: none;">
-                    <h3 style="color: var(--bsu-gold); margin-bottom: 1rem;">Treatment History</h3>
-                    <div id="adminHistoryTable"></div>
-                </div>
+                <div class="tabs"><button class="tab-btn active" id="tabBtn-emergency" onclick="switchAdminTab('emergency')">Emergency</button><button class="tab-btn" id="tabBtn-routine" onclick="switchAdminTab('routine')">Routine</button><button class="tab-btn" id="tabBtn-directory" onclick="switchAdminTab('directory')">BST Directory</button><button class="tab-btn" id="tabBtn-treated" onclick="switchAdminTab('treated')">History</button></div>
+                <div id="adminPanel-emergency" class="admin-panel"><h3>Urgent Triage (Max-Heap)</h3><button class="btn btn-maroon" onclick="callNextPatient('emergency')">Admit Next</button><div id="adminEmergencyTable"></div></div>
+                <div id="adminPanel-routine" class="admin-panel" style="display: none;"><h3>Routine Queue (FIFO)</h3><button class="btn btn-gold" onclick="callNextPatient('routine')">Call Next</button><div id="adminRoutineTable"></div></div>
+                <div id="adminPanel-directory" class="admin-panel" style="display: none;"><h3>BST Master Directory</h3><div id="adminDirectoryTable"></div></div>
+                <div id="adminPanel-treated" class="admin-panel" style="display: none;"><h3>History</h3><div id="adminHistoryTable"></div></div>
             </div>
         </section>
 
     </div>
 
-    <!-- MODALS & SCRIPTS -->
-    <div id="ticketModal" class="modal-wrap">
-        <div class="modal-body">
-            <h3 class="cinzel" style="color: var(--bsu-gold); margin-bottom: 1rem;">Consultation Ticket</h3>
-            <form onsubmit="handleJoinQueue(event)">
-                <div class="form-group">
-                    <label>Type</label>
-                    <select id="reqType" class="form-control" onchange="toggleReqSeverity()">
-                        <option value="Routine">Routine</option>
-                        <option value="Emergency">Emergency</option>
-                    </select>
-                </div>
-                <div class="form-group" id="reqSeverityGroup" style="display: none;">
-                    <label>Severity (1-10)</label>
-                    <input type="range" id="reqSeverity" min="1" max="10" value="7" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>Symptoms</label>
-                    <textarea id="reqSymptoms" class="form-control" rows="3" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-gold" style="width:100%;">Submit Ticket</button>
-            </form>
-        </div>
-    </div>
+    <!-- MODALS -->
+    <div id="ticketModal" class="modal-wrap"><div class="modal-body"><h3 class="cinzel" style="color: var(--bsu-gold);">Join Triage</h3><form onsubmit="handleJoinQueue(event)"><div class="form-group"><label>Type</label><select id="reqType" class="form-control" onchange="toggleReqSeverity()"><option value="Routine">Routine</option><option value="Emergency">Emergency</option></select></div><div class="form-group" id="reqSeverityGroup" style="display:none;"><label>Severity (1-10)</label><input type="range" id="reqSeverity" min="1" max="10" value="7" class="form-control"></div><div class="form-group"><label>Symptoms</label><textarea id="reqSymptoms" class="form-control" rows="3" required></textarea></div><button type="submit" class="btn btn-gold" style="width:100%;">Submit</button></form></div></div>
 
-    <div id="inspectorModal" class="modal-wrap">
-        <div class="modal-body">
-            <h3 class="cinzel" id="inspName" style="color: var(--bsu-gold);">Student File</h3>
-            <div id="inspCommentsList" style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; margin: 1rem 0;"></div>
-            <div style="display: flex; gap: 0.5rem;">
-                <input type="text" id="newCommentInput" class="form-control" placeholder="Add clinical note...">
-                <button class="btn btn-gold" onclick="submitComment()">Add</button>
-            </div>
-            <button class="btn btn-outline" style="margin-top: 1rem; width:100%;" onclick="closeInspectorModal()">Close</button>
-        </div>
-    </div>
+    <div id="inspectorModal" class="modal-wrap"><div class="modal-body"><h3 class="cinzel" id="inspName">File</h3><div id="inspCommentsList"></div><div style="display:flex; gap:0.5rem;"><input type="text" id="newCommentInput" class="form-control" placeholder="Clinical Note..."><button class="btn btn-gold" onclick="submitComment()">Add</button></div><button class="btn btn-outline" style="width:100%; margin-top:1rem;" onclick="closeInspectorModal()">Close</button></div></div>
 
     <script>
-        // (Copy-paste the entire JavaScript logic from the previous Phalanx Health version)
-        // Ensure all API calls (/api/auth/session, /api/auth/login, etc.) match app.py
         let userRole = null;
         let selectedStudentSrCode = null;
 
@@ -519,25 +397,33 @@
         function loadAdminData() {
             fetch('/api/admin/all_data').then(r => r.json()).then(d => {
                 updateStats(d.stats);
-                renderAdminTable('adminEmergencyTable', d.emergency_queue);
-                renderAdminTable('adminRoutineTable', d.routine_queue);
-                // Add directory and history renders...
+                renderAdminQueueTable('adminEmergencyTable', d.emergency_queue);
+                renderAdminQueueTable('adminRoutineTable', d.routine_queue);
+                renderDirectoryTable('adminDirectoryTable', d.all_records);
+                renderHistoryTable('adminHistoryTable', d.history);
             });
         }
 
-        function renderAdminTable(id, list) {
-            const wrap = document.getElementById(id);
-            wrap.innerHTML = `<table class="custom-table"><thead><tr><th>Ticket</th><th>Student</th><th>Action</th></tr></thead><tbody>
-                ${list.map(p => `<tr><td>${p.ticket}</td><td>${p.name}</td><td><button onclick='openInspectorModal(${JSON.stringify(p)})'>Assess</button></td></tr>`).join('')}
+        function renderAdminQueueTable(id, list) {
+            document.getElementById(id).innerHTML = `<table class="custom-table"><thead><tr><th>Ticket</th><th>Student</th><th>Action</th></tr></thead><tbody>
+                ${list.map(p => `<tr><td>${p.ticket}</td><td>${p.name}</td><td><button class="btn btn-outline" onclick='openInspectorModal(${JSON.stringify(p)})'>Assess</button></td></tr>`).join('')}
+            </tbody></table>`;
+        }
+
+        function renderDirectoryTable(id, list) {
+            document.getElementById(id).innerHTML = `<table class="custom-table"><thead><tr><th>SR-Code</th><th>Name</th></tr></thead><tbody>
+                ${list.map(p => `<tr><td>${p.sr_code}</td><td>${p.name}</td></tr>`).join('')}
+            </tbody></table>`;
+        }
+
+        function renderHistoryTable(id, list) {
+            document.getElementById(id).innerHTML = `<table class="custom-table"><thead><tr><th>Ticket</th><th>Name</th></tr></thead><tbody>
+                ${list.map(p => `<tr><td>${p.ticket}</td><td>${p.name}</td></tr>`).join('')}
             </tbody></table>`;
         }
 
         function callNextPatient(type) {
-            fetch('/api/admin/call_next', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({type: type})
-            }).then(r => r.json()).then(res => {
+            fetch('/api/admin/call_next', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({type: type}) }).then(r => r.json()).then(res => {
                 if (res.success) { alert("Calling " + res.patient.name); loadAdminData(); } else { alert(res.message); }
             });
         }
@@ -546,19 +432,14 @@
         function openTicketModal() { document.getElementById('ticketModal').classList.add('show'); }
         function closeTicketModal() { document.getElementById('ticketModal').classList.remove('show'); }
         function openInspectorModal(p) { 
-            selectedStudentSrCode = p.sr_code; 
-            document.getElementById('inspName').innerText = p.name;
+            selectedStudentSrCode = p.sr_code; document.getElementById('inspName').innerText = p.name;
             document.getElementById('inspCommentsList').innerHTML = p.comments.map(c => `<div>${c}</div>`).join('');
             document.getElementById('inspectorModal').classList.add('show'); 
         }
         function closeInspectorModal() { document.getElementById('inspectorModal').classList.remove('show'); }
         function submitComment() {
             const val = document.getElementById('newCommentInput').value;
-            fetch('/api/admin/add_comment', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({sr_code: selectedStudentSrCode, comment: val})
-            }).then(r => r.json()).then(res => { loadAdminData(); closeInspectorModal(); });
+            fetch('/api/admin/add_comment', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({sr_code: selectedStudentSrCode, comment: val}) }).then(() => { loadAdminData(); closeInspectorModal(); });
         }
         function switchAdminTab(t) {
             document.querySelectorAll('.admin-panel').forEach(p => p.style.display = 'none');
@@ -566,6 +447,7 @@
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tabBtn-'+t).classList.add('active');
         }
+        function handleStatCardClick(t) { if (userRole === 'admin') switchAdminTab(t); }
     </script>
 </body>
 </html>
