@@ -3,430 +3,667 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phalanx Health • Red Spartan Medical Triage</title>
-    <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-
+    <title>PHALANX HEALTH</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        spartan: {
+                            maroon: '#6B0F1A',
+                            maroonDark: '#45060E',
+                            gold: '#FFC72C',
+                            goldHover: '#E5AF1B',
+                            smoke: '#F8F9FA'
+                        }
+                    },
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Boxicons & Google Fonts -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
     <style>
-        :root {
-            --bsu-maroon: #800000;
-            --bsu-maroon-dark: #4d0000;
-            --bsu-maroon-light: #9c1c1c;
-            --bsu-gold: #FFC72C;
-            --bsu-gold-hover: #e0ac1e;
-            --bsu-white: #FFFFFF;
-            --bg-canvas: #0d0305;
-            --card-surface: rgba(28, 8, 12, 0.88);
-            --border-glass: rgba(255, 199, 44, 0.22);
-            --text-primary: #FFFFFF;
-            --text-secondary: #d8c7c9;
-            --radius-main: 14px;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg-canvas); color: var(--text-primary); min-height: 100vh; }
-        .mono { font-family: 'JetBrains Mono', monospace; }
-        .cinzel { font-family: 'Cinzel', serif; }
-
-        header {
-            background: linear-gradient(180deg, rgba(77, 0, 0, 0.95) 0%, rgba(30, 4, 8, 0.95) 100%);
-            border-bottom: 2px solid var(--bsu-gold);
-            padding: 0.75rem 2rem; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 25px rgba(128, 0, 0, 0.4);
-            position: sticky; top: 0; z-index: 100;
-        }
-        .brand-container { display: flex; align-items: center; gap: 1.25rem; }
-        .univ-seal-img {
-            width: 65px; height: 65px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 8px rgba(255, 199, 44, 0.5));
-        }
-        .brand-title h1 { font-size: 1.7rem; font-weight: 800; letter-spacing: 2px; color: var(--bsu-white); }
-
-        .page-container { max-width: 1350px; margin: 0 auto; padding: 2rem; }
-
-        .btn {
-            padding: 0.55rem 1.2rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem;
-            cursor: pointer; transition: all 0.25s ease; border: none; display: inline-flex;
-            align-items: center; gap: 0.5rem; text-decoration: none;
-        }
-        .btn-gold { background: var(--bsu-gold); color: #000; box-shadow: 0 0 15px rgba(255, 199, 44, 0.3); }
-        .btn-gold:hover { background: var(--bsu-gold-hover); transform: translateY(-1px); }
-        .btn-maroon { background: var(--bsu-maroon); color: #fff; border: 1px solid var(--bsu-gold); }
-        .btn-maroon:hover { background: var(--bsu-maroon-light); }
-        .btn-outline { background: transparent; border: 1px solid var(--border-glass); color: #fff; }
-        .btn-outline:hover { background: rgba(255,255,255,0.06); }
-
-        #authGate {
-            min-height: 80vh; display: flex; align-items: center; justify-content: center;
-            background: radial-gradient(circle at center, rgba(128, 0, 0, 0.3) 0%, transparent 70%);
-        }
-        .auth-box {
-            width: 100%; max-width: 460px; background: var(--card-surface);
-            border: 2px solid var(--border-glass); border-radius: var(--radius-main);
-            padding: 2.25rem; box-shadow: 0 15px 40px rgba(0,0,0,0.6); backdrop-filter: blur(12px);
-        }
-        .auth-seal-logo {
-            width: 150px; height: auto;
-            object-fit: contain;
-            margin: 0 auto 1rem auto; display: block;
-            filter: drop-shadow(0 0 15px rgba(255, 199, 44, 0.3));
-        }
-
-        .auth-tab-bar { display: flex; border-bottom: 1px solid var(--border-glass); margin-bottom: 1.5rem; }
-        .auth-tab-bar button {
-            flex: 1; padding: 0.75rem; background: none; border: none; color: var(--text-secondary);
-            font-weight: 700; font-size: 0.9rem; cursor: pointer; border-bottom: 3px solid transparent;
-        }
-        .auth-tab-bar button.active { color: var(--bsu-gold); border-bottom-color: var(--bsu-gold); }
-
-        .form-group { margin-bottom: 1.15rem; }
-        .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--bsu-gold); margin-bottom: 0.4rem; text-transform: uppercase; }
-        .form-control {
-            width: 100%; padding: 0.75rem 1rem; background: rgba(0, 0, 0, 0.45);
-            border: 1px solid var(--border-glass); border-radius: 8px; color: #fff;
-            font-size: 0.95rem; outline: none; transition: border-color 0.2s ease;
-        }
-        .form-control:focus { border-color: var(--bsu-gold); box-shadow: 0 0 10px rgba(255, 199, 44, 0.2); }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
-        .stat-card {
-            background: var(--card-surface); border: 1px solid var(--border-glass);
-            border-radius: var(--radius-main); padding: 1.25rem 1.5rem; display: flex;
-            align-items: center; justify-content: space-between; cursor: pointer;
-            transition: all 0.25s ease;
-        }
-        .stat-card:hover { transform: translateY(-3px); border-color: var(--bsu-gold); box-shadow: 0 8px 25px rgba(255, 199, 44, 0.2); }
-        .stat-card .val { font-size: 2.2rem; font-weight: 800; color: var(--bsu-white); }
-        .stat-card .lbl { font-size: 0.75rem; color: var(--bsu-gold); font-weight: 700; text-transform: uppercase; }
-        .stat-card i { font-size: 2.5rem; color: var(--bsu-gold); opacity: 0.85; }
-
-        .card { background: var(--card-surface); border: 1px solid var(--border-glass); border-radius: var(--radius-main); padding: 1.5rem; backdrop-filter: blur(8px); }
-        .tabs { display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border-glass); margin-bottom: 1.5rem; }
-        .tab-btn { padding: 0.75rem 1.4rem; background: none; border: none; color: var(--text-secondary); font-weight: 700; font-size: 0.9rem; cursor: pointer; border-bottom: 3px solid transparent; display: flex; align-items: center; gap: 0.5rem; }
-        .tab-btn.active { color: var(--bsu-gold); border-bottom-color: var(--bsu-gold); background: rgba(255, 199, 44, 0.05); }
-
-        .custom-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-        .custom-table th { text-align: left; padding: 0.85rem; background: rgba(128, 0, 0, 0.45); color: var(--bsu-gold); font-weight: 700; border-bottom: 1px solid var(--border-glass); }
-        .custom-table td { padding: 0.85rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        .tag { padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
-        .tag-emergency { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
-        .tag-routine { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
-        .tag-treated { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
-
-        .modal-wrap { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-wrap.show { display: flex; }
-        .modal-body { background: #140508; border: 2px solid var(--bsu-gold); border-radius: var(--radius-main); width: 95%; max-width: 600px; padding: 2rem; box-shadow: 0 15px 50px rgba(0,0,0,0.8); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.03); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+        .gold-glow { box-shadow: 0 0 20px rgba(255, 199, 44, 0.25); }
     </style>
 </head>
-<body>
+<body class="bg-[#F4F6F9] text-slate-800 font-sans antialiased min-h-screen flex flex-col justify-between">
 
-    <header>
-        <div class="brand-container">
-            <img src="/static/logo.png" alt="Spartan Logo" class="univ-seal-img" onerror="this.src='https://img.icons8.com/color/96/spartan-helmet.png'">
-            <div class="brand-title">
-                <h1 class="cinzel">PHALANX HEALTH</h1>
+    <!-- TOP HEADER -->
+    <header class="bg-gradient-to-r from-spartan-maroonDark via-spartan-maroon to-spartan-maroonDark text-white shadow-xl border-b-4 border-spartan-gold sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+            <div class="flex items-center space-x-3.5">
+                <div class="w-12 h-12 rounded-xl bg-white/10 p-1 border border-spartan-gold/40 flex items-center justify-center overflow-hidden shadow-inner flex-shrink-0">
+                    <img 
+                        src="/static/spartan.png" 
+                        alt="Spartan Logo" 
+                        class="w-full h-full object-contain"
+                        onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/1067/1067357.png';"
+                    />
+                </div>
+                <div>
+                    <h1 class="font-cinzel text-2xl sm:text-3xl font-black tracking-wider text-spartan-gold drop-shadow-md">
+                        PHALANX HEALTH
+                    </h1>
+                </div>
             </div>
-        </div>
 
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <span id="navUserBadge" class="tag tag-routine" style="display: none;">Guest</span>
-            <button id="navLogoutBtn" class="btn btn-outline" style="display: none;" onclick="handleLogout()">
-                <i class='bx bx-log-out'></i> Sign Out
-            </button>
+            <!-- SESSION BADGE / LOGOUT -->
+            <div id="user-nav" class="hidden items-center space-x-3">
+                <div class="hidden sm:flex flex-col text-right">
+                    <span id="nav-user-name" class="font-bold text-sm text-white">Student</span>
+                    <span id="nav-user-role" class="text-xs text-spartan-gold font-mono uppercase tracking-wider">PATIENT</span>
+                </div>
+                <button onclick="handleLogout()" class="px-3.5 py-1.5 bg-black/30 hover:bg-black/50 text-white rounded-lg border border-white/20 text-xs font-bold transition flex items-center space-x-1.5">
+                    <i class='bx bx-log-out text-base'></i>
+                    <span>Log Out</span>
+                </button>
+            </div>
         </div>
     </header>
 
-    <div class="page-container">
+    <!-- MAIN VIEW CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
 
-        <section id="authGate">
-            <div class="auth-box">
-                <div style="text-align: center; margin-bottom: 1.5rem;">
-                    <img src="/static/logo.png" alt="Spartan Logo" class="auth-seal-logo" onerror="this.src='https://img.icons8.com/color/96/spartan-helmet.png'">
-                    <h2 class="cinzel" style="font-size: 1.5rem; margin-top: 0.5rem; color: var(--bsu-white); letter-spacing: 2px;">PHALANX HEALTH</h2>
+        <!-- ================= AUTH VIEW (LOGIN / REGISTER) ================= -->
+        <section id="view-auth" class="max-w-md mx-auto my-6">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200/80 overflow-hidden">
+                <div class="bg-gradient-to-b from-spartan-maroon to-spartan-maroonDark p-6 text-center text-white">
+                    <div class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-white/10 p-2 border border-spartan-gold/50 flex items-center justify-center overflow-hidden shadow-inner">
+                        <img 
+                            src="/static/spartan.png" 
+                            alt="Spartan Logo" 
+                            class="w-full h-full object-contain"
+                            onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/1067/1067357.png';"
+                        />
+                    </div>
+                    <h2 class="font-cinzel text-xl font-black tracking-wide text-spartan-gold">AUTHENTICATION PORTAL</h2>
+                    <p class="text-xs text-slate-300 mt-1">Access Student Queue or Clinic Management</p>
                 </div>
 
-                <div class="auth-tab-bar">
-                    <button id="tabBtnLogin" class="active" onclick="switchAuthTab('login')">Sign In</button>
-                    <button id="tabBtnRegister" onclick="switchAuthTab('register')">Create Account</button>
+                <!-- Tabs -->
+                <div class="flex border-b border-slate-200">
+                    <button id="tab-login" onclick="switchAuthTab('login')" class="w-1/2 py-3 text-sm font-bold text-spartan-maroon border-b-2 border-spartan-maroon">Sign In</button>
+                    <button id="tab-reg" onclick="switchAuthTab('reg')" class="w-1/2 py-3 text-sm font-bold text-slate-400 hover:text-slate-600">Register</button>
                 </div>
 
-                <form id="signInForm" onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label>SR-Code or Staff ID</label>
-                        <input type="text" id="loginSrCode" class="form-control mono" placeholder="e.g. 24-09303 or ADMIN" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.85rem; margin-top: 0.5rem;">
-                        <i class='bx bx-log-in'></i> Sign In to Account
-                    </button>
-                </form>
-
-                <form id="signUpForm" style="display: none;" onsubmit="handleRegister(event)">
-                    <div class="form-group">
-                        <label>Student SR-Code</label>
-                        <input type="text" id="regSrCode" class="form-control mono" placeholder="e.g. 24-09303" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" id="regFullName" class="form-control" placeholder="e.g. Juan P. Dela Cruz" required>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                        <div class="form-group">
-                            <label>Age</label>
-                            <input type="number" id="regAge" class="form-control" value="20" required>
+                <!-- Form -->
+                <div class="p-6">
+                    <!-- Login Form -->
+                    <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">SR-Code / Staff ID</label>
+                            <input type="text" id="login-srcode" required placeholder="e.g. 24-09303 or ADMIN" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon font-mono text-sm uppercase">
                         </div>
-                        <div class="form-group">
-                            <label>Gender</label>
-                            <select id="regGender" class="form-control">
-                                <option>Male</option>
-                                <option>Female</option>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Password</label>
+                            <input type="password" id="login-pass" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon text-sm">
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-spartan-maroon hover:bg-spartan-maroonDark text-white font-bold rounded-lg shadow-md hover:shadow-lg transition flex items-center justify-center space-x-2">
+                            <span>Sign In</span>
+                            <i class='bx bx-right-arrow-alt text-lg'></i>
+                        </button>
+                    </form>
+
+                    <!-- Register Form -->
+                    <form id="form-register" onsubmit="handleRegister(event)" class="space-y-3.5 hidden">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">SR-Code</label>
+                            <input type="text" id="reg-srcode" required placeholder="24-09303" class="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon font-mono text-sm uppercase">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Full Name</label>
+                            <input type="text" id="reg-name" required placeholder="Juan Dela Cruz" class="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon text-sm">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Program</label>
+                                <input type="text" id="reg-dept" required placeholder="BS CpE" class="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Year Level</label>
+                                <select id="reg-year" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon text-sm">
+                                    <option value="1st Year">1st Year</option>
+                                    <option value="2nd Year">2nd Year</option>
+                                    <option value="3rd Year">3rd Year</option>
+                                    <option value="4th Year" selected>4th Year</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Password</label>
+                            <input type="password" id="reg-pass" required placeholder="••••••••" class="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon text-sm">
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-spartan-maroon hover:bg-spartan-maroonDark text-white font-bold rounded-lg shadow-md hover:shadow-lg transition">
+                            Create Patient Account
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= STUDENT VIEW ================= -->
+        <section id="view-student" class="hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Check-in Card -->
+                <div class="md:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="font-cinzel font-bold text-lg text-spartan-maroon mb-4 flex items-center space-x-2">
+                        <i class='bx bx-plus-medical text-spartan-gold'></i>
+                        <span>Clinic Check-In</span>
+                    </h3>
+                    <form onsubmit="handleJoinQueue(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Symptoms / Concern (Confidential)</label>
+                            <textarea id="queue-symptoms" required rows="3" placeholder="Describe symptoms (e.g. fever, headache, minor sprain)..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-spartan-maroon focus:outline-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Urgency Level</label>
+                            <select id="queue-urgency" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-spartan-maroon focus:outline-none">
+                                <option value="routine">Routine Check / Medical Clearance</option>
+                                <option value="emergency">Emergency / Severe Discomfort</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Set Password</label>
-                        <input type="password" id="regPassword" class="form-control" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.85rem; margin-top: 0.5rem;">
-                        <i class='bx bx-user-check'></i> Register Student Account
-                    </button>
-                </form>
-            </div>
-        </section>
-
-        <section id="statSection" class="stats-grid" style="display: none;">
-            <div class="stat-card" onclick="handleStatCardClick('directory')">
-                <div><div class="lbl">Total Registered</div><div class="val mono" id="statRegistered">0</div></div><i class='bx bx-id-card'></i>
-            </div>
-            <div class="stat-card" onclick="handleStatCardClick('emergency')">
-                <div><div class="lbl">Urgent / Emergency</div><div class="val mono" id="statEmergency" style="color: #ef4444;">0</div></div><i class='bx bx-pulse' style="color: #ef4444;"></i>
-            </div>
-            <div class="stat-card" onclick="handleStatCardClick('routine')">
-                <div><div class="lbl">Routine Wait</div><div class="val mono" id="statRoutine" style="color: #60a5fa;">0</div></div><i class='bx bx-time' style="color: #60a5fa;"></i>
-            </div>
-            <div class="stat-card" onclick="handleStatCardClick('treated')">
-                <div><div class="lbl">Total Handled</div><div class="val mono" id="statTreated" style="color: #4ade80;">0</div></div><i class='bx bx-check-shield' style="color: #4ade80;"></i>
-            </div>
-        </section>
-
-        <section id="patientView" style="display: none;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
-                <div class="card" style="border: 2px solid var(--bsu-gold);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;"><h3 class="cinzel" style="color: var(--bsu-gold);"><i class='bx bx-receipt'></i> My Ticket</h3><span id="ticketBadge" class="tag tag-routine">None</span></div>
-                    <div id="activeTicketDisplay"><div style="text-align:center; padding:2rem;"><p>You are not in the queue.</p><button class="btn btn-gold" onclick="openTicketModal()">Join Queue</button></div></div>
+                        <button type="submit" class="w-full py-2.5 bg-spartan-maroon hover:bg-spartan-maroonDark text-white font-bold rounded-lg shadow transition">
+                            Enter Queue
+                        </button>
+                    </form>
                 </div>
-                <div class="card"><h3 class="cinzel" style="color: var(--bsu-gold); margin-bottom: 1rem;">Records</h3><div id="patientHistoryList"></div></div>
+
+                <!-- Live Public Board (Privacy Masked) -->
+                <div class="md:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between border-b pb-3 mb-4">
+                            <h3 class="font-cinzel font-bold text-lg text-slate-800">Live Calling Board</h3>
+                            <span class="text-xs bg-amber-50 text-amber-700 px-2 py-1 rounded font-mono border border-amber-200">Confidential Mode</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-red-50 p-4 rounded-xl border border-red-200">
+                                <h4 class="text-xs font-bold uppercase text-red-800 mb-2 font-cinzel">Emergency Priority</h4>
+                                <div id="student-emergency-list" class="space-y-2 text-sm text-slate-600">
+                                    <p class="text-xs italic text-slate-400">No emergency cases waiting.</p>
+                                </div>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                                <h4 class="text-xs font-bold uppercase text-blue-800 mb-2 font-cinzel">Routine Queue</h4>
+                                <div id="student-routine-list" class="space-y-2 text-sm text-slate-600">
+                                    <p class="text-xs italic text-slate-400">No routine patients waiting.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-4 text-center">Names and symptoms are masked on public monitors to protect student privacy.</p>
+                </div>
             </div>
-            <div class="card"><h3 class="cinzel" style="color: var(--bsu-gold); margin-bottom: 1rem;">Calling Board</h3><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;"><div><h4>Urgent</h4><div id="pubEmergencyList"></div></div><div><h4>Routine</h4><div id="pubRoutineList"></div></div></div></div>
         </section>
 
-        <section id="adminView" style="display: none;">
-            <div class="card">
-                <div class="tabs"><button class="tab-btn active" id="tabBtn-emergency" onclick="switchAdminTab('emergency')">Emergency</button><button class="tab-btn" id="tabBtn-routine" onclick="switchAdminTab('routine')">Routine</button><button class="tab-btn" id="tabBtn-directory" onclick="switchAdminTab('directory')">BST Directory</button><button class="tab-btn" id="tabBtn-treated" onclick="switchAdminTab('treated')">History</button></div>
-                <div id="adminPanel-emergency" class="admin-panel"><h3>Urgent Triage (Max-Heap)</h3><button class="btn btn-maroon" onclick="callNextPatient('emergency')">Admit Next</button><div id="adminEmergencyTable"></div></div>
-                <div id="adminPanel-routine" class="admin-panel" style="display: none;"><h3>Routine Queue (FIFO)</h3><button class="btn btn-gold" onclick="callNextPatient('routine')">Call Next</button><div id="adminRoutineTable"></div></div>
-                <div id="adminPanel-directory" class="admin-panel" style="display: none;"><h3>BST Master Directory</h3><div id="adminDirectoryTable"></div></div>
-                <div id="adminPanel-treated" class="admin-panel" style="display: none;"><h3>History</h3><div id="adminHistoryTable"></div></div>
+        <!-- ================= ADMIN VIEW ================= -->
+        <section id="view-admin" class="hidden space-y-6">
+            
+            <!-- Quick Stat Cards (Interactive Navigation) -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div onclick="scrollToSection('admin-patients-sec')" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-spartan-maroon cursor-pointer transition">
+                    <span class="text-xs font-bold text-slate-400 uppercase">Registered</span>
+                    <h4 id="stat-total-patients" class="text-2xl font-bold font-mono text-slate-800 mt-1">0</h4>
+                </div>
+                <div onclick="scrollToSection('admin-emergency-sec')" class="bg-red-50 p-4 rounded-xl shadow-sm border border-red-200 hover:border-red-400 cursor-pointer transition">
+                    <span class="text-xs font-bold text-red-600 uppercase">Emergency (Heap)</span>
+                    <h4 id="stat-emergency-count" class="text-2xl font-bold font-mono text-red-700 mt-1">0</h4>
+                </div>
+                <div onclick="scrollToSection('admin-routine-sec')" class="bg-blue-50 p-4 rounded-xl shadow-sm border border-blue-200 hover:border-blue-400 cursor-pointer transition">
+                    <span class="text-xs font-bold text-blue-600 uppercase">Routine (FIFO)</span>
+                    <h4 id="stat-routine-count" class="text-2xl font-bold font-mono text-blue-700 mt-1">0</h4>
+                </div>
+                <div onclick="scrollToSection('admin-treated-sec')" class="bg-emerald-50 p-4 rounded-xl shadow-sm border border-emerald-200 hover:border-emerald-400 cursor-pointer transition">
+                    <span class="text-xs font-bold text-emerald-600 uppercase">Total Treated</span>
+                    <h4 id="stat-treated-count" class="text-2xl font-bold font-mono text-emerald-700 mt-1">0</h4>
+                </div>
             </div>
+
+            <!-- Triage Queue Controller -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <!-- Emergency Priority (Max-Heap) -->
+                <div id="admin-emergency-sec" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                    <div class="flex items-center justify-between pb-3 border-b mb-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-red-600 animate-pulse"></span>
+                            <h3 class="font-cinzel font-bold text-base text-slate-800">Emergency Queue (Max-Heap)</h3>
+                        </div>
+                        <button onclick="callNext('emergency')" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-lg transition shadow flex items-center space-x-1">
+                            <i class='bx bx-bell'></i>
+                            <span>Call Next</span>
+                        </button>
+                    </div>
+                    <div id="admin-emergency-list" class="space-y-2 max-h-72 overflow-y-auto custom-scrollbar"></div>
+                </div>
+
+                <!-- Routine Queue (FIFO) -->
+                <div id="admin-routine-sec" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                    <div class="flex items-center justify-between pb-3 border-b mb-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-blue-600"></span>
+                            <h3 class="font-cinzel font-bold text-base text-slate-800">Routine Queue (FIFO)</h3>
+                        </div>
+                        <button onclick="callNext('routine')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg transition shadow flex items-center space-x-1">
+                            <i class='bx bx-bell'></i>
+                            <span>Call Next</span>
+                        </button>
+                    </div>
+                    <div id="admin-routine-list" class="space-y-2 max-h-72 overflow-y-auto custom-scrollbar"></div>
+                </div>
+            </div>
+
+            <!-- Student Directory / BST Search -->
+            <div id="admin-patients-sec" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-3 border-b mb-4 gap-3">
+                    <h3 class="font-cinzel font-bold text-base text-slate-800">Student Directory (BST Indexed)</h3>
+                    <div class="w-full sm:w-72 relative">
+                        <i class='bx bx-search absolute left-3 top-2.5 text-slate-400'></i>
+                        <input type="text" id="admin-search-input" oninput="filterPatients(this.value)" placeholder="Search by SR-Code or Name..." class="w-full pl-9 pr-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-spartan-maroon">
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-50 text-slate-400 uppercase text-[11px] font-mono">
+                            <tr>
+                                <th class="p-3">SR-Code</th>
+                                <th class="p-3">Name</th>
+                                <th class="p-3">Program / Year</th>
+                                <th class="p-3">Total Visits</th>
+                                <th class="p-3 text-right">Medical Record</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-patient-table-body" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Treated History Section -->
+            <div id="admin-treated-sec" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                <h3 class="font-cinzel font-bold text-base text-slate-800 pb-3 border-b mb-3">Treated Patients Log</h3>
+                <div id="admin-treated-list" class="space-y-2 max-h-56 overflow-y-auto custom-scrollbar"></div>
+            </div>
+
         </section>
 
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-4 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p>PHALANX HEALTH &bull; CpE 411 Data Structures and Algorithms &bull; Batangas State University Alangilan</p>
+        </div>
+    </footer>
+
+    <!-- PATIENT MEDICAL HISTORY & ASSESSMENT MODAL -->
+    <div id="inspector-modal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-spartan-maroon text-white p-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class='bx bx-user-pin text-xl text-spartan-gold'></i>
+                    <h3 class="font-cinzel font-bold text-base" id="modal-title">Student Medical Record</h3>
+                </div>
+                <button onclick="closeInspector()" class="text-white hover:text-spartan-gold text-2xl leading-none">&times;</button>
+            </div>
+            <div class="p-5 overflow-y-auto custom-scrollbar space-y-4">
+                <div id="modal-student-info" class="p-3 bg-slate-50 rounded-xl border text-sm font-mono space-y-1"></div>
+                <div>
+                    <h4 class="text-xs font-bold uppercase text-slate-500 mb-2">Visit History & Doctor Comments</h4>
+                    <div id="modal-history-list" class="space-y-2 text-sm"></div>
+                </div>
+                <div class="pt-2 border-t">
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Add Doctor Assessment / Note</label>
+                    <textarea id="modal-new-comment" rows="2" placeholder="Enter diagnosis, prescription, or clinic notes..." class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-spartan-maroon focus:outline-none"></textarea>
+                    <button onclick="saveDoctorComment()" class="mt-2 w-full py-2 bg-spartan-maroon hover:bg-spartan-maroonDark text-white font-bold text-xs rounded-lg transition shadow">
+                        Save Assessment
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div id="ticketModal" class="modal-wrap"><div class="modal-body"><h3 class="cinzel" style="color: var(--bsu-gold);">Join Triage</h3><form onsubmit="handleJoinQueue(event)"><div class="form-group"><label>Type</label><select id="reqType" class="form-control" onchange="toggleReqSeverity()"><option value="Routine">Routine</option><option value="Emergency">Emergency</option></select></div><div class="form-group" id="reqSeverityGroup" style="display:none;"><label>Severity (1-10)</label><input type="range" id="reqSeverity" min="1" max="10" value="7" class="form-control"></div><div class="form-group"><label>Symptoms</label><textarea id="reqSymptoms" class="form-control" rows="3" required></textarea></div><button type="submit" class="btn btn-gold" style="width:100%;">Submit</button></form></div></div>
-
-    <div id="inspectorModal" class="modal-wrap"><div class="modal-body"><h3 class="cinzel" id="inspName">File</h3><div id="inspCommentsList"></div><div style="display:flex; gap:0.5rem;"><input type="text" id="newCommentInput" class="form-control" placeholder="Clinical Note..."><button class="btn btn-gold" onclick="submitComment()">Add</button></div><button class="btn btn-outline" style="width:100%; margin-top:1rem;" onclick="closeInspectorModal()">Close</button></div></div>
-
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        let userRole = null;
-        let selectedStudentSrCode = null;
+        let currentUser = null;
+        let cachedAdminData = null;
+        let selectedStudentCode = null;
 
-        window.onload = function() { checkSession(); };
+        function switchAuthTab(type) {
+            const loginForm = document.getElementById('form-login');
+            const regForm = document.getElementById('form-register');
+            const tabLogin = document.getElementById('tab-login');
+            const tabReg = document.getElementById('tab-reg');
 
-        function checkSession() {
-            fetch('/api/auth/session').then(r => r.json()).then(d => {
-                if (d.logged_in) {
-                    userRole = d.role;
-                    renderRoleUI(d.role, d.name, d.sr_code);
-                } else { showAuthGate(); }
-            });
-        }
-
-        function showAuthGate() {
-            document.getElementById('authGate').style.display = 'flex';
-            document.getElementById('statSection').style.display = 'none';
-            document.getElementById('patientView').style.display = 'none';
-            document.getElementById('adminView').style.display = 'none';
-            document.getElementById('navUserBadge').style.display = 'none';
-            document.getElementById('navLogoutBtn').style.display = 'none';
-        }
-
-        function renderRoleUI(role, name, srCode) {
-            document.getElementById('authGate').style.display = 'none';
-            document.getElementById('statSection').style.display = 'grid';
-            document.getElementById('navLogoutBtn').style.display = 'inline-flex';
-            const badge = document.getElementById('navUserBadge');
-            badge.style.display = 'inline-block';
-            if (role === 'admin') {
-                badge.className = 'tag tag-emergency'; badge.innerText = `Staff: ${name}`;
-                document.getElementById('adminView').style.display = 'block';
-                document.getElementById('patientView').style.display = 'none';
-                loadAdminData();
+            if(type === 'login') {
+                loginForm.classList.remove('hidden');
+                regForm.classList.add('hidden');
+                tabLogin.className = "w-1/2 py-3 text-sm font-bold text-spartan-maroon border-b-2 border-spartan-maroon";
+                tabReg.className = "w-1/2 py-3 text-sm font-bold text-slate-400 hover:text-slate-600";
             } else {
-                badge.className = 'tag tag-routine'; badge.innerText = `Student: ${srCode}`;
-                document.getElementById('patientView').style.display = 'block';
-                document.getElementById('adminView').style.display = 'none';
-                loadPatientPortal(); loadPublicQueue();
+                loginForm.classList.add('hidden');
+                regForm.classList.remove('hidden');
+                tabReg.className = "w-1/2 py-3 text-sm font-bold text-spartan-maroon border-b-2 border-spartan-maroon";
+                tabLogin.className = "w-1/2 py-3 text-sm font-bold text-slate-400 hover:text-slate-600";
             }
         }
 
-        function switchAuthTab(tab) {
-            document.getElementById('tabBtnLogin').classList.toggle('active', tab === 'login');
-            document.getElementById('tabBtnRegister').classList.toggle('active', tab === 'register');
-            document.getElementById('signInForm').style.display = tab === 'login' ? 'block' : 'none';
-            document.getElementById('signUpForm').style.display = tab === 'register' ? 'block' : 'none';
+        async function handleLogin(e) {
+            e.preventDefault();
+            const srcode = document.getElementById('login-srcode').value.trim();
+            const password = document.getElementById('login-pass').value.trim();
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ srcode, password })
+                });
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error || 'Login failed');
+
+                currentUser = data.user;
+                setupSessionUI();
+            } catch(err) {
+                alert(err.message);
+            }
         }
 
-        function handleLogin(e) {
+        async function handleRegister(e) {
             e.preventDefault();
-            const sr = document.getElementById('loginSrCode').value.trim();
-            const pw = document.getElementById('loginPassword').value.trim();
-            fetch('/api/auth/login', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({sr_code: sr, password: pw})
-            }).then(r => r.json()).then(res => {
-                if (res.success) { checkSession(); } else { alert(res.message); }
-            });
-        }
-
-        function handleRegister(e) {
-            e.preventDefault();
-            const data = {
-                sr_code: document.getElementById('regSrCode').value.trim(),
-                name: document.getElementById('regFullName').value.trim(),
-                age: document.getElementById('regAge').value,
-                gender: document.getElementById('regGender').value,
-                password: document.getElementById('regPassword').value.trim()
+            const payload = {
+                srcode: document.getElementById('reg-srcode').value.trim(),
+                name: document.getElementById('reg-name').value.trim(),
+                department: document.getElementById('reg-dept').value.trim(),
+                year_level: document.getElementById('reg-year').value,
+                password: document.getElementById('reg-pass').value.trim()
             };
-            fetch('/api/auth/register', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            }).then(r => r.json()).then(res => {
-                if (res.success) { alert(res.message); switchAuthTab('login'); } else { alert(res.message); }
-            });
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error || 'Registration failed');
+                alert('Account registered! Please sign in.');
+                switchAuthTab('login');
+            } catch(err) {
+                alert(err.message);
+            }
         }
 
-        function handleLogout() { fetch('/api/auth/logout', {method: 'POST'}).then(() => location.reload()); }
+        function setupSessionUI() {
+            document.getElementById('view-auth').classList.add('hidden');
+            document.getElementById('user-nav').classList.remove('hidden');
+            document.getElementById('user-nav').classList.add('flex');
 
-        function loadPatientPortal() {
-            fetch('/api/patient/my_portal').then(r => r.json()).then(data => {
-                const disp = document.getElementById('activeTicketDisplay');
-                if (data.active_ticket) {
-                    const t = data.active_ticket;
-                    disp.innerHTML = `<div style="text-align:center; padding:1.5rem; border:1px solid var(--bsu-gold); border-radius:8px;">
-                        <h1 class="cinzel" style="font-size:3rem; color:var(--bsu-gold);">${t.ticket}</h1>
-                        <p>${data.queue_pos}</p>
-                    </div>`;
-                    document.getElementById('ticketBadge').innerText = "Waiting";
-                }
-                const hList = document.getElementById('patientHistoryList');
-                hList.innerHTML = data.history.map(h => `<div style="margin-bottom:0.5rem; background:rgba(255,255,255,0.05); padding:0.5rem; border-radius:5px;">
-                    <strong>${h.ticket}</strong> - ${h.date}<br><small>${h.symptoms}</small>
-                </div>`).join('');
-            });
+            document.getElementById('nav-user-name').innerText = currentUser.name;
+            document.getElementById('nav-user-role').innerText = currentUser.role.toUpperCase();
+
+            if(currentUser.role === 'admin') {
+                document.getElementById('view-admin').classList.remove('hidden');
+                fetchAdminData();
+            } else {
+                document.getElementById('view-student').classList.remove('hidden');
+                fetchStudentData();
+            }
         }
 
-        function loadPublicQueue() {
-            fetch('/api/public_queue').then(r => r.json()).then(d => {
-                updateStats(d.stats);
-                document.getElementById('pubEmergencyList').innerHTML = d.emergency_list.map(p => `<div>${p.ticket} (${p.masked_sr})</div>`).join('');
-                document.getElementById('pubRoutineList').innerHTML = d.routine_list.map(p => `<div>${p.ticket} (${p.masked_sr})</div>`).join('');
-            });
+        function handleLogout() {
+            currentUser = null;
+            location.reload();
         }
 
-        function updateStats(s) {
-            document.getElementById('statRegistered').innerText = s.total_registered;
-            document.getElementById('statEmergency').innerText = s.emergency_count;
-            document.getElementById('statRoutine').innerText = s.routine_count;
-            document.getElementById('statTreated').innerText = s.total_treated;
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if(el) el.scrollIntoView({ behavior: 'smooth' });
         }
 
-        function handleJoinQueue(e) {
+        // ================= ADMIN LOGIC =================
+        async function fetchAdminData() {
+            if(!currentUser || currentUser.role !== 'admin') return;
+            try {
+                const res = await fetch('/api/admin/all_data');
+                const data = await res.json();
+                cachedAdminData = data;
+                renderAdminDashboard(data);
+            } catch(err) {
+                console.error(err);
+            }
+        }
+
+        function renderAdminDashboard(data) {
+            document.getElementById('stat-total-patients').innerText = data.patients.length;
+            document.getElementById('stat-emergency-count').innerText = data.emergency_queue.length;
+            document.getElementById('stat-routine-count').innerText = data.routine_queue.length;
+            document.getElementById('stat-treated-count').innerText = data.treated_history.length;
+
+            // Emergency list
+            const emergList = document.getElementById('admin-emergency-list');
+            emergList.innerHTML = data.emergency_queue.length === 0 ? 
+                `<p class="text-xs italic text-slate-400 p-2">No emergency cases waiting.</p>` :
+                data.emergency_queue.map(p => `
+                    <div class="p-3 bg-red-50/70 border border-red-200 rounded-xl flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-mono font-bold text-red-900">${p.srcode} - ${p.name}</span>
+                            <p class="text-xs text-red-700 italic mt-0.5">"${p.symptoms}"</p>
+                        </div>
+                        <button onclick="openInspector('${p.srcode}')" class="text-xs font-bold bg-white text-red-700 border border-red-300 px-2 py-1 rounded shadow-sm hover:bg-red-50">View</button>
+                    </div>
+                `).join('');
+
+            // Routine list
+            const routineList = document.getElementById('admin-routine-list');
+            routineList.innerHTML = data.routine_queue.length === 0 ? 
+                `<p class="text-xs italic text-slate-400 p-2">No routine patients waiting.</p>` :
+                data.routine_queue.map(p => `
+                    <div class="p-3 bg-blue-50/70 border border-blue-200 rounded-xl flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-mono font-bold text-blue-900">${p.srcode} - ${p.name}</span>
+                            <p class="text-xs text-blue-700 italic mt-0.5">"${p.symptoms}"</p>
+                        </div>
+                        <button onclick="openInspector('${p.srcode}')" class="text-xs font-bold bg-white text-blue-700 border border-blue-300 px-2 py-1 rounded shadow-sm hover:bg-blue-50">View</button>
+                    </div>
+                `).join('');
+
+            // Treated list
+            const treatedList = document.getElementById('admin-treated-list');
+            treatedList.innerHTML = data.treated_history.length === 0 ? 
+                `<p class="text-xs italic text-slate-400 p-2">No patients treated yet today.</p>` :
+                data.treated_history.map(p => `
+                    <div class="p-2.5 bg-slate-50 border rounded-lg flex items-center justify-between text-xs">
+                        <span class="font-mono text-slate-700"><strong>${p.srcode}</strong> - ${p.name}</span>
+                        <span class="text-slate-400 text-[11px]">${p.timestamp}</span>
+                    </div>
+                `).join('');
+
+            const searchInput = document.getElementById('admin-search-input');
+            filterPatients(searchInput ? searchInput.value : '');
+        }
+
+        function renderPatientTable(patients) {
+            const tbody = document.getElementById('admin-patient-table-body');
+            tbody.innerHTML = patients.map(p => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3 font-mono font-bold text-spartan-maroon">${p.srcode}</td>
+                    <td class="p-3 font-medium text-slate-800">${p.name}</td>
+                    <td class="p-3 text-slate-500">${p.department} - ${p.year_level}</td>
+                    <td class="p-3 font-mono">${(p.visits || []).length}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="openInspector('${p.srcode}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 border rounded text-xs font-bold text-slate-700">
+                            Inspect
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterPatients(query) {
+            if(!cachedAdminData) return;
+            const q = (query || '').toLowerCase().trim();
+            const filtered = cachedAdminData.patients.filter(p => 
+                p.srcode.toLowerCase().includes(q) || p.name.toLowerCase().includes(q)
+            );
+            renderPatientTable(filtered);
+        }
+
+        async function callNext(type) {
+            try {
+                const res = await fetch('/api/admin/call_next', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ type })
+                });
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error || 'Failed to call next');
+                alert(`Called next: ${data.patient.name} (${data.patient.srcode})`);
+                fetchAdminData();
+            } catch(err) {
+                alert(err.message);
+            }
+        }
+
+        // ================= STUDENT LOGIC =================
+        async function fetchStudentData() {
+            try {
+                const res = await fetch('/api/admin/all_data');
+                const data = await res.json();
+
+                const emergList = document.getElementById('student-emergency-list');
+                emergList.innerHTML = data.emergency_queue.length === 0 ? 
+                    `<p class="text-xs italic text-slate-400">No emergency cases waiting.</p>` :
+                    data.emergency_queue.map(p => `
+                        <div class="p-2 bg-white rounded border border-red-200 font-mono text-xs text-red-900 flex justify-between">
+                            <span>${maskSRCode(p.srcode)}</span>
+                            <span class="text-red-600 font-bold">Priority High</span>
+                        </div>
+                    `).join('');
+
+                const routineList = document.getElementById('student-routine-list');
+                routineList.innerHTML = data.routine_queue.length === 0 ? 
+                    `<p class="text-xs italic text-slate-400">No routine patients waiting.</p>` :
+                    data.routine_queue.map((p, idx) => `
+                        <div class="p-2 bg-white rounded border border-blue-200 font-mono text-xs text-blue-900 flex justify-between">
+                            <span>${maskSRCode(p.srcode)}</span>
+                            <span class="text-blue-600 font-bold">#${idx + 1} In Line</span>
+                        </div>
+                    `).join('');
+
+            } catch(err) {
+                console.error(err);
+            }
+        }
+
+        function maskSRCode(code) {
+            if(!code || code.length < 4) return '***';
+            return code.substring(0, 3) + '***' + code.slice(-2);
+        }
+
+        async function handleJoinQueue(e) {
             e.preventDefault();
-            const data = {
-                type: document.getElementById('reqType').value,
-                severity: document.getElementById('reqSeverity').value,
-                symptoms: document.getElementById('reqSymptoms').value
-            };
-            fetch('/api/patient/join_queue', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            }).then(r => r.json()).then(res => {
-                if (res.success) { alert("Joined!"); closeTicketModal(); loadPatientPortal(); } else { alert(res.message); }
-            });
+            const symptoms = document.getElementById('queue-symptoms').value;
+            const urgency = document.getElementById('queue-urgency').value;
+
+            try {
+                const res = await fetch('/api/patient/join_queue', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        srcode: currentUser.srcode,
+                        symptoms,
+                        urgency
+                    })
+                });
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error || 'Failed to join queue');
+                alert('Successfully registered to clinic queue!');
+                document.getElementById('queue-symptoms').value = '';
+                fetchStudentData();
+            } catch(err) {
+                alert(err.message);
+            }
         }
 
-        function loadAdminData() {
-            fetch('/api/admin/all_data').then(r => r.json()).then(d => {
-                updateStats(d.stats);
-                renderAdminQueueTable('adminEmergencyTable', d.emergency_queue);
-                renderAdminQueueTable('adminRoutineTable', d.routine_queue);
-                renderDirectoryTable('adminDirectoryTable', d.all_records);
-                renderHistoryTable('adminHistoryTable', d.history);
-            });
+        // ================= INSPECTOR MODAL =================
+        function openInspector(srcode) {
+            if(!cachedAdminData) return;
+            const patient = cachedAdminData.patients.find(p => p.srcode === srcode);
+            if(!patient) return;
+
+            selectedStudentCode = srcode;
+            document.getElementById('modal-student-info').innerHTML = `
+                <div><strong>SR-Code:</strong> ${patient.srcode}</div>
+                <div><strong>Name:</strong> ${patient.name}</div>
+                <div><strong>Department:</strong> ${patient.department} (${patient.year_level})</div>
+            `;
+
+            const historyList = document.getElementById('modal-history-list');
+            historyList.innerHTML = (!patient.visits || patient.visits.length === 0) ?
+                `<p class="text-xs italic text-slate-400">No medical visit logs found.</p>` :
+                patient.visits.map(v => `
+                    <div class="p-2.5 bg-slate-50 border rounded-lg text-xs space-y-1">
+                        <div class="flex justify-between font-bold text-slate-700">
+                            <span>Symptom: ${v.symptoms}</span>
+                            <span class="text-slate-400 font-mono text-[10px]">${v.date || ''}</span>
+                        </div>
+                        <p class="text-slate-600"><strong>Assessment:</strong> ${v.comment || 'No doctor comment.'}</p>
+                    </div>
+                `).join('');
+
+            document.getElementById('inspector-modal').classList.remove('hidden');
+            document.getElementById('inspector-modal').classList.add('flex');
         }
 
-        function renderAdminQueueTable(id, list) {
-            document.getElementById(id).innerHTML = `<table class="custom-table"><thead><tr><th>Ticket</th><th>Student</th><th>Action</th></tr></thead><tbody>
-                ${list.map(p => `<tr><td>${p.ticket}</td><td>${p.name}</td><td><button class="btn btn-outline" onclick='openInspectorModal(${JSON.stringify(p)})'>Assess</button></td></tr>`).join('')}
-            </tbody></table>`;
+        function closeInspector() {
+            document.getElementById('inspector-modal').classList.add('hidden');
+            document.getElementById('inspector-modal').classList.remove('flex');
+            document.getElementById('modal-new-comment').value = '';
+            selectedStudentCode = null;
         }
 
-        function renderDirectoryTable(id, list) {
-            document.getElementById(id).innerHTML = `<table class="custom-table"><thead><tr><th>SR-Code</th><th>Name</th></tr></thead><tbody>
-                ${list.map(p => `<tr><td>${p.sr_code}</td><td>${p.name}</td></tr>`).join('')}
-            </tbody></table>`;
+        async function saveDoctorComment() {
+            const comment = document.getElementById('modal-new-comment').value.trim();
+            if(!comment || !selectedStudentCode) return;
+
+            try {
+                const res = await fetch('/api/admin/add_comment', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ srcode: selectedStudentCode, comment })
+                });
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error || 'Failed to save comment');
+                alert('Assessment recorded successfully.');
+                closeInspector();
+                fetchAdminData();
+            } catch(err) {
+                alert(err.message);
+            }
         }
 
-        function renderHistoryTable(id, list) {
-            document.getElementById(id).innerHTML = `<table class="custom-table"><thead><tr><th>Ticket</th><th>Name</th></tr></thead><tbody>
-                ${list.map(p => `<tr><td>${p.ticket}</td><td>${p.name}</td></tr>`).join('')}
-            </tbody></table>`;
-        }
-
-        function callNextPatient(type) {
-            fetch('/api/admin/call_next', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({type: type}) }).then(r => r.json()).then(res => {
-                if (res.success) { alert("Calling " + res.patient.name); loadAdminData(); } else { alert(res.message); }
-            });
-        }
-
-        function toggleReqSeverity() { document.getElementById('reqSeverityGroup').style.display = document.getElementById('reqType').value === 'Emergency' ? 'block' : 'none'; }
-        function openTicketModal() { document.getElementById('ticketModal').classList.add('show'); }
-        function closeTicketModal() { document.getElementById('ticketModal').classList.remove('show'); }
-        function openInspectorModal(p) { 
-            selectedStudentSrCode = p.sr_code; document.getElementById('inspName').innerText = p.name;
-            document.getElementById('inspCommentsList').innerHTML = p.comments.map(c => `<div>${c}</div>`).join('');
-            document.getElementById('inspectorModal').classList.add('show'); 
-        }
-        function closeInspectorModal() { document.getElementById('inspectorModal').classList.remove('show'); }
-        function submitComment() {
-            const val = document.getElementById('newCommentInput').value;
-            fetch('/api/admin/add_comment', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({sr_code: selectedStudentSrCode, comment: val}) }).then(() => { loadAdminData(); closeInspectorModal(); });
-        }
-        function switchAdminTab(t) {
-            document.querySelectorAll('.admin-panel').forEach(p => p.style.display = 'none');
-            document.getElementById('adminPanel-'+t).style.display = 'block';
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tabBtn-'+t).classList.add('active');
-        }
-        function handleStatCardClick(t) { if (userRole === 'admin') switchAdminTab(t); }
+        // Auto Refresh every 10 seconds smoothly
+        setInterval(() => {
+            if(currentUser) {
+                if(currentUser.role === 'admin') fetchAdminData();
+                else fetchStudentData();
+            }
+        }, 10000);
     </script>
 </body>
 </html>
