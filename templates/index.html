@@ -12,11 +12,12 @@
                 extend: {
                     colors: {
                         spartan: {
-                            maroon: '#800000',      /* Official BatStateU Maroon */
-                            maroonDark: '#4D0000',  /* Deep Spartan Maroon */
-                            maroonLight: '#990000',
-                            gold: '#FFC72C',        /* Official Spartan Gold */
-                            goldDark: '#D4A017'
+                            maroon: '#800000',
+                            maroonDark: '#4A0000',
+                            maroonDeep: '#330000',
+                            gold: '#FFC72C',
+                            goldHover: '#E5B224',
+                            goldLight: '#FFF3D1'
                         }
                     },
                     fontFamily: {
@@ -32,22 +33,24 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
     
     <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.03); }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #800000; }
+        .custom-scrollbar::-webkit-scrollbar { width: 7px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #F1F1F1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #800000; border-radius: 4px; }
+        .gold-border { border-color: #FFC72C; }
+        .maroon-border { border-color: #800000; }
+        .text-shadow { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); }
     </style>
 </head>
-<body class="bg-[#F8F9FA] text-slate-800 font-sans antialiased min-h-screen flex flex-col justify-between">
+<body class="bg-[#F2F4F7] text-slate-900 font-sans antialiased min-h-screen flex flex-col justify-between">
 
-    <!-- TOP HEADER -->
-    <header class="bg-gradient-to-r from-spartan-maroonDark via-spartan-maroon to-spartan-maroonDark text-white shadow-xl border-b-4 border-spartan-gold sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
-            <div class="flex items-center space-x-3.5">
-                <div class="w-12 h-12 rounded-xl bg-white/10 p-1 border-2 border-spartan-gold flex items-center justify-center overflow-hidden flex-shrink-0 shadow-md">
+    <!-- BOLD TOP HEADER -->
+    <header class="bg-gradient-to-r from-spartan-maroonDeep via-spartan-maroon to-spartan-maroonDeep text-white shadow-2xl border-b-4 border-spartan-gold sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-14 h-14 rounded-xl bg-white p-1 border-2 border-spartan-gold flex items-center justify-center overflow-hidden flex-shrink-0 shadow-lg">
                     <img 
                         src="/static/spartan.png" 
                         alt="Spartan Logo" 
@@ -56,19 +59,19 @@
                     />
                 </div>
                 <div>
-                    <h1 class="font-cinzel text-2xl sm:text-3xl font-black tracking-wider text-spartan-gold drop-shadow">
+                    <h1 class="font-cinzel text-2xl sm:text-3xl font-black tracking-wider text-spartan-gold text-shadow">
                         PHALANX HEALTH
                     </h1>
                 </div>
             </div>
 
             <!-- SESSION BADGE / LOGOUT -->
-            <div id="user-nav" class="hidden items-center space-x-3">
+            <div id="user-nav" class="hidden items-center space-x-4">
                 <div class="hidden sm:flex flex-col text-right">
-                    <span id="nav-user-name" class="font-bold text-sm text-white">Student</span>
-                    <span id="nav-user-role" class="text-xs text-spartan-gold font-mono uppercase tracking-wider font-bold">PATIENT</span>
+                    <span id="nav-user-name" class="font-black text-sm text-white drop-shadow">Student</span>
+                    <span id="nav-user-role" class="text-xs text-spartan-gold font-mono uppercase tracking-widest font-bold">PATIENT</span>
                 </div>
-                <button onclick="handleLogout()" class="px-3.5 py-1.5 bg-black/40 hover:bg-black/60 text-white rounded-lg border border-spartan-gold/50 text-xs font-bold transition flex items-center space-x-1.5">
+                <button onclick="handleLogout()" class="px-4 py-2 bg-black/40 hover:bg-black/70 text-spartan-gold rounded-lg border-2 border-spartan-gold text-xs font-black uppercase tracking-wider transition-all shadow-md flex items-center space-x-1.5">
                     <i class='bx bx-log-out text-base'></i>
                     <span>Log Out</span>
                 </button>
@@ -81,9 +84,9 @@
 
         <!-- ================= AUTH VIEW (LOGIN / REGISTER) ================= -->
         <section id="view-auth" class="max-w-md mx-auto my-6">
-            <div class="bg-white rounded-2xl shadow-2xl border-2 border-spartan-gold/40 overflow-hidden">
-                <div class="bg-gradient-to-b from-spartan-maroon to-spartan-maroonDark p-6 text-center text-white border-b-2 border-spartan-gold">
-                    <div class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-white/10 p-2 border-2 border-spartan-gold flex items-center justify-center overflow-hidden shadow-inner">
+            <div class="bg-white rounded-2xl shadow-2xl border-4 border-spartan-maroon overflow-hidden">
+                <div class="bg-gradient-to-b from-spartan-maroon to-spartan-maroonDeep p-6 text-center text-white border-b-4 border-spartan-gold">
+                    <div class="w-20 h-20 mx-auto mb-3 rounded-2xl bg-white p-2 border-2 border-spartan-gold flex items-center justify-center overflow-hidden shadow-xl">
                         <img 
                             src="/static/spartan.png" 
                             alt="Spartan Logo" 
@@ -91,52 +94,52 @@
                             onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/1067/1067357.png';"
                         />
                     </div>
-                    <h2 class="font-cinzel text-xl font-black tracking-wide text-spartan-gold">AUTHENTICATION PORTAL</h2>
-                    <p class="text-xs text-slate-200 mt-1">Access Student Queue or Clinic Management</p>
+                    <h2 class="font-cinzel text-2xl font-black tracking-wide text-spartan-gold text-shadow">AUTHENTICATION PORTAL</h2>
+                    <p class="text-xs text-slate-200 mt-1 font-semibold uppercase tracking-wider">Smart Medical Triage System</p>
                 </div>
 
                 <!-- Tabs -->
-                <div class="flex border-b border-slate-200 bg-slate-50">
-                    <button id="tab-login" onclick="switchAuthTab('login')" class="w-1/2 py-3 text-sm font-bold text-spartan-maroon border-b-4 border-spartan-maroon bg-white transition">Sign In</button>
-                    <button id="tab-reg" onclick="switchAuthTab('reg')" class="w-1/2 py-3 text-sm font-bold text-slate-400 hover:text-spartan-maroon transition">Register</button>
+                <div class="flex border-b-2 border-slate-200 bg-slate-100">
+                    <button id="tab-login" onclick="switchAuthTab('login')" class="w-1/2 py-3.5 text-sm font-black uppercase text-spartan-maroon border-b-4 border-spartan-maroon bg-white transition">Sign In</button>
+                    <button id="tab-reg" onclick="switchAuthTab('reg')" class="w-1/2 py-3.5 text-sm font-bold uppercase text-slate-500 hover:text-spartan-maroon transition">Register</button>
                 </div>
 
                 <!-- Form -->
-                <div class="p-6">
+                <div class="p-6 bg-white">
                     <!-- Login Form -->
                     <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
                         <div>
-                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">SR-Code / Staff ID</label>
-                            <input type="text" id="login-srcode" required placeholder="e.g. 24-09303 or ADMIN" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon font-mono text-sm uppercase">
+                            <label class="block text-xs font-black uppercase text-spartan-maroon mb-1">SR-Code / Staff ID</label>
+                            <input type="text" id="login-srcode" required placeholder="e.g. 24-09303 or ADMIN" class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-spartan-maroon focus:outline-none font-mono text-sm font-bold uppercase">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Password</label>
-                            <input type="password" id="login-pass" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon text-sm">
+                            <label class="block text-xs font-black uppercase text-spartan-maroon mb-1">Password</label>
+                            <input type="password" id="login-pass" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-spartan-maroon focus:outline-none text-sm font-bold">
                         </div>
-                        <button type="submit" class="w-full py-3 bg-spartan-maroon hover:bg-spartan-maroonDark text-spartan-gold font-bold rounded-lg shadow-md hover:shadow-lg transition flex items-center justify-center space-x-2 border border-spartan-gold">
+                        <button type="submit" class="w-full py-3.5 bg-spartan-maroon hover:bg-spartan-maroonDark text-spartan-gold font-black uppercase tracking-wider rounded-xl shadow-xl transition-all transform hover:-translate-y-0.5 border-2 border-spartan-gold flex items-center justify-center space-x-2">
                             <span>Sign In</span>
-                            <i class='bx bx-right-arrow-alt text-lg'></i>
+                            <i class='bx bx-right-arrow-alt text-xl'></i>
                         </button>
                     </form>
 
                     <!-- Register Form -->
-                    <form id="form-register" onsubmit="handleRegister(event)" class="space-y-3.5 hidden">
+                    <form id="form-register" onsubmit="handleRegister(event)" class="space-y-3 hidden">
                         <div>
-                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">SR-Code</label>
-                            <input type="text" id="reg-srcode" required placeholder="24-09303" class="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon font-mono text-sm uppercase">
+                            <label class="block text-xs font-black uppercase text-spartan-maroon mb-1">SR-Code</label>
+                            <input type="text" id="reg-srcode" required placeholder="24-09303" class="w-full px-3.5 py-2 rounded-lg border-2 border-slate-300 focus:border-spartan-maroon focus:outline-none font-mono text-sm font-bold uppercase">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Full Name</label>
-                            <input type="text" id="reg-name" required placeholder="Juan Dela Cruz" class="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon text-sm">
+                            <label class="block text-xs font-black uppercase text-spartan-maroon mb-1">Full Name</label>
+                            <input type="text" id="reg-name" required placeholder="Juan Dela Cruz" class="w-full px-3.5 py-2 rounded-lg border-2 border-slate-300 focus:border-spartan-maroon focus:outline-none text-sm font-bold">
                         </div>
                         <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Program</label>
-                                <input type="text" id="reg-dept" required placeholder="BS CpE" class="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon text-sm">
+                                <label class="block text-xs font-black uppercase text-spartan-maroon mb-1">Program</label>
+                                <input type="text" id="reg-dept" required placeholder="BS CpE" class="w-full px-3.5 py-2 rounded-lg border-2 border-slate-300 focus:border-spartan-maroon focus:outline-none text-sm font-bold">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Year Level</label>
-                                <select id="reg-year" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon text-sm">
+                                <label class="block text-xs font-black uppercase text-spartan-maroon mb-1">Year Level</label>
+                                <select id="reg-year" class="w-full px-3 py-2 rounded-lg border-2 border-slate-300 focus:border-spartan-maroon focus:outline-none text-sm font-bold">
                                     <option value="1st Year">1st Year</option>
                                     <option value="2nd Year">2nd Year</option>
                                     <option value="3rd Year">3rd Year</option>
@@ -145,11 +148,11 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Password</label>
-                            <input type="password" id="reg-pass" required placeholder="••••••••" class="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon text-sm">
+                            <label class="block text-xs font-black uppercase text-spartan-maroon mb-1">Password</label>
+                            <input type="password" id="reg-pass" required placeholder="••••••••" class="w-full px-3.5 py-2 rounded-lg border-2 border-slate-300 focus:border-spartan-maroon focus:outline-none text-sm font-bold">
                         </div>
-                        <button type="submit" class="w-full py-3 bg-spartan-maroon hover:bg-spartan-maroonDark text-spartan-gold font-bold rounded-lg shadow-md hover:shadow-lg transition border border-spartan-gold">
-                            Create Patient Account
+                        <button type="submit" class="w-full py-3.5 bg-spartan-maroon hover:bg-spartan-maroonDark text-spartan-gold font-black uppercase tracking-wider rounded-xl shadow-xl transition-all transform hover:-translate-y-0.5 border-2 border-spartan-gold">
+                            Register Account
                         </button>
                     </form>
                 </div>
@@ -160,52 +163,58 @@
         <section id="view-student" class="hidden space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Check-in Card -->
-                <div class="md:col-span-1 bg-white p-6 rounded-2xl shadow-md border-t-4 border-spartan-maroon">
-                    <h3 class="font-cinzel font-bold text-lg text-spartan-maroon mb-4 flex items-center space-x-2">
+                <div class="md:col-span-1 bg-white p-6 rounded-2xl shadow-xl border-t-8 border-spartan-maroon border-x border-b border-slate-200">
+                    <h3 class="font-cinzel font-black text-xl text-spartan-maroon mb-4 flex items-center space-x-2">
                         <i class='bx bx-plus-medical text-spartan-gold'></i>
                         <span>Clinic Check-In</span>
                     </h3>
                     <form onsubmit="handleJoinQueue(event)" class="space-y-4">
                         <div>
-                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Symptoms / Concern (Confidential)</label>
-                            <textarea id="queue-symptoms" required rows="3" placeholder="Describe symptoms (e.g. fever, headache, minor sprain)..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-spartan-maroon focus:outline-none"></textarea>
+                            <label class="block text-xs font-black uppercase text-spartan-maroon mb-1">Symptoms / Concern (Confidential)</label>
+                            <textarea id="queue-symptoms" required rows="3" placeholder="Describe symptoms (fever, headache, minor injury)..." class="w-full px-3.5 py-2 border-2 border-slate-300 rounded-lg text-sm font-semibold focus:border-spartan-maroon focus:outline-none"></textarea>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Urgency Level</label>
-                            <select id="queue-urgency" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-spartan-maroon focus:outline-none">
+                            <label class="block text-xs font-black uppercase text-spartan-maroon mb-1">Urgency Priority</label>
+                            <select id="queue-urgency" class="w-full px-3.5 py-2 border-2 border-slate-300 rounded-lg text-sm font-bold focus:border-spartan-maroon focus:outline-none">
                                 <option value="routine">Routine Check / Medical Clearance</option>
                                 <option value="emergency">Emergency / Severe Discomfort</option>
                             </select>
                         </div>
-                        <button type="submit" class="w-full py-2.5 bg-spartan-maroon hover:bg-spartan-maroonDark text-white font-bold rounded-lg shadow transition">
-                            Enter Queue
+                        <button type="submit" class="w-full py-3 bg-spartan-maroon hover:bg-spartan-maroonDark text-spartan-gold font-black uppercase tracking-wider rounded-xl shadow-lg transition border-2 border-spartan-gold">
+                            Submit To Queue
                         </button>
                     </form>
                 </div>
 
-                <!-- Live Public Board (Privacy Masked) -->
-                <div class="md:col-span-2 bg-white p-6 rounded-2xl shadow-md border-t-4 border-spartan-gold flex flex-col justify-between">
+                <!-- Live Calling Board -->
+                <div class="md:col-span-2 bg-white p-6 rounded-2xl shadow-xl border-t-8 border-spartan-gold border-x border-b border-slate-200 flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between border-b pb-3 mb-4">
-                            <h3 class="font-cinzel font-bold text-lg text-spartan-maroon">Live Calling Board</h3>
-                            <span class="text-xs bg-amber-50 text-amber-800 px-2 py-1 rounded font-mono border border-amber-300">Confidential Mode</span>
+                        <div class="flex items-center justify-between border-b-2 border-slate-200 pb-3 mb-4">
+                            <h3 class="font-cinzel font-black text-xl text-spartan-maroon">Live Calling Board</h3>
+                            <span class="text-xs bg-spartan-maroon text-spartan-gold px-3 py-1 rounded-full font-mono font-bold border border-spartan-gold">Confidential Board</span>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div class="bg-red-50 p-4 rounded-xl border-2 border-red-200">
-                                <h4 class="text-xs font-bold uppercase text-red-900 mb-2 font-cinzel">Emergency Priority</h4>
-                                <div id="student-emergency-list" class="space-y-2 text-sm text-slate-700">
+                            <div class="bg-red-50 p-4 rounded-xl border-2 border-red-500">
+                                <h4 class="text-xs font-black uppercase text-red-800 mb-2 font-cinzel flex items-center space-x-1">
+                                    <i class='bx bxs-hot text-red-600'></i>
+                                    <span>Emergency Priority</span>
+                                </h4>
+                                <div id="student-emergency-list" class="space-y-2 text-sm">
                                     <p class="text-xs italic text-slate-400">No emergency cases waiting.</p>
                                 </div>
                             </div>
-                            <div class="bg-amber-50/50 p-4 rounded-xl border-2 border-amber-200">
-                                <h4 class="text-xs font-bold uppercase text-amber-900 mb-2 font-cinzel">Routine Queue</h4>
-                                <div id="student-routine-list" class="space-y-2 text-sm text-slate-700">
+                            <div class="bg-amber-50 p-4 rounded-xl border-2 border-spartan-gold">
+                                <h4 class="text-xs font-black uppercase text-amber-900 mb-2 font-cinzel flex items-center space-x-1">
+                                    <i class='bx bx-time text-amber-700'></i>
+                                    <span>Routine Queue</span>
+                                </h4>
+                                <div id="student-routine-list" class="space-y-2 text-sm">
                                     <p class="text-xs italic text-slate-400">No routine patients waiting.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <p class="text-[11px] text-slate-400 mt-4 text-center">Names and symptoms are masked on public monitors to protect student privacy.</p>
+                    <p class="text-[11px] text-slate-500 font-semibold mt-4 text-center">Student SR-Codes are partially masked and symptoms remain confidential.</p>
                 </div>
             </div>
         </section>
@@ -213,23 +222,23 @@
         <!-- ================= ADMIN VIEW ================= -->
         <section id="view-admin" class="hidden space-y-6">
             
-            <!-- Quick Stat Cards (Interactive Navigation) -->
+            <!-- Quick Stat Cards (High Contrast Spartan Cards) -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div onclick="scrollToSection('admin-patients-sec')" class="bg-white p-4 rounded-xl shadow border-l-4 border-spartan-maroon hover:shadow-md cursor-pointer transition">
-                    <span class="text-xs font-bold text-slate-500 uppercase">Registered</span>
-                    <h4 id="stat-total-patients" class="text-2xl font-bold font-mono text-spartan-maroon mt-1">0</h4>
+                <div onclick="scrollToSection('admin-patients-sec')" class="bg-gradient-to-br from-spartan-maroon to-spartan-maroonDark text-white p-4 rounded-2xl shadow-xl border-2 border-spartan-gold hover:scale-[1.02] cursor-pointer transition-all">
+                    <span class="text-xs font-black uppercase text-spartan-gold">Total Registered</span>
+                    <h4 id="stat-total-patients" class="text-3xl font-black font-mono text-white mt-1">0</h4>
                 </div>
-                <div onclick="scrollToSection('admin-emergency-sec')" class="bg-white p-4 rounded-xl shadow border-l-4 border-red-600 hover:shadow-md cursor-pointer transition">
-                    <span class="text-xs font-bold text-red-700 uppercase">Emergency (Heap)</span>
-                    <h4 id="stat-emergency-count" class="text-2xl font-bold font-mono text-red-700 mt-1">0</h4>
+                <div onclick="scrollToSection('admin-emergency-sec')" class="bg-gradient-to-br from-red-700 to-red-900 text-white p-4 rounded-2xl shadow-xl border-2 border-red-400 hover:scale-[1.02] cursor-pointer transition-all">
+                    <span class="text-xs font-black uppercase text-red-200">Emergency (Heap)</span>
+                    <h4 id="stat-emergency-count" class="text-3xl font-black font-mono text-white mt-1">0</h4>
                 </div>
-                <div onclick="scrollToSection('admin-routine-sec')" class="bg-white p-4 rounded-xl shadow border-l-4 border-spartan-gold hover:shadow-md cursor-pointer transition">
-                    <span class="text-xs font-bold text-amber-800 uppercase">Routine (FIFO)</span>
-                    <h4 id="stat-routine-count" class="text-2xl font-bold font-mono text-amber-700 mt-1">0</h4>
+                <div onclick="scrollToSection('admin-routine-sec')" class="bg-gradient-to-br from-amber-500 to-amber-700 text-white p-4 rounded-2xl shadow-xl border-2 border-amber-300 hover:scale-[1.02] cursor-pointer transition-all">
+                    <span class="text-xs font-black uppercase text-amber-100">Routine (FIFO)</span>
+                    <h4 id="stat-routine-count" class="text-3xl font-black font-mono text-white mt-1">0</h4>
                 </div>
-                <div onclick="scrollToSection('admin-treated-sec')" class="bg-white p-4 rounded-xl shadow border-l-4 border-emerald-600 hover:shadow-md cursor-pointer transition">
-                    <span class="text-xs font-bold text-emerald-700 uppercase">Total Treated</span>
-                    <h4 id="stat-treated-count" class="text-2xl font-bold font-mono text-emerald-700 mt-1">0</h4>
+                <div onclick="scrollToSection('admin-treated-sec')" class="bg-gradient-to-br from-emerald-700 to-emerald-900 text-white p-4 rounded-2xl shadow-xl border-2 border-emerald-400 hover:scale-[1.02] cursor-pointer transition-all">
+                    <span class="text-xs font-black uppercase text-emerald-200">Total Treated</span>
+                    <h4 id="stat-treated-count" class="text-3xl font-black font-mono text-white mt-1">0</h4>
                 </div>
             </div>
 
@@ -237,14 +246,14 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
                 <!-- Emergency Priority (Max-Heap) -->
-                <div id="admin-emergency-sec" class="bg-white rounded-2xl shadow-md border-t-4 border-red-600 p-5">
-                    <div class="flex items-center justify-between pb-3 border-b mb-3">
+                <div id="admin-emergency-sec" class="bg-white rounded-2xl shadow-xl border-t-8 border-red-700 border-x border-b border-slate-200 p-5">
+                    <div class="flex items-center justify-between pb-3 border-b-2 border-slate-200 mb-3">
                         <div class="flex items-center space-x-2">
-                            <span class="w-3 h-3 rounded-full bg-red-600 animate-pulse"></span>
-                            <h3 class="font-cinzel font-bold text-base text-slate-800">Emergency Queue (Max-Heap)</h3>
+                            <span class="w-3.5 h-3.5 rounded-full bg-red-600 animate-pulse"></span>
+                            <h3 class="font-cinzel font-black text-lg text-red-900">Emergency Queue (Max-Heap)</h3>
                         </div>
-                        <button onclick="callNext('emergency')" class="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-lg transition shadow flex items-center space-x-1">
-                            <i class='bx bx-bell'></i>
+                        <button onclick="callNext('emergency')" class="px-4 py-2 bg-red-700 hover:bg-red-800 text-white font-black text-xs uppercase tracking-wider rounded-lg transition shadow-md flex items-center space-x-1">
+                            <i class='bx bx-bell text-base'></i>
                             <span>Call Next</span>
                         </button>
                     </div>
@@ -252,14 +261,14 @@
                 </div>
 
                 <!-- Routine Queue (FIFO) -->
-                <div id="admin-routine-sec" class="bg-white rounded-2xl shadow-md border-t-4 border-spartan-gold p-5">
-                    <div class="flex items-center justify-between pb-3 border-b mb-3">
+                <div id="admin-routine-sec" class="bg-white rounded-2xl shadow-xl border-t-8 border-spartan-gold border-x border-b border-slate-200 p-5">
+                    <div class="flex items-center justify-between pb-3 border-b-2 border-slate-200 mb-3">
                         <div class="flex items-center space-x-2">
-                            <span class="w-3 h-3 rounded-full bg-spartan-gold"></span>
-                            <h3 class="font-cinzel font-bold text-base text-slate-800">Routine Queue (FIFO)</h3>
+                            <span class="w-3.5 h-3.5 rounded-full bg-spartan-gold"></span>
+                            <h3 class="font-cinzel font-black text-lg text-spartan-maroon">Routine Queue (FIFO)</h3>
                         </div>
-                        <button onclick="callNext('routine')" class="px-3.5 py-1.5 bg-spartan-maroon hover:bg-spartan-maroonDark text-spartan-gold font-bold text-xs rounded-lg transition shadow flex items-center space-x-1 border border-spartan-gold">
-                            <i class='bx bx-bell'></i>
+                        <button onclick="callNext('routine')" class="px-4 py-2 bg-spartan-maroon hover:bg-spartan-maroonDark text-spartan-gold font-black text-xs uppercase tracking-wider rounded-lg transition shadow-md flex items-center space-x-1 border border-spartan-gold">
+                            <i class='bx bx-bell text-base'></i>
                             <span>Call Next</span>
                         </button>
                     </div>
@@ -268,17 +277,17 @@
             </div>
 
             <!-- Student Directory / BST Search -->
-            <div id="admin-patients-sec" class="bg-white rounded-2xl shadow-md border-t-4 border-spartan-maroon p-5">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-3 border-b mb-4 gap-3">
-                    <h3 class="font-cinzel font-bold text-base text-spartan-maroon">Student Directory (BST Indexed)</h3>
-                    <div class="w-full sm:w-72 relative">
-                        <i class='bx bx-search absolute left-3 top-2.5 text-slate-400'></i>
-                        <input type="text" id="admin-search-input" oninput="filterPatients(this.value)" placeholder="Search by SR-Code or Name..." class="w-full pl-9 pr-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-spartan-maroon">
+            <div id="admin-patients-sec" class="bg-white rounded-2xl shadow-xl border-t-8 border-spartan-maroon border-x border-b border-slate-200 p-5">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-3 border-b-2 border-slate-200 mb-4 gap-3">
+                    <h3 class="font-cinzel font-black text-xl text-spartan-maroon">Student Directory (BST Indexed)</h3>
+                    <div class="w-full sm:w-80 relative">
+                        <i class='bx bx-search absolute left-3 top-2.5 text-spartan-maroon font-bold text-lg'></i>
+                        <input type="text" id="admin-search-input" oninput="filterPatients(this.value)" placeholder="Search by SR-Code or Name..." class="w-full pl-10 pr-3 py-2 border-2 border-slate-300 focus:border-spartan-maroon rounded-xl text-sm font-bold focus:outline-none">
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-700">
-                        <thead class="bg-slate-100 text-slate-600 uppercase text-[11px] font-mono">
+                    <table class="w-full text-left text-sm text-slate-800">
+                        <thead class="bg-spartan-maroon text-spartan-gold uppercase text-[11px] font-mono font-black">
                             <tr>
                                 <th class="p-3">SR-Code</th>
                                 <th class="p-3">Name</th>
@@ -287,14 +296,14 @@
                                 <th class="p-3 text-right">Medical Record</th>
                             </tr>
                         </thead>
-                        <tbody id="admin-patient-table-body" class="divide-y divide-slate-100"></tbody>
+                        <tbody id="admin-patient-table-body" class="divide-y divide-slate-200 font-semibold"></tbody>
                     </table>
                 </div>
             </div>
 
             <!-- Treated History Section -->
-            <div id="admin-treated-sec" class="bg-white rounded-2xl shadow-md border-t-4 border-emerald-600 p-5">
-                <h3 class="font-cinzel font-bold text-base text-slate-800 pb-3 border-b mb-3">Treated Patients Log</h3>
+            <div id="admin-treated-sec" class="bg-white rounded-2xl shadow-xl border-t-8 border-emerald-700 border-x border-b border-slate-200 p-5">
+                <h3 class="font-cinzel font-black text-xl text-emerald-900 pb-3 border-b-2 border-slate-200 mb-3">Treated Patients Log</h3>
                 <div id="admin-treated-list" class="space-y-2 max-h-56 overflow-y-auto custom-scrollbar"></div>
             </div>
 
@@ -303,32 +312,32 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-spartan-maroonDark text-slate-300 text-xs py-4 border-t-2 border-spartan-gold">
+    <footer class="bg-spartan-maroonDeep text-slate-300 text-xs py-5 border-t-4 border-spartan-gold mt-8">
         <div class="max-w-7xl mx-auto px-4 text-center">
-            <p>PHALANX HEALTH &bull; CpE 411 Data Structures and Algorithms &bull; Batangas State University Alangilan</p>
+            <p class="font-bold tracking-wide">PHALANX HEALTH &bull; CpE 411 Data Structures and Algorithms &bull; Batangas State University Alangilan</p>
         </div>
     </footer>
 
     <!-- PATIENT MEDICAL HISTORY & ASSESSMENT MODAL -->
-    <div id="inspector-modal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
-        <div class="bg-white w-full max-w-xl rounded-2xl shadow-2xl border-2 border-spartan-gold overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="bg-spartan-maroon text-white p-4 flex justify-between items-center border-b-2 border-spartan-gold">
+    <div id="inspector-modal" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-xl rounded-2xl shadow-2xl border-4 border-spartan-gold overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-spartan-maroon text-white p-4 flex justify-between items-center border-b-4 border-spartan-gold">
                 <div class="flex items-center space-x-2">
-                    <i class='bx bx-user-pin text-xl text-spartan-gold'></i>
-                    <h3 class="font-cinzel font-bold text-base text-spartan-gold" id="modal-title">Student Medical Record</h3>
+                    <i class='bx bx-user-pin text-2xl text-spartan-gold'></i>
+                    <h3 class="font-cinzel font-black text-lg text-spartan-gold tracking-wide" id="modal-title">Student Medical Record</h3>
                 </div>
-                <button onclick="closeInspector()" class="text-white hover:text-spartan-gold text-2xl leading-none">&times;</button>
+                <button onclick="closeInspector()" class="text-white hover:text-spartan-gold text-3xl font-black leading-none">&times;</button>
             </div>
             <div class="p-5 overflow-y-auto custom-scrollbar space-y-4">
-                <div id="modal-student-info" class="p-3 bg-slate-50 rounded-xl border text-sm font-mono space-y-1"></div>
+                <div id="modal-student-info" class="p-3.5 bg-slate-100 rounded-xl border-2 border-slate-300 text-sm font-mono space-y-1 font-bold"></div>
                 <div>
-                    <h4 class="text-xs font-bold uppercase text-slate-600 mb-2 font-cinzel">Visit History & Doctor Comments</h4>
+                    <h4 class="text-xs font-black uppercase text-spartan-maroon mb-2 font-cinzel">Visit History & Doctor Comments</h4>
                     <div id="modal-history-list" class="space-y-2 text-sm"></div>
                 </div>
-                <div class="pt-2 border-t">
-                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1 font-cinzel">Add Doctor Assessment / Note</label>
-                    <textarea id="modal-new-comment" rows="2" placeholder="Enter diagnosis, prescription, or clinic notes..." class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-spartan-maroon focus:outline-none"></textarea>
-                    <button onclick="saveDoctorComment()" class="mt-2 w-full py-2 bg-spartan-maroon hover:bg-spartan-maroonDark text-spartan-gold font-bold text-xs rounded-lg transition shadow border border-spartan-gold">
+                <div class="pt-3 border-t-2 border-slate-200">
+                    <label class="block text-xs font-black uppercase text-spartan-maroon mb-1 font-cinzel">Add Doctor Assessment / Note</label>
+                    <textarea id="modal-new-comment" rows="2" placeholder="Enter diagnosis, prescription, or clinical notes..." class="w-full px-3 py-2 border-2 border-slate-300 rounded-lg text-sm font-semibold focus:border-spartan-maroon focus:outline-none"></textarea>
+                    <button onclick="saveDoctorComment()" class="mt-2 w-full py-2.5 bg-spartan-maroon hover:bg-spartan-maroonDark text-spartan-gold font-black uppercase tracking-wider text-xs rounded-xl transition shadow-lg border-2 border-spartan-gold">
                         Save Assessment
                     </button>
                 </div>
@@ -351,13 +360,13 @@
             if(type === 'login') {
                 loginForm.classList.remove('hidden');
                 regForm.classList.add('hidden');
-                tabLogin.className = "w-1/2 py-3 text-sm font-bold text-spartan-maroon border-b-4 border-spartan-maroon bg-white transition";
-                tabReg.className = "w-1/2 py-3 text-sm font-bold text-slate-400 hover:text-spartan-maroon transition";
+                tabLogin.className = "w-1/2 py-3.5 text-sm font-black uppercase text-spartan-maroon border-b-4 border-spartan-maroon bg-white transition";
+                tabReg.className = "w-1/2 py-3.5 text-sm font-bold uppercase text-slate-500 hover:text-spartan-maroon transition";
             } else {
                 loginForm.classList.add('hidden');
                 regForm.classList.remove('hidden');
-                tabReg.className = "w-1/2 py-3 text-sm font-bold text-spartan-maroon border-b-4 border-spartan-maroon bg-white transition";
-                tabLogin.className = "w-1/2 py-3 text-sm font-bold text-slate-400 hover:text-spartan-maroon transition";
+                tabReg.className = "w-1/2 py-3.5 text-sm font-black uppercase text-spartan-maroon border-b-4 border-spartan-maroon bg-white transition";
+                tabLogin.className = "w-1/2 py-3.5 text-sm font-bold uppercase text-slate-500 hover:text-spartan-maroon transition";
             }
         }
 
@@ -456,39 +465,39 @@
             // Emergency list
             const emergList = document.getElementById('admin-emergency-list');
             emergList.innerHTML = data.emergency_queue.length === 0 ? 
-                `<p class="text-xs italic text-slate-400 p-2">No emergency cases waiting.</p>` :
+                `<p class="text-xs italic text-slate-400 p-2 font-semibold">No emergency cases waiting.</p>` :
                 data.emergency_queue.map(p => `
-                    <div class="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center justify-between">
+                    <div class="p-3 bg-red-50 border-2 border-red-300 rounded-xl flex items-center justify-between">
                         <div>
-                            <span class="text-xs font-mono font-bold text-red-900">${p.srcode} - ${p.name}</span>
-                            <p class="text-xs text-red-700 italic mt-0.5">"${p.symptoms}"</p>
+                            <span class="text-xs font-mono font-black text-red-900">${p.srcode} - ${p.name}</span>
+                            <p class="text-xs text-red-700 italic font-semibold mt-0.5">"${p.symptoms}"</p>
                         </div>
-                        <button onclick="openInspector('${p.srcode}')" class="text-xs font-bold bg-white text-red-700 border border-red-300 px-2 py-1 rounded shadow-sm hover:bg-red-50">View</button>
+                        <button onclick="openInspector('${p.srcode}')" class="text-xs font-black bg-red-700 text-white px-3 py-1.5 rounded-lg shadow hover:bg-red-800 transition">View</button>
                     </div>
                 `).join('');
 
             // Routine list
             const routineList = document.getElementById('admin-routine-list');
             routineList.innerHTML = data.routine_queue.length === 0 ? 
-                `<p class="text-xs italic text-slate-400 p-2">No routine patients waiting.</p>` :
+                `<p class="text-xs italic text-slate-400 p-2 font-semibold">No routine patients waiting.</p>` :
                 data.routine_queue.map(p => `
-                    <div class="p-3 bg-amber-50/60 border border-amber-200 rounded-xl flex items-center justify-between">
+                    <div class="p-3 bg-amber-50 border-2 border-amber-300 rounded-xl flex items-center justify-between">
                         <div>
-                            <span class="text-xs font-mono font-bold text-amber-900">${p.srcode} - ${p.name}</span>
-                            <p class="text-xs text-amber-800 italic mt-0.5">"${p.symptoms}"</p>
+                            <span class="text-xs font-mono font-black text-amber-950">${p.srcode} - ${p.name}</span>
+                            <p class="text-xs text-amber-800 italic font-semibold mt-0.5">"${p.symptoms}"</p>
                         </div>
-                        <button onclick="openInspector('${p.srcode}')" class="text-xs font-bold bg-white text-amber-800 border border-amber-300 px-2 py-1 rounded shadow-sm hover:bg-amber-50">View</button>
+                        <button onclick="openInspector('${p.srcode}')" class="text-xs font-black bg-spartan-maroon text-spartan-gold border border-spartan-gold px-3 py-1.5 rounded-lg shadow hover:bg-spartan-maroonDark transition">View</button>
                     </div>
                 `).join('');
 
             // Treated list
             const treatedList = document.getElementById('admin-treated-list');
             treatedList.innerHTML = data.treated_history.length === 0 ? 
-                `<p class="text-xs italic text-slate-400 p-2">No patients treated yet today.</p>` :
+                `<p class="text-xs italic text-slate-400 p-2 font-semibold">No patients treated yet today.</p>` :
                 data.treated_history.map(p => `
-                    <div class="p-2.5 bg-slate-50 border rounded-lg flex items-center justify-between text-xs">
-                        <span class="font-mono text-slate-700"><strong>${p.srcode}</strong> - ${p.name}</span>
-                        <span class="text-slate-400 text-[11px]">${p.timestamp}</span>
+                    <div class="p-2.5 bg-emerald-50 border border-emerald-300 rounded-xl flex items-center justify-between text-xs font-semibold">
+                        <span class="font-mono text-emerald-950"><strong>${p.srcode}</strong> - ${p.name}</span>
+                        <span class="text-emerald-700 font-mono text-[11px] font-bold">${p.timestamp}</span>
                     </div>
                 `).join('');
 
@@ -499,13 +508,13 @@
         function renderPatientTable(patients) {
             const tbody = document.getElementById('admin-patient-table-body');
             tbody.innerHTML = patients.map(p => `
-                <tr class="hover:bg-slate-50 transition">
-                    <td class="p-3 font-mono font-bold text-spartan-maroon">${p.srcode}</td>
-                    <td class="p-3 font-medium text-slate-800">${p.name}</td>
-                    <td class="p-3 text-slate-500">${p.department} - ${p.year_level}</td>
-                    <td class="p-3 font-mono">${(p.visits || []).length}</td>
+                <tr class="hover:bg-amber-50/50 transition">
+                    <td class="p-3 font-mono font-black text-spartan-maroon">${p.srcode}</td>
+                    <td class="p-3 font-bold text-slate-900">${p.name}</td>
+                    <td class="p-3 text-slate-600 font-semibold">${p.department} - ${p.year_level}</td>
+                    <td class="p-3 font-mono font-black">${(p.visits || []).length}</td>
                     <td class="p-3 text-right">
-                        <button onclick="openInspector('${p.srcode}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 border rounded text-xs font-bold text-slate-700">
+                        <button onclick="openInspector('${p.srcode}')" class="px-3 py-1.5 bg-spartan-maroon hover:bg-spartan-maroonDark text-spartan-gold border border-spartan-gold rounded-lg text-xs font-black uppercase transition shadow">
                             Inspect
                         </button>
                     </td>
@@ -546,21 +555,21 @@
 
                 const emergList = document.getElementById('student-emergency-list');
                 emergList.innerHTML = data.emergency_queue.length === 0 ? 
-                    `<p class="text-xs italic text-slate-400">No emergency cases waiting.</p>` :
+                    `<p class="text-xs italic text-slate-400 font-semibold">No emergency cases waiting.</p>` :
                     data.emergency_queue.map(p => `
-                        <div class="p-2 bg-white rounded border border-red-200 font-mono text-xs text-red-900 flex justify-between">
+                        <div class="p-2.5 bg-white rounded-lg border-2 border-red-300 font-mono text-xs font-black text-red-900 flex justify-between">
                             <span>${maskSRCode(p.srcode)}</span>
-                            <span class="text-red-700 font-bold">Priority High</span>
+                            <span class="text-red-700 uppercase font-black">High Priority</span>
                         </div>
                     `).join('');
 
                 const routineList = document.getElementById('student-routine-list');
                 routineList.innerHTML = data.routine_queue.length === 0 ? 
-                    `<p class="text-xs italic text-slate-400">No routine patients waiting.</p>` :
+                    `<p class="text-xs italic text-slate-400 font-semibold">No routine patients waiting.</p>` :
                     data.routine_queue.map((p, idx) => `
-                        <div class="p-2 bg-white rounded border border-amber-200 font-mono text-xs text-amber-900 flex justify-between">
+                        <div class="p-2.5 bg-white rounded-lg border-2 border-amber-300 font-mono text-xs font-black text-amber-950 flex justify-between">
                             <span>${maskSRCode(p.srcode)}</span>
-                            <span class="text-amber-700 font-bold">#${idx + 1} In Line</span>
+                            <span class="text-amber-800 uppercase font-black">#${idx + 1} In Line</span>
                         </div>
                     `).join('');
 
@@ -607,21 +616,21 @@
 
             selectedStudentCode = srcode;
             document.getElementById('modal-student-info').innerHTML = `
-                <div><strong>SR-Code:</strong> ${patient.srcode}</div>
-                <div><strong>Name:</strong> ${patient.name}</div>
-                <div><strong>Department:</strong> ${patient.department} (${patient.year_level})</div>
+                <div><span class="text-spartan-maroon">SR-Code:</span> ${patient.srcode}</div>
+                <div><span class="text-spartan-maroon">Name:</span> ${patient.name}</div>
+                <div><span class="text-spartan-maroon">Program / Year:</span> ${patient.department} (${patient.year_level})</div>
             `;
 
             const historyList = document.getElementById('modal-history-list');
             historyList.innerHTML = (!patient.visits || patient.visits.length === 0) ?
-                `<p class="text-xs italic text-slate-400">No medical visit logs found.</p>` :
+                `<p class="text-xs italic text-slate-400 font-semibold">No medical visit logs recorded yet.</p>` :
                 patient.visits.map(v => `
-                    <div class="p-2.5 bg-slate-50 border rounded-lg text-xs space-y-1">
-                        <div class="flex justify-between font-bold text-slate-700">
+                    <div class="p-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-xs space-y-1">
+                        <div class="flex justify-between font-black text-spartan-maroon">
                             <span>Symptom: ${v.symptoms}</span>
-                            <span class="text-slate-400 font-mono text-[10px]">${v.date || ''}</span>
+                            <span class="text-slate-500 font-mono text-[10px]">${v.date || ''}</span>
                         </div>
-                        <p class="text-slate-600"><strong>Assessment:</strong> ${v.comment || 'No doctor comment.'}</p>
+                        <p class="text-slate-800 font-semibold"><strong>Doctor Note:</strong> ${v.comment || 'No doctor comment yet.'}</p>
                     </div>
                 `).join('');
 
@@ -656,7 +665,7 @@
             }
         }
 
-        // Smooth Auto-Refresh
+        // Smooth Auto-Refresh every 10 seconds
         setInterval(() => {
             if(currentUser) {
                 if(currentUser.role === 'admin') fetchAdminData();
