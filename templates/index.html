@@ -12,11 +12,11 @@
                 extend: {
                     colors: {
                         spartan: {
-                            maroon: '#6B0F1A',
-                            maroonDark: '#45060E',
-                            gold: '#FFC72C',
-                            goldHover: '#E5AF1B',
-                            smoke: '#F8F9FA'
+                            maroon: '#800000',      /* Official BatStateU Maroon */
+                            maroonDark: '#4D0000',  /* Deep Spartan Maroon */
+                            maroonLight: '#990000',
+                            gold: '#FFC72C',        /* Official Spartan Gold */
+                            goldDark: '#D4A017'
                         }
                     },
                     fontFamily: {
@@ -38,17 +38,16 @@
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.03); }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
-        .gold-glow { box-shadow: 0 0 20px rgba(255, 199, 44, 0.25); }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #800000; }
     </style>
 </head>
-<body class="bg-[#F4F6F9] text-slate-800 font-sans antialiased min-h-screen flex flex-col justify-between">
+<body class="bg-[#F8F9FA] text-slate-800 font-sans antialiased min-h-screen flex flex-col justify-between">
 
     <!-- TOP HEADER -->
     <header class="bg-gradient-to-r from-spartan-maroonDark via-spartan-maroon to-spartan-maroonDark text-white shadow-xl border-b-4 border-spartan-gold sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
             <div class="flex items-center space-x-3.5">
-                <div class="w-12 h-12 rounded-xl bg-white/10 p-1 border border-spartan-gold/40 flex items-center justify-center overflow-hidden shadow-inner flex-shrink-0">
+                <div class="w-12 h-12 rounded-xl bg-white/10 p-1 border-2 border-spartan-gold flex items-center justify-center overflow-hidden flex-shrink-0 shadow-md">
                     <img 
                         src="/static/spartan.png" 
                         alt="Spartan Logo" 
@@ -57,7 +56,7 @@
                     />
                 </div>
                 <div>
-                    <h1 class="font-cinzel text-2xl sm:text-3xl font-black tracking-wider text-spartan-gold drop-shadow-md">
+                    <h1 class="font-cinzel text-2xl sm:text-3xl font-black tracking-wider text-spartan-gold drop-shadow">
                         PHALANX HEALTH
                     </h1>
                 </div>
@@ -67,9 +66,9 @@
             <div id="user-nav" class="hidden items-center space-x-3">
                 <div class="hidden sm:flex flex-col text-right">
                     <span id="nav-user-name" class="font-bold text-sm text-white">Student</span>
-                    <span id="nav-user-role" class="text-xs text-spartan-gold font-mono uppercase tracking-wider">PATIENT</span>
+                    <span id="nav-user-role" class="text-xs text-spartan-gold font-mono uppercase tracking-wider font-bold">PATIENT</span>
                 </div>
-                <button onclick="handleLogout()" class="px-3.5 py-1.5 bg-black/30 hover:bg-black/50 text-white rounded-lg border border-white/20 text-xs font-bold transition flex items-center space-x-1.5">
+                <button onclick="handleLogout()" class="px-3.5 py-1.5 bg-black/40 hover:bg-black/60 text-white rounded-lg border border-spartan-gold/50 text-xs font-bold transition flex items-center space-x-1.5">
                     <i class='bx bx-log-out text-base'></i>
                     <span>Log Out</span>
                 </button>
@@ -82,9 +81,9 @@
 
         <!-- ================= AUTH VIEW (LOGIN / REGISTER) ================= -->
         <section id="view-auth" class="max-w-md mx-auto my-6">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200/80 overflow-hidden">
-                <div class="bg-gradient-to-b from-spartan-maroon to-spartan-maroonDark p-6 text-center text-white">
-                    <div class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-white/10 p-2 border border-spartan-gold/50 flex items-center justify-center overflow-hidden shadow-inner">
+            <div class="bg-white rounded-2xl shadow-2xl border-2 border-spartan-gold/40 overflow-hidden">
+                <div class="bg-gradient-to-b from-spartan-maroon to-spartan-maroonDark p-6 text-center text-white border-b-2 border-spartan-gold">
+                    <div class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-white/10 p-2 border-2 border-spartan-gold flex items-center justify-center overflow-hidden shadow-inner">
                         <img 
                             src="/static/spartan.png" 
                             alt="Spartan Logo" 
@@ -93,13 +92,13 @@
                         />
                     </div>
                     <h2 class="font-cinzel text-xl font-black tracking-wide text-spartan-gold">AUTHENTICATION PORTAL</h2>
-                    <p class="text-xs text-slate-300 mt-1">Access Student Queue or Clinic Management</p>
+                    <p class="text-xs text-slate-200 mt-1">Access Student Queue or Clinic Management</p>
                 </div>
 
                 <!-- Tabs -->
-                <div class="flex border-b border-slate-200">
-                    <button id="tab-login" onclick="switchAuthTab('login')" class="w-1/2 py-3 text-sm font-bold text-spartan-maroon border-b-2 border-spartan-maroon">Sign In</button>
-                    <button id="tab-reg" onclick="switchAuthTab('reg')" class="w-1/2 py-3 text-sm font-bold text-slate-400 hover:text-slate-600">Register</button>
+                <div class="flex border-b border-slate-200 bg-slate-50">
+                    <button id="tab-login" onclick="switchAuthTab('login')" class="w-1/2 py-3 text-sm font-bold text-spartan-maroon border-b-4 border-spartan-maroon bg-white transition">Sign In</button>
+                    <button id="tab-reg" onclick="switchAuthTab('reg')" class="w-1/2 py-3 text-sm font-bold text-slate-400 hover:text-spartan-maroon transition">Register</button>
                 </div>
 
                 <!-- Form -->
@@ -107,14 +106,14 @@
                     <!-- Login Form -->
                     <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
                         <div>
-                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">SR-Code / Staff ID</label>
+                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">SR-Code / Staff ID</label>
                             <input type="text" id="login-srcode" required placeholder="e.g. 24-09303 or ADMIN" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon font-mono text-sm uppercase">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Password</label>
+                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Password</label>
                             <input type="password" id="login-pass" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon text-sm">
                         </div>
-                        <button type="submit" class="w-full py-3 bg-spartan-maroon hover:bg-spartan-maroonDark text-white font-bold rounded-lg shadow-md hover:shadow-lg transition flex items-center justify-center space-x-2">
+                        <button type="submit" class="w-full py-3 bg-spartan-maroon hover:bg-spartan-maroonDark text-spartan-gold font-bold rounded-lg shadow-md hover:shadow-lg transition flex items-center justify-center space-x-2 border border-spartan-gold">
                             <span>Sign In</span>
                             <i class='bx bx-right-arrow-alt text-lg'></i>
                         </button>
@@ -123,20 +122,20 @@
                     <!-- Register Form -->
                     <form id="form-register" onsubmit="handleRegister(event)" class="space-y-3.5 hidden">
                         <div>
-                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">SR-Code</label>
+                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">SR-Code</label>
                             <input type="text" id="reg-srcode" required placeholder="24-09303" class="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon font-mono text-sm uppercase">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Full Name</label>
+                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Full Name</label>
                             <input type="text" id="reg-name" required placeholder="Juan Dela Cruz" class="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon text-sm">
                         </div>
                         <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Program</label>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Program</label>
                                 <input type="text" id="reg-dept" required placeholder="BS CpE" class="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon text-sm">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Year Level</label>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Year Level</label>
                                 <select id="reg-year" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon text-sm">
                                     <option value="1st Year">1st Year</option>
                                     <option value="2nd Year">2nd Year</option>
@@ -146,10 +145,10 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Password</label>
+                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Password</label>
                             <input type="password" id="reg-pass" required placeholder="••••••••" class="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-spartan-maroon text-sm">
                         </div>
-                        <button type="submit" class="w-full py-3 bg-spartan-maroon hover:bg-spartan-maroonDark text-white font-bold rounded-lg shadow-md hover:shadow-lg transition">
+                        <button type="submit" class="w-full py-3 bg-spartan-maroon hover:bg-spartan-maroonDark text-spartan-gold font-bold rounded-lg shadow-md hover:shadow-lg transition border border-spartan-gold">
                             Create Patient Account
                         </button>
                     </form>
@@ -161,18 +160,18 @@
         <section id="view-student" class="hidden space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Check-in Card -->
-                <div class="md:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="md:col-span-1 bg-white p-6 rounded-2xl shadow-md border-t-4 border-spartan-maroon">
                     <h3 class="font-cinzel font-bold text-lg text-spartan-maroon mb-4 flex items-center space-x-2">
                         <i class='bx bx-plus-medical text-spartan-gold'></i>
                         <span>Clinic Check-In</span>
                     </h3>
                     <form onsubmit="handleJoinQueue(event)" class="space-y-4">
                         <div>
-                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Symptoms / Concern (Confidential)</label>
+                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Symptoms / Concern (Confidential)</label>
                             <textarea id="queue-symptoms" required rows="3" placeholder="Describe symptoms (e.g. fever, headache, minor sprain)..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-spartan-maroon focus:outline-none"></textarea>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Urgency Level</label>
+                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Urgency Level</label>
                             <select id="queue-urgency" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-spartan-maroon focus:outline-none">
                                 <option value="routine">Routine Check / Medical Clearance</option>
                                 <option value="emergency">Emergency / Severe Discomfort</option>
@@ -185,22 +184,22 @@
                 </div>
 
                 <!-- Live Public Board (Privacy Masked) -->
-                <div class="md:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div class="md:col-span-2 bg-white p-6 rounded-2xl shadow-md border-t-4 border-spartan-gold flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between border-b pb-3 mb-4">
-                            <h3 class="font-cinzel font-bold text-lg text-slate-800">Live Calling Board</h3>
-                            <span class="text-xs bg-amber-50 text-amber-700 px-2 py-1 rounded font-mono border border-amber-200">Confidential Mode</span>
+                            <h3 class="font-cinzel font-bold text-lg text-spartan-maroon">Live Calling Board</h3>
+                            <span class="text-xs bg-amber-50 text-amber-800 px-2 py-1 rounded font-mono border border-amber-300">Confidential Mode</span>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div class="bg-red-50 p-4 rounded-xl border border-red-200">
-                                <h4 class="text-xs font-bold uppercase text-red-800 mb-2 font-cinzel">Emergency Priority</h4>
-                                <div id="student-emergency-list" class="space-y-2 text-sm text-slate-600">
+                            <div class="bg-red-50 p-4 rounded-xl border-2 border-red-200">
+                                <h4 class="text-xs font-bold uppercase text-red-900 mb-2 font-cinzel">Emergency Priority</h4>
+                                <div id="student-emergency-list" class="space-y-2 text-sm text-slate-700">
                                     <p class="text-xs italic text-slate-400">No emergency cases waiting.</p>
                                 </div>
                             </div>
-                            <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
-                                <h4 class="text-xs font-bold uppercase text-blue-800 mb-2 font-cinzel">Routine Queue</h4>
-                                <div id="student-routine-list" class="space-y-2 text-sm text-slate-600">
+                            <div class="bg-amber-50/50 p-4 rounded-xl border-2 border-amber-200">
+                                <h4 class="text-xs font-bold uppercase text-amber-900 mb-2 font-cinzel">Routine Queue</h4>
+                                <div id="student-routine-list" class="space-y-2 text-sm text-slate-700">
                                     <p class="text-xs italic text-slate-400">No routine patients waiting.</p>
                                 </div>
                             </div>
@@ -216,20 +215,20 @@
             
             <!-- Quick Stat Cards (Interactive Navigation) -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div onclick="scrollToSection('admin-patients-sec')" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-spartan-maroon cursor-pointer transition">
-                    <span class="text-xs font-bold text-slate-400 uppercase">Registered</span>
-                    <h4 id="stat-total-patients" class="text-2xl font-bold font-mono text-slate-800 mt-1">0</h4>
+                <div onclick="scrollToSection('admin-patients-sec')" class="bg-white p-4 rounded-xl shadow border-l-4 border-spartan-maroon hover:shadow-md cursor-pointer transition">
+                    <span class="text-xs font-bold text-slate-500 uppercase">Registered</span>
+                    <h4 id="stat-total-patients" class="text-2xl font-bold font-mono text-spartan-maroon mt-1">0</h4>
                 </div>
-                <div onclick="scrollToSection('admin-emergency-sec')" class="bg-red-50 p-4 rounded-xl shadow-sm border border-red-200 hover:border-red-400 cursor-pointer transition">
-                    <span class="text-xs font-bold text-red-600 uppercase">Emergency (Heap)</span>
+                <div onclick="scrollToSection('admin-emergency-sec')" class="bg-white p-4 rounded-xl shadow border-l-4 border-red-600 hover:shadow-md cursor-pointer transition">
+                    <span class="text-xs font-bold text-red-700 uppercase">Emergency (Heap)</span>
                     <h4 id="stat-emergency-count" class="text-2xl font-bold font-mono text-red-700 mt-1">0</h4>
                 </div>
-                <div onclick="scrollToSection('admin-routine-sec')" class="bg-blue-50 p-4 rounded-xl shadow-sm border border-blue-200 hover:border-blue-400 cursor-pointer transition">
-                    <span class="text-xs font-bold text-blue-600 uppercase">Routine (FIFO)</span>
-                    <h4 id="stat-routine-count" class="text-2xl font-bold font-mono text-blue-700 mt-1">0</h4>
+                <div onclick="scrollToSection('admin-routine-sec')" class="bg-white p-4 rounded-xl shadow border-l-4 border-spartan-gold hover:shadow-md cursor-pointer transition">
+                    <span class="text-xs font-bold text-amber-800 uppercase">Routine (FIFO)</span>
+                    <h4 id="stat-routine-count" class="text-2xl font-bold font-mono text-amber-700 mt-1">0</h4>
                 </div>
-                <div onclick="scrollToSection('admin-treated-sec')" class="bg-emerald-50 p-4 rounded-xl shadow-sm border border-emerald-200 hover:border-emerald-400 cursor-pointer transition">
-                    <span class="text-xs font-bold text-emerald-600 uppercase">Total Treated</span>
+                <div onclick="scrollToSection('admin-treated-sec')" class="bg-white p-4 rounded-xl shadow border-l-4 border-emerald-600 hover:shadow-md cursor-pointer transition">
+                    <span class="text-xs font-bold text-emerald-700 uppercase">Total Treated</span>
                     <h4 id="stat-treated-count" class="text-2xl font-bold font-mono text-emerald-700 mt-1">0</h4>
                 </div>
             </div>
@@ -238,13 +237,13 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
                 <!-- Emergency Priority (Max-Heap) -->
-                <div id="admin-emergency-sec" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                <div id="admin-emergency-sec" class="bg-white rounded-2xl shadow-md border-t-4 border-red-600 p-5">
                     <div class="flex items-center justify-between pb-3 border-b mb-3">
                         <div class="flex items-center space-x-2">
                             <span class="w-3 h-3 rounded-full bg-red-600 animate-pulse"></span>
                             <h3 class="font-cinzel font-bold text-base text-slate-800">Emergency Queue (Max-Heap)</h3>
                         </div>
-                        <button onclick="callNext('emergency')" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-lg transition shadow flex items-center space-x-1">
+                        <button onclick="callNext('emergency')" class="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-lg transition shadow flex items-center space-x-1">
                             <i class='bx bx-bell'></i>
                             <span>Call Next</span>
                         </button>
@@ -253,13 +252,13 @@
                 </div>
 
                 <!-- Routine Queue (FIFO) -->
-                <div id="admin-routine-sec" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                <div id="admin-routine-sec" class="bg-white rounded-2xl shadow-md border-t-4 border-spartan-gold p-5">
                     <div class="flex items-center justify-between pb-3 border-b mb-3">
                         <div class="flex items-center space-x-2">
-                            <span class="w-3 h-3 rounded-full bg-blue-600"></span>
+                            <span class="w-3 h-3 rounded-full bg-spartan-gold"></span>
                             <h3 class="font-cinzel font-bold text-base text-slate-800">Routine Queue (FIFO)</h3>
                         </div>
-                        <button onclick="callNext('routine')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg transition shadow flex items-center space-x-1">
+                        <button onclick="callNext('routine')" class="px-3.5 py-1.5 bg-spartan-maroon hover:bg-spartan-maroonDark text-spartan-gold font-bold text-xs rounded-lg transition shadow flex items-center space-x-1 border border-spartan-gold">
                             <i class='bx bx-bell'></i>
                             <span>Call Next</span>
                         </button>
@@ -269,17 +268,17 @@
             </div>
 
             <!-- Student Directory / BST Search -->
-            <div id="admin-patients-sec" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+            <div id="admin-patients-sec" class="bg-white rounded-2xl shadow-md border-t-4 border-spartan-maroon p-5">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-3 border-b mb-4 gap-3">
-                    <h3 class="font-cinzel font-bold text-base text-slate-800">Student Directory (BST Indexed)</h3>
+                    <h3 class="font-cinzel font-bold text-base text-spartan-maroon">Student Directory (BST Indexed)</h3>
                     <div class="w-full sm:w-72 relative">
                         <i class='bx bx-search absolute left-3 top-2.5 text-slate-400'></i>
                         <input type="text" id="admin-search-input" oninput="filterPatients(this.value)" placeholder="Search by SR-Code or Name..." class="w-full pl-9 pr-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-spartan-maroon">
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-600">
-                        <thead class="bg-slate-50 text-slate-400 uppercase text-[11px] font-mono">
+                    <table class="w-full text-left text-sm text-slate-700">
+                        <thead class="bg-slate-100 text-slate-600 uppercase text-[11px] font-mono">
                             <tr>
                                 <th class="p-3">SR-Code</th>
                                 <th class="p-3">Name</th>
@@ -294,7 +293,7 @@
             </div>
 
             <!-- Treated History Section -->
-            <div id="admin-treated-sec" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+            <div id="admin-treated-sec" class="bg-white rounded-2xl shadow-md border-t-4 border-emerald-600 p-5">
                 <h3 class="font-cinzel font-bold text-base text-slate-800 pb-3 border-b mb-3">Treated Patients Log</h3>
                 <div id="admin-treated-list" class="space-y-2 max-h-56 overflow-y-auto custom-scrollbar"></div>
             </div>
@@ -304,7 +303,7 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-slate-900 text-slate-400 text-xs py-4 border-t border-slate-800">
+    <footer class="bg-spartan-maroonDark text-slate-300 text-xs py-4 border-t-2 border-spartan-gold">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <p>PHALANX HEALTH &bull; CpE 411 Data Structures and Algorithms &bull; Batangas State University Alangilan</p>
         </div>
@@ -312,24 +311,24 @@
 
     <!-- PATIENT MEDICAL HISTORY & ASSESSMENT MODAL -->
     <div id="inspector-modal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
-        <div class="bg-white w-full max-w-xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="bg-spartan-maroon text-white p-4 flex justify-between items-center">
+        <div class="bg-white w-full max-w-xl rounded-2xl shadow-2xl border-2 border-spartan-gold overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-spartan-maroon text-white p-4 flex justify-between items-center border-b-2 border-spartan-gold">
                 <div class="flex items-center space-x-2">
                     <i class='bx bx-user-pin text-xl text-spartan-gold'></i>
-                    <h3 class="font-cinzel font-bold text-base" id="modal-title">Student Medical Record</h3>
+                    <h3 class="font-cinzel font-bold text-base text-spartan-gold" id="modal-title">Student Medical Record</h3>
                 </div>
                 <button onclick="closeInspector()" class="text-white hover:text-spartan-gold text-2xl leading-none">&times;</button>
             </div>
             <div class="p-5 overflow-y-auto custom-scrollbar space-y-4">
                 <div id="modal-student-info" class="p-3 bg-slate-50 rounded-xl border text-sm font-mono space-y-1"></div>
                 <div>
-                    <h4 class="text-xs font-bold uppercase text-slate-500 mb-2">Visit History & Doctor Comments</h4>
+                    <h4 class="text-xs font-bold uppercase text-slate-600 mb-2 font-cinzel">Visit History & Doctor Comments</h4>
                     <div id="modal-history-list" class="space-y-2 text-sm"></div>
                 </div>
                 <div class="pt-2 border-t">
-                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Add Doctor Assessment / Note</label>
+                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1 font-cinzel">Add Doctor Assessment / Note</label>
                     <textarea id="modal-new-comment" rows="2" placeholder="Enter diagnosis, prescription, or clinic notes..." class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-spartan-maroon focus:outline-none"></textarea>
-                    <button onclick="saveDoctorComment()" class="mt-2 w-full py-2 bg-spartan-maroon hover:bg-spartan-maroonDark text-white font-bold text-xs rounded-lg transition shadow">
+                    <button onclick="saveDoctorComment()" class="mt-2 w-full py-2 bg-spartan-maroon hover:bg-spartan-maroonDark text-spartan-gold font-bold text-xs rounded-lg transition shadow border border-spartan-gold">
                         Save Assessment
                     </button>
                 </div>
@@ -352,13 +351,13 @@
             if(type === 'login') {
                 loginForm.classList.remove('hidden');
                 regForm.classList.add('hidden');
-                tabLogin.className = "w-1/2 py-3 text-sm font-bold text-spartan-maroon border-b-2 border-spartan-maroon";
-                tabReg.className = "w-1/2 py-3 text-sm font-bold text-slate-400 hover:text-slate-600";
+                tabLogin.className = "w-1/2 py-3 text-sm font-bold text-spartan-maroon border-b-4 border-spartan-maroon bg-white transition";
+                tabReg.className = "w-1/2 py-3 text-sm font-bold text-slate-400 hover:text-spartan-maroon transition";
             } else {
                 loginForm.classList.add('hidden');
                 regForm.classList.remove('hidden');
-                tabReg.className = "w-1/2 py-3 text-sm font-bold text-spartan-maroon border-b-2 border-spartan-maroon";
-                tabLogin.className = "w-1/2 py-3 text-sm font-bold text-slate-400 hover:text-slate-600";
+                tabReg.className = "w-1/2 py-3 text-sm font-bold text-spartan-maroon border-b-4 border-spartan-maroon bg-white transition";
+                tabLogin.className = "w-1/2 py-3 text-sm font-bold text-slate-400 hover:text-spartan-maroon transition";
             }
         }
 
@@ -459,7 +458,7 @@
             emergList.innerHTML = data.emergency_queue.length === 0 ? 
                 `<p class="text-xs italic text-slate-400 p-2">No emergency cases waiting.</p>` :
                 data.emergency_queue.map(p => `
-                    <div class="p-3 bg-red-50/70 border border-red-200 rounded-xl flex items-center justify-between">
+                    <div class="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center justify-between">
                         <div>
                             <span class="text-xs font-mono font-bold text-red-900">${p.srcode} - ${p.name}</span>
                             <p class="text-xs text-red-700 italic mt-0.5">"${p.symptoms}"</p>
@@ -473,12 +472,12 @@
             routineList.innerHTML = data.routine_queue.length === 0 ? 
                 `<p class="text-xs italic text-slate-400 p-2">No routine patients waiting.</p>` :
                 data.routine_queue.map(p => `
-                    <div class="p-3 bg-blue-50/70 border border-blue-200 rounded-xl flex items-center justify-between">
+                    <div class="p-3 bg-amber-50/60 border border-amber-200 rounded-xl flex items-center justify-between">
                         <div>
-                            <span class="text-xs font-mono font-bold text-blue-900">${p.srcode} - ${p.name}</span>
-                            <p class="text-xs text-blue-700 italic mt-0.5">"${p.symptoms}"</p>
+                            <span class="text-xs font-mono font-bold text-amber-900">${p.srcode} - ${p.name}</span>
+                            <p class="text-xs text-amber-800 italic mt-0.5">"${p.symptoms}"</p>
                         </div>
-                        <button onclick="openInspector('${p.srcode}')" class="text-xs font-bold bg-white text-blue-700 border border-blue-300 px-2 py-1 rounded shadow-sm hover:bg-blue-50">View</button>
+                        <button onclick="openInspector('${p.srcode}')" class="text-xs font-bold bg-white text-amber-800 border border-amber-300 px-2 py-1 rounded shadow-sm hover:bg-amber-50">View</button>
                     </div>
                 `).join('');
 
@@ -551,7 +550,7 @@
                     data.emergency_queue.map(p => `
                         <div class="p-2 bg-white rounded border border-red-200 font-mono text-xs text-red-900 flex justify-between">
                             <span>${maskSRCode(p.srcode)}</span>
-                            <span class="text-red-600 font-bold">Priority High</span>
+                            <span class="text-red-700 font-bold">Priority High</span>
                         </div>
                     `).join('');
 
@@ -559,9 +558,9 @@
                 routineList.innerHTML = data.routine_queue.length === 0 ? 
                     `<p class="text-xs italic text-slate-400">No routine patients waiting.</p>` :
                     data.routine_queue.map((p, idx) => `
-                        <div class="p-2 bg-white rounded border border-blue-200 font-mono text-xs text-blue-900 flex justify-between">
+                        <div class="p-2 bg-white rounded border border-amber-200 font-mono text-xs text-amber-900 flex justify-between">
                             <span>${maskSRCode(p.srcode)}</span>
-                            <span class="text-blue-600 font-bold">#${idx + 1} In Line</span>
+                            <span class="text-amber-700 font-bold">#${idx + 1} In Line</span>
                         </div>
                     `).join('');
 
@@ -657,7 +656,7 @@
             }
         }
 
-        // Auto Refresh every 10 seconds smoothly
+        // Smooth Auto-Refresh
         setInterval(() => {
             if(currentUser) {
                 if(currentUser.role === 'admin') fetchAdminData();
