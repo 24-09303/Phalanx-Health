@@ -1,508 +1,1445 @@
-import os
-import time
-import random
-import threading
-from collections import deque
-from datetime import datetime, timezone, timedelta
-
-from flask import Flask, jsonify, render_template, request, session
-from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+from flask import Flask, render_template, request, jsonify, session
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "phalanx-health-cpe411-secret-key")
+app.secret_key = 'batstateu_spartan_dsa_clinic_secret_2025'
 
-PH_TIME = timezone(timedelta(hours=8))   # Philippine Standard Time
-lock = threading.Lock()
+# ==============================================================================
+# DATA STRUCTURES (CPE 411 REQUIREMENTS)
+# ==============================================================================
 
-
-def now_str():
-    return datetime.now(PH_TIME).strftime("%b %d, %Y %I:%M %p")
-
-
-# =====================================================================
-# DSA 1: MAX-HEAP  (Emergency Triage - highest severity is served first)
-# =====================================================================
 class MaxHeap:
+    """Max-Heap Priority Queue for Emergency Triage cases O(log N)."""
     def __init__(self):
         self.heap = []
-        self._counter = 0
 
-    def _key(self, item):
-        # Higher severity first; if tied, earlier arrival first
-        return (item["severity"], -item["order"])
+    def insert(self, patient):
+        self.heap.append(patient)
+        self._heapify_up(len(self.heap) - 1)
 
-    def push(self, item):
-        self._counter += 1
-        item["order"] = self._counter
-        self.heap.append(item)
-        self._sift_up(len(self.heap) - 1)
-
-    def pop(self):
+    def extract_max(self):
         if not self.heap:
             return None
-        top = self.heap[0]
-        last = self.heap.pop()
-        if self.heap:
-            self.heap[0] = last
-            self._sift_down(0)
-        return top
+        if len(self.heap) == 1:
+            return self.heap.pop()
+        root = self.heap[0]
+        self.heap[0] = self.heap.pop()
+        self._heapify_down(0)
+        return root
 
-    def _sift_up(self, i):
-        while i > 0:
-            parent = (i - 1) // 2
-            if self._key(self.heap[i]) > self._key(self.heap[parent]):
-                self.heap[i], self.heap[parent] = self.heap[parent], self.heap[i]
-                i = parent
-            else:
-                break
+    def _heapify_up(self, index):
+        parent = (index - 1) // 2
+        if index > 0 and self.heap[index]['severity'] > self.heap[parent]['severity']:
+            self.heap[index], self.heap[parent] = self.heap[parent], self.heap[index]
+            self._heapify_up(parent)
 
-    def _sift_down(self, i):
-        n = len(self.heap)
-        while True:
-            largest = i
-            left, right = 2 * i + 1, 2 * i + 2
-            if left < n and self._key(self.heap[left]) > self._key(self.heap[largest]):
-                largest = left
-            if right < n and self._key(self.heap[right]) > self._key(self.heap[largest]):
-                largest = right
-            if largest == i:
-                break
-            self.heap[i], self.heap[largest] = self.heap[largest], self.heap[i]
-            i = largest
+    def _heapify_down(self, index):
+        largest = index
+        left, right = 2 * index + 1, 2 * index + 2
+        size = len(self.heap)
 
-    def contains(self, srcode):
-        return any(p["srcode"] == srcode for p in self.heap)
+        if left < size and self.heap[left]['severity'] > self.heap[largest]['severity']:
+            largest = left
+        if right < size and self.heap[right]['severity'] > self.heap[largest]['severity']:
+            largest = right
+        if largest != index:
+            self.heap[index], self.heap[largest] = self.heap[largest], self.heap[index]
+            self._heapify_down(largest)
 
-    def sorted_view(self):
-        return sorted(self.heap, key=self._key, reverse=True)
+    def get_all(self):
+        return sorted(self.heap, key=lambda x: x['severity'], reverse=True)
 
-    def __len__(self):
+    def size(self):
         return len(self.heap)
 
+    def has_active(self, sr_code):
+        return any(p['sr_code'] == sr_code for p in self.heap)
 
-# =====================================================================
-# DSA 2: FIFO QUEUE  (Routine Patients - first come, first served)
-# =====================================================================
+
 class PatientQueue:
+    """FIFO Queue for Routine Consultations O(1)."""
     def __init__(self):
-        self.items = deque()
+        self.queue = []
 
-    def enqueue(self, item):
-        self.items.append(item)
+    def enqueue(self, patient):
+        self.queue.append(patient)
 
     def dequeue(self):
-        return self.items.popleft() if self.items else None
+        return self.queue.pop(0) if self.queue else None
 
-    def contains(self, srcode):
-        return any(p["srcode"] == srcode for p in self.items)
+    def get_all(self):
+        return list(self.queue)
 
-    def to_list(self):
-        return list(self.items)
+    def size(self):
+        return len(self.queue)
 
-    def __len__(self):
-        return len(self.items)
+    def has_active(self, sr_code):
+        return any(p['sr_code'] == sr_code for p in self.queue)
 
 
-# =====================================================================
-# DSA 3: BINARY SEARCH TREE  (Student Directory - O(log N) lookup)
-# =====================================================================
 class BSTNode:
-    def __init__(self, key, data):
-        self.key = key
-        self.data = data
+    def __init__(self, record):
+        self.record = record
         self.left = None
         self.right = None
 
 
 class PatientBST:
+    """Binary Search Tree for Fast O(log N) Student Directory Lookup."""
     def __init__(self):
         self.root = None
-        self.size = 0
 
-    def insert(self, key, data):
-        new_node = BSTNode(key, data)
-        if self.root is None:
+    def insert(self, record):
+        new_node = BSTNode(record)
+        if not self.root:
             self.root = new_node
-            self.size += 1
             return True
-        current = self.root
+        curr = self.root
         while True:
-            if key == current.key:
-                return False  # duplicate SR-Code
-            if key < current.key:
-                if current.left is None:
-                    current.left = new_node
-                    break
-                current = current.left
+            if record['sr_code'] == curr.record['sr_code']:
+                # Update existing record
+                curr.record = record
+                return True
+            elif record['sr_code'] < curr.record['sr_code']:
+                if curr.left is None:
+                    curr.left = new_node
+                    return True
+                curr = curr.left
             else:
-                if current.right is None:
-                    current.right = new_node
-                    break
-                current = current.right
-        self.size += 1
-        return True
+                if curr.right is None:
+                    curr.right = new_node
+                    return True
+                curr = curr.right
 
-    def search(self, key):
-        current = self.root
-        while current:
-            if key == current.key:
-                return current.data
-            current = current.left if key < current.key else current.right
+    def search(self, sr_code):
+        curr = self.root
+        while curr:
+            if sr_code == curr.record['sr_code']:
+                return curr.record
+            elif sr_code < curr.record['sr_code']:
+                curr = curr.left
+            else:
+                curr = curr.right
         return None
 
-    def inorder(self):
-        """Iterative in-order traversal -> patients sorted by SR-Code."""
-        result, stack, current = [], [], self.root
-        while stack or current:
-            while current:
-                stack.append(current)
-                current = current.left
-            current = stack.pop()
-            result.append(current.data)
-            current = current.right
+    def get_inorder(self, node=None, result=None):
+        if result is None:
+            result = []
+            node = self.root
+        if node:
+            self.get_inorder(node.left, result)
+            result.append(node.record)
+            self.get_inorder(node.right, result)
         return result
 
 
-# =====================================================================
-# ILO2: LINEAR SEARCH vs BINARY SEARCH (backend benchmark for report)
-# =====================================================================
-def linear_search(arr, target):
-    for i, value in enumerate(arr):
-        if value == target:
-            return i
-    return -1
+# ==============================================================================
+# GLOBAL STORAGE & PRE-SEEDED ACCOUNTS
+# ==============================================================================
 
+triage_heap = MaxHeap()
+routine_queue = PatientQueue()
+patient_bst = PatientBST()
+treatment_history = []
 
-def binary_search(arr, target):
-    low, high = 0, len(arr) - 1
-    while low <= high:
-        mid = (low + high) // 2
-        if arr[mid] == target:
-            return mid
-        if arr[mid] < target:
-            low = mid + 1
-        else:
-            high = mid - 1
-    return -1
+stats = {
+    'total_registered': 0,
+    'total_treated': 0,
+    'emergencies_handled': 0,
+    'routine_handled': 0
+}
 
-
-def run_benchmark(sizes=(100, 1000, 10000, 100000), trials=50):
-    results = []
-    for n in sizes:
-        data = list(range(0, n * 2, 2))          # sorted dataset
-        targets = random.sample(data, min(trials, n))
-
-        start = time.perf_counter()
-        for t in targets:
-            linear_search(data, t)
-        linear_time = (time.perf_counter() - start) / len(targets)
-
-        start = time.perf_counter()
-        for t in targets:
-            binary_search(data, t)
-        binary_time = (time.perf_counter() - start) / len(targets)
-
-        results.append({
-            "n": n,
-            "linear_avg_microseconds": round(linear_time * 1_000_000, 3),
-            "binary_avg_microseconds": round(binary_time * 1_000_000, 3),
-            "speedup": round(linear_time / binary_time, 2) if binary_time > 0 else None,
-            "linear_complexity": "O(n)",
-            "binary_complexity": "O(log n)",
-        })
-    return results
-
-
-# =====================================================================
-# DATA STORES
-# =====================================================================
-STAFF = {
+# User Account Database: { sr_code: { password, name, age, gender, role, history } }
+users_db = {
     "ADMIN": {
-        "srcode": "ADMIN",
-        "name": "Clinic Administrator",
+        "sr_code": "ADMIN",
+        "password": "batstateu411",
+        "name": "Dr. Vicente Ramos (MD)",
         "role": "admin",
-        "password_hash": generate_password_hash("batstateu411"),
+        "age": 45,
+        "gender": "Male",
+        "history": []
+    },
+    "24-09303": {
+        "sr_code": "24-09303",
+        "password": "student123",
+        "name": "Maria Christine Santos",
+        "role": "student",
+        "age": 20,
+        "gender": "Female",
+        "history": [
+            {
+                "ticket": "R-100",
+                "type": "Routine",
+                "date": "2025-01-15",
+                "symptoms": "Annual OJT Medical Clearance",
+                "comments": ["Cleared for internship. BP 110/70. Fit to work."]
+            }
+        ]
+    },
+    "23-01824": {
+        "sr_code": "23-01824",
+        "password": "student123",
+        "name": "Juan Dela Cruz",
+        "role": "student",
+        "age": 21,
+        "gender": "Male",
+        "history": []
     }
 }
 
-student_directory = PatientBST()
-emergency_heap = MaxHeap()
-routine_queue = PatientQueue()
-treated_history = []
+# Pre-populate directory with seed students
+for user_key, u in users_db.items():
+    if u['role'] == 'student':
+        stats['total_registered'] += 1
+        patient_bst.insert({
+            'sr_code': u['sr_code'],
+            'name': u['name'],
+            'age': u['age'],
+            'gender': u['gender'],
+            'last_ticket': 'None',
+            'status': 'Idle'
+        })
 
-# Demo student account
-student_directory.insert("24-09303", {
-    "srcode": "24-09303",
-    "name": "Demo Student",
-    "department": "BS CpE",
-    "year_level": "2nd Year",
-    "role": "student",
-    "password_hash": generate_password_hash("student123"),
-    "visits": [],
+# Add one initial emergency ticket into the Max-Heap for Maria Santos
+seed_ticket = {
+    "ticket": "E-101",
+    "sr_code": "24-09303",
+    "name": "Maria Christine Santos",
+    "age": 20,
+    "gender": "Female",
+    "type": "Emergency",
+    "severity": 9,
+    "symptoms": "Severe acute abdominal spasms and nausea",
+    "comments": ["Initial triage vitals: BP 130/90, Pulse 102 bpm. Administering antispasmodic."],
+    "registered_at": "08:30 AM",
+    "status": "Waiting"
+}
+triage_heap.insert(seed_ticket)
+patient_bst.insert({
+    'sr_code': "24-09303",
+    'name': "Maria Christine Santos",
+    'age': 20,
+    'gender': "Female",
+    'last_ticket': "E-101",
+    'status': "Waiting (Emergency)"
 })
 
 
-# =====================================================================
-# HELPERS
-# =====================================================================
-CRITICAL_KEYWORDS = [
-    "chest pain", "can't breathe", "cannot breathe", "difficulty breathing",
-    "shortness of breath", "unconscious", "fainted", "seizure", "bleeding",
-    "allergic", "anaphylaxis", "poison", "head injury", "fracture",
-]
-MODERATE_KEYWORDS = [
-    "fever", "vomit", "dizzy", "dizziness", "sprain", "burn", "asthma",
-    "migraine", "high blood", "diarrhea", "wound", "cut",
-]
+def mask_sr_code(code):
+    if '-' in code:
+        parts = code.split('-')
+        return f"{parts[0]}-*****"
+    return code[:3] + "*****" if len(code) > 3 else "*****"
 
 
-def compute_severity(symptoms):
-    """Severity score 1-10 used as the Max-Heap priority key."""
-    s = symptoms.lower()
-    score = 5
-    critical_hits = sum(1 for k in CRITICAL_KEYWORDS if k in s)
-    moderate_hits = sum(1 for k in MODERATE_KEYWORDS if k in s)
-    score += min(critical_hits * 4, 5)
-    score += min(moderate_hits, 2)
-    return max(1, min(score, 10))
+# ==============================================================================
+# AUTHENTICATION ENDPOINTS
+# ==============================================================================
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 
-def mask_srcode(code):
-    if not code or len(code) < 4:
-        return "***"
-    return code[:3] + "***" + code[-2:]
+@app.route('/api/auth/register', methods=['POST'])
+def auth_register():
+    data = request.json or {}
+    sr_code = data.get('sr_code', '').strip().upper()
+    name = data.get('name', '').strip()
+    password = data.get('password', '').strip()
+    age = data.get('age', 20)
+    gender = data.get('gender', 'Male')
 
+    if not sr_code or not name or not password:
+        return jsonify({'success': False, 'message': 'All fields are required!'}), 400
 
-def public_patient(p):
-    """Patient record without the password hash."""
-    return {k: v for k, v in p.items() if k != "password_hash"}
+    if sr_code in users_db:
+        return jsonify({'success': False, 'message': f'Account with SR-Code {sr_code} already exists!'}), 400
 
-
-def queue_entry_view(e):
-    return {
-        "srcode": e["srcode"],
-        "name": e["name"],
-        "symptoms": e["symptoms"],
-        "severity": e.get("severity"),
-        "time": e["time"],
+    # Create new student account
+    users_db[sr_code] = {
+        'sr_code': sr_code,
+        'name': name,
+        'password': password,
+        'role': 'student',
+        'age': int(age),
+        'gender': gender,
+        'history': []
     }
 
+    # Register into BST Master Directory
+    patient_bst.insert({
+        'sr_code': sr_code,
+        'name': name,
+        'age': int(age),
+        'gender': gender,
+        'last_ticket': 'None',
+        'status': 'Idle'
+    })
+    stats['total_registered'] += 1
 
-def is_admin():
-    return session.get("role") == "admin"
-
-
-def error(message, status=400):
-    return jsonify({"error": message}), status
-
-
-# =====================================================================
-# ROUTES
-# =====================================================================
-@app.route("/")
-def index():
-    return render_template("index.html")
+    return jsonify({'success': True, 'message': 'Account registered successfully! You can now log in.'})
 
 
-@app.route("/api/auth/register", methods=["POST"])
-def register():
-    data = request.get_json(silent=True) or {}
-    srcode = str(data.get("srcode", "")).strip().upper()
-    name = str(data.get("name", "")).strip()
-    department = str(data.get("department", "")).strip()
-    year_level = str(data.get("year_level", "")).strip()
-    password = str(data.get("password", "")).strip()
+@app.route('/api/auth/login', methods=['POST'])
+def auth_login():
+    data = request.json or {}
+    sr_code = data.get('sr_code', '').strip().upper()
+    password = data.get('password', '').strip()
 
-    if not all([srcode, name, department, year_level, password]):
-        return error("Please fill in all fields.")
-    if srcode in STAFF:
-        return error("That ID is reserved.")
-    if len(password) < 4:
-        return error("Password must be at least 4 characters.")
-
-    with lock:
-        created = student_directory.insert(srcode, {
-            "srcode": srcode,
-            "name": name,
-            "department": department,
-            "year_level": year_level,
-            "role": "student",
-            "password_hash": generate_password_hash(password),
-            "visits": [],
+    user = users_db.get(sr_code)
+    if user and user['password'] == password:
+        session['sr_code'] = sr_code
+        session['role'] = user['role']
+        session['name'] = user['name']
+        return jsonify({
+            'success': True,
+            'role': user['role'],
+            'sr_code': sr_code,
+            'name': user['name']
         })
-    if not created:
-        return error("This SR-Code is already registered. Please sign in.")
-    return jsonify({"message": "Account created successfully."})
+    return jsonify({'success': False, 'message': 'Invalid SR-Code or Password!'}), 401
 
 
-@app.route("/api/auth/login", methods=["POST"])
-def login():
-    data = request.get_json(silent=True) or {}
-    srcode = str(data.get("srcode", "")).strip().upper()
-    password = str(data.get("password", "")).strip()
-
-    if not srcode or not password:
-        return error("Please enter your SR-Code / Staff ID and password.")
-
-    user = STAFF.get(srcode)
-    if user is None:
-        with lock:
-            user = student_directory.search(srcode)   # BST lookup
-
-    if user is None:
-        return error("Account not found. Please register first.", 401)
-    if not check_password_hash(user["password_hash"], password):
-        return error("Incorrect password.", 401)
-
-    session["srcode"] = user["srcode"]
-    session["role"] = user["role"]
-
-    return jsonify({"user": {
-        "srcode": user["srcode"],
-        "name": user["name"],
-        "role": user["role"],
-    }})
+@app.route('/api/auth/logout', methods=['POST'])
+def auth_logout():
+    session.clear()
+    return jsonify({'success': True})
 
 
-@app.route("/api/patient/join_queue", methods=["POST"])
-def join_queue():
-    srcode = session.get("srcode")
-    if not srcode or session.get("role") != "student":
-        return error("Session expired. Please sign in again.", 401)
+@app.route('/api/auth/session', methods=['GET'])
+def auth_session():
+    if 'sr_code' in session:
+        return jsonify({
+            'logged_in': True,
+            'sr_code': session.get('sr_code'),
+            'role': session.get('role'),
+            'name': session.get('name')
+        })
+    return jsonify({'logged_in': False})
 
-    data = request.get_json(silent=True) or {}
-    symptoms = str(data.get("symptoms", "")).strip()
-    urgency = str(data.get("urgency", "routine")).strip().lower()
 
-    if not symptoms:
-        return error("Please describe your symptoms.")
+# ==============================================================================
+# PATIENT / STUDENT PORTAL ENDPOINTS
+# ==============================================================================
 
-    with lock:
-        patient = student_directory.search(srcode)
-        if patient is None:
-            return error("Account not found. Please register again.", 404)
-        if emergency_heap.contains(srcode) or routine_queue.contains(srcode):
-            return error("You are already in the queue.")
+@app.route('/api/patient/my_portal', methods=['GET'])
+def patient_my_portal():
+    sr_code = session.get('sr_code')
+    if not sr_code or session.get('role') != 'student':
+        return jsonify({'error': 'Unauthorized'}), 401
 
-        timestamp = now_str()
-        entry = {
-            "srcode": srcode,
-            "name": patient["name"],
-            "symptoms": symptoms,
-            "time": timestamp,
+    user = users_db.get(sr_code)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    # Search if student has an active ticket in queues
+    active_ticket = None
+    queue_pos = None
+
+    # Check emergency heap
+    heap_list = triage_heap.get_all()
+    for idx, p in enumerate(heap_list):
+        if p['sr_code'] == sr_code:
+            active_ticket = p
+            queue_pos = f"#{idx + 1} in Urgent Priority Triage (Max-Heap)"
+            break
+
+    # Check routine queue
+    if not active_ticket:
+        routine_list = routine_queue.get_all()
+        for idx, p in enumerate(routine_list):
+            if p['sr_code'] == sr_code:
+                active_ticket = p
+                queue_pos = f"#{idx + 1} in Routine Consultation Queue (FIFO)"
+                break
+
+    return jsonify({
+        'user': {
+            'sr_code': user['sr_code'],
+            'name': user['name'],
+            'age': user['age'],
+            'gender': user['gender']
+        },
+        'active_ticket': active_ticket,
+        'queue_pos': queue_pos,
+        'history': user['history']
+    })
+
+
+@app.route('/api/patient/join_queue', methods=['POST'])
+def patient_join_queue():
+    sr_code = session.get('sr_code')
+    if not sr_code or session.get('role') != 'student':
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    if triage_heap.has_active(sr_code) or routine_queue.has_active(sr_code):
+        return jsonify({'success': False, 'message': 'You already have an active ticket waiting in the queue!'}), 400
+
+    user = users_db[sr_code]
+    data = request.json or {}
+    c_type = data.get('type', 'Routine')
+    severity = int(data.get('severity', 3 if c_type == 'Routine' else 7))
+    symptoms = data.get('symptoms', 'No symptoms specified').strip()
+
+    ticket_prefix = 'E' if c_type == 'Emergency' else 'R'
+    ticket_no = f"{ticket_prefix}-{stats['total_treated'] + triage_heap.size() + routine_queue.size() + 101}"
+
+    ticket_obj = {
+        'ticket': ticket_no,
+        'sr_code': sr_code,
+        'name': user['name'],
+        'age': user['age'],
+        'gender': user['gender'],
+        'type': c_type,
+        'severity': severity,
+        'symptoms': symptoms,
+        'comments': [],
+        'registered_at': datetime.now().strftime('%I:%M %p'),
+        'status': 'Waiting'
+    }
+
+    if c_type == 'Emergency':
+        triage_heap.insert(ticket_obj)
+    else:
+        routine_queue.enqueue(ticket_obj)
+
+    # Update BST Record status
+    patient_bst.insert({
+        'sr_code': sr_code,
+        'name': user['name'],
+        'age': user['age'],
+        'gender': user['gender'],
+        'last_ticket': ticket_no,
+        'status': f"Waiting ({c_type})"
+    })
+
+    return jsonify({'success': True, 'ticket': ticket_obj})
+
+
+@app.route('/api/public_queue', methods=['GET'])
+def public_queue():
+    """Confidential Display: Tickets & Masked SR-Codes ONLY (NO symptoms)."""
+    emg = [{'ticket': p['ticket'], 'masked_sr': mask_sr_code(p['sr_code']), 'time': p['registered_at']} for p in triage_heap.get_all()]
+    rtn = [{'ticket': p['ticket'], 'masked_sr': mask_sr_code(p['sr_code']), 'time': p['registered_at']} for p in routine_queue.get_all()]
+
+    return jsonify({
+        'stats': {
+            'total_registered': stats['total_registered'],
+            'emergency_count': triage_heap.size(),
+            'routine_count': routine_queue.size(),
+            'total_treated': stats['total_treated']
+        },
+        'emergency_list': emg,
+        'routine_list': rtn
+    })
+
+
+# ==============================================================================
+# CLINIC STAFF / ADMIN APIS
+# ==============================================================================
+
+def verify_admin():
+    return session.get('role') == 'admin'
+
+
+@app.route('/api/admin/all_data', methods=['GET'])
+def admin_all_data():
+    if not verify_admin():
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    return jsonify({
+        'stats': {
+            'total_registered': stats['total_registered'],
+            'emergency_count': triage_heap.size(),
+            'routine_count': routine_queue.size(),
+            'total_treated': stats['total_treated']
+        },
+        'emergency_queue': triage_heap.get_all(),
+        'routine_queue': routine_queue.get_all(),
+        'all_records': patient_bst.get_inorder(),
+        'history': treatment_history
+    })
+
+
+@app.route('/api/admin/call_next', methods=['POST'])
+def admin_call_next():
+    if not verify_admin():
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    data = request.json or {}
+    q_type = data.get('type', 'emergency')
+
+    patient = triage_heap.extract_max() if q_type == 'emergency' else routine_queue.dequeue()
+    if not patient:
+        return jsonify({'success': False, 'message': 'No patients in this queue!'}), 404
+
+    patient['status'] = 'Treated'
+    patient['treated_at'] = datetime.now().strftime('%I:%M %p')
+    treatment_history.insert(0, patient)
+    stats['total_treated'] += 1
+
+    # Save to user's personal medical record
+    sr = patient['sr_code']
+    if sr in users_db:
+        users_db[sr]['history'].insert(0, {
+            'ticket': patient['ticket'],
+            'type': patient['type'],
+            'date': datetime.now().strftime('%Y-%m-%d %I:%M %p'),
+            'symptoms': patient['symptoms'],
+            'comments': list(patient['comments'])
+        })
+
+    # Update BST
+    student_rec = patient_bst.search(sr)
+    if student_rec:
+        student_rec['status'] = 'Completed'
+
+    return jsonify({'success': True, 'patient': patient})
+
+
+@app.route('/api/admin/add_comment', methods=['POST'])
+def admin_add_comment():
+    if not verify_admin():
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    data = request.json or {}
+    sr_code = data.get('sr_code', '').strip().upper()
+    comment = data.get('comment', '').strip()
+
+    if not sr_code or not comment:
+        return jsonify({'success': False, 'message': 'Missing SR-Code or Comment'}), 400
+
+    timestamp = datetime.now().strftime('%I:%M %p')
+    note_text = f"[{timestamp}] Dr. Assessment: {comment}"
+
+    # Search in active emergency heap
+    for p in triage_heap.heap:
+        if p['sr_code'] == sr_code:
+            p['comments'].append(note_text)
+            return jsonify({'success': True, 'comments': p['comments']})
+
+    # Search in active routine queue
+    for p in routine_queue.queue:
+        if p['sr_code'] == sr_code:
+            p['comments'].append(note_text)
+            return jsonify({'success': True, 'comments': p['comments']})
+
+    # Search in treatment history
+    for p in treatment_history:
+        if p['sr_code'] == sr_code:
+            p['comments'].append(note_text)
+            return jsonify({'success': True, 'comments': p['comments']})
+
+    # Add to user database directly
+    if sr_code in users_db and users_db[sr_code]['history']:
+        users_db[sr_code]['history'][0]['comments'].append(note_text)
+        return jsonify({'success': True, 'comments': users_db[sr_code]['history'][0]['comments']})
+
+    return jsonify({'success': False, 'message': 'Patient active file not found.'}), 404
+
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
+```
+
+---
+
+## File 2: `templates/index.html`
+
+Replace the entire content of **`templates/index.html`** in your GitHub repository with this:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BatStateU • Red Spartan Medical Triage Portal</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --bsu-maroon: #800000;
+            --bsu-maroon-dark: #4d0000;
+            --bsu-maroon-light: #9c1c1c;
+            --bsu-gold: #FFC72C;
+            --bsu-gold-hover: #e0ac1e;
+            --bsu-white: #FFFFFF;
+            --bg-canvas: #0d0305;
+            --card-surface: rgba(28, 8, 12, 0.88);
+            --border-glass: rgba(255, 199, 44, 0.22);
+            --text-primary: #FFFFFF;
+            --text-secondary: #d8c7c9;
+            --radius-main: 14px;
         }
 
-        if urgency == "emergency":
-            entry["severity"] = compute_severity(symptoms)
-            emergency_heap.push(entry)
-        else:
-            entry["severity"] = None
-            routine_queue.enqueue(entry)
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg-canvas); color: var(--text-primary); min-height: 100vh; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .cinzel { font-family: 'Cinzel', serif; }
 
-        patient["visits"].append({
-            "symptoms": symptoms,
-            "urgency": urgency,
-            "date": timestamp,
-            "comment": "",
-            "status": "waiting",
-        })
+        /* Top Brand Header */
+        header {
+            background: linear-gradient(180deg, rgba(77, 0, 0, 0.95) 0%, rgba(30, 4, 8, 0.95) 100%);
+            border-bottom: 2px solid var(--bsu-gold);
+            padding: 0.85rem 2rem; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 25px rgba(128, 0, 0, 0.4);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .brand-container { display: flex; align-items: center; gap: 1rem; }
+        .univ-seal {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: radial-gradient(circle, var(--bsu-gold) 20%, var(--bsu-maroon) 85%);
+            border: 2px solid var(--bsu-gold); display: flex; align-items: center; justify-content: center;
+        }
+        .univ-seal i { font-size: 1.7rem; color: #fff; }
+        .brand-title h1 { font-size: 1.15rem; font-weight: 800; letter-spacing: 0.8px; color: var(--bsu-white); }
+        .brand-title p { font-size: 0.72rem; color: var(--bsu-gold); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
 
-    return jsonify({"message": "Added to queue."})
+        /* Container */
+        .page-container { max-width: 1350px; margin: 0 auto; padding: 2rem; }
 
+        /* Buttons */
+        .btn {
+            padding: 0.55rem 1.2rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem;
+            cursor: pointer; transition: all 0.25s ease; border: none; display: inline-flex;
+            align-items: center; gap: 0.5rem; text-decoration: none;
+        }
+        .btn-gold { background: var(--bsu-gold); color: #000; box-shadow: 0 0 15px rgba(255, 199, 44, 0.3); }
+        .btn-gold:hover { background: var(--bsu-gold-hover); transform: translateY(-1px); }
+        .btn-maroon { background: var(--bsu-maroon); color: #fff; border: 1px solid var(--bsu-gold); }
+        .btn-maroon:hover { background: var(--bsu-maroon-light); }
+        .btn-outline { background: transparent; border: 1px solid var(--border-glass); color: #fff; }
+        .btn-outline:hover { background: rgba(255,255,255,0.06); }
 
-@app.route("/api/admin/all_data")
-def all_data():
-    with lock:
-        if is_admin():
-            return jsonify({
-                "patients": [public_patient(p) for p in student_directory.inorder()],
-                "emergency_queue": [queue_entry_view(e) for e in emergency_heap.sorted_view()],
-                "routine_queue": [queue_entry_view(e) for e in routine_queue.to_list()],
-                "treated_history": treated_history,
+        /* ================= AUTHENTICATION GATE ================= */
+        #authGate {
+            min-height: 80vh; display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at center, rgba(128, 0, 0, 0.3) 0%, transparent 70%);
+        }
+        .auth-box {
+            width: 100%; max-width: 460px; background: var(--card-surface);
+            border: 2px solid var(--border-glass); border-radius: var(--radius-main);
+            padding: 2.25rem; box-shadow: 0 15px 40px rgba(0,0,0,0.6); backdrop-filter: blur(12px);
+        }
+        .auth-tab-bar { display: flex; border-bottom: 1px solid var(--border-glass); margin-bottom: 1.5rem; }
+        .auth-tab-bar button {
+            flex: 1; padding: 0.75rem; background: none; border: none; color: var(--text-secondary);
+            font-weight: 700; font-size: 0.9rem; cursor: pointer; border-bottom: 3px solid transparent;
+        }
+        .auth-tab-bar button.active { color: var(--bsu-gold); border-bottom-color: var(--bsu-gold); }
+
+        .form-group { margin-bottom: 1.15rem; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--bsu-gold); margin-bottom: 0.4rem; text-transform: uppercase; }
+        .form-control {
+            width: 100%; padding: 0.75rem 1rem; background: rgba(0, 0, 0, 0.45);
+            border: 1px solid var(--border-glass); border-radius: 8px; color: #fff;
+            font-size: 0.95rem; outline: none; transition: border-color 0.2s ease;
+        }
+        .form-control:focus { border-color: var(--bsu-gold); box-shadow: 0 0 10px rgba(255, 199, 44, 0.2); }
+
+        /* ================= STATS SECTION (CLICKABLE) ================= */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+        .stat-card {
+            background: var(--card-surface); border: 1px solid var(--border-glass);
+            border-radius: var(--radius-main); padding: 1.25rem 1.5rem; display: flex;
+            align-items: center; justify-content: space-between; cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px); border-color: var(--bsu-gold);
+            box-shadow: 0 8px 25px rgba(255, 199, 44, 0.2);
+        }
+        .stat-card .val { font-size: 2.2rem; font-weight: 800; color: var(--bsu-white); }
+        .stat-card .lbl { font-size: 0.75rem; color: var(--bsu-gold); font-weight: 700; text-transform: uppercase; }
+        .stat-card i { font-size: 2.5rem; color: var(--bsu-gold); opacity: 0.85; }
+
+        /* Cards & Tabs */
+        .card {
+            background: var(--card-surface); border: 1px solid var(--border-glass);
+            border-radius: var(--radius-main); padding: 1.5rem; backdrop-filter: blur(8px);
+        }
+        .tabs { display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border-glass); margin-bottom: 1.5rem; }
+        .tab-btn {
+            padding: 0.75rem 1.4rem; background: none; border: none; color: var(--text-secondary);
+            font-weight: 700; font-size: 0.9rem; cursor: pointer; border-bottom: 3px solid transparent;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .tab-btn.active { color: var(--bsu-gold); border-bottom-color: var(--bsu-gold); background: rgba(255, 199, 44, 0.05); }
+
+        /* Tables & Badges */
+        .custom-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        .custom-table th {
+            text-align: left; padding: 0.85rem; background: rgba(128, 0, 0, 0.45);
+            color: var(--bsu-gold); font-weight: 700; border-bottom: 1px solid var(--border-glass);
+        }
+        .custom-table td { padding: 0.85rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .tag { padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .tag-emergency { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+        .tag-routine { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
+        .tag-treated { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
+
+        /* Modals */
+        .modal-wrap {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .modal-wrap.show { display: flex; }
+        .modal-body {
+            background: #140508; border: 2px solid var(--bsu-gold); border-radius: var(--radius-main);
+            width: 95%; max-width: 600px; padding: 2rem; box-shadow: 0 15px 50px rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="brand-container">
+            <div class="univ-seal"><i class='bx bx-plus-medical'></i></div>
+            <div class="brand-title">
+                <h1 class="cinzel">BATANGAS STATE UNIVERSITY</h1>
+                <p>Medical Clinic • Red Spartan Triage</p>
+            </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="navUserBadge" class="tag tag-routine" style="display: none;">Guest</span>
+            <button id="navLogoutBtn" class="btn btn-outline" style="display: none;" onclick="handleLogout()">
+                <i class='bx bx-log-out'></i> Sign Out
+            </button>
+        </div>
+    </header>
+
+    <div class="page-container">
+
+        <!-- ================= 1. AUTHENTICATION (LOGIN & REGISTRATION) ================= -->
+        <section id="authGate">
+            <div class="auth-box">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <i class='bx bxs-user-badge' style="font-size: 3rem; color: var(--bsu-gold);"></i>
+                    <h2 class="cinzel" style="font-size: 1.3rem; margin-top: 0.5rem;">Clinic Portal Access</h2>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary);">Red Spartan Health Information System</p>
+                </div>
+
+                <div class="auth-tab-bar">
+                    <button id="tabBtnLogin" class="active" onclick="switchAuthTab('login')">Sign In</button>
+                    <button id="tabBtnRegister" onclick="switchAuthTab('register')">Create Student Account</button>
+                </div>
+
+                <!-- SIGN IN FORM -->
+                <form id="signInForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>SR-Code or Staff ID</label>
+                        <input type="text" id="loginSrCode" class="form-control mono" placeholder="e.g. 24-09303 or ADMIN" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.8rem;">
+                        <i class='bx bx-log-in'></i> Sign In to Account
+                    </button>
+                    <div style="margin-top: 1.25rem; font-size: 0.75rem; color: var(--text-secondary); text-align: center;">
+                        <span>Demo Admin: <code>ADMIN</code> / <code>batstateu411</code></span><br>
+                        <span>Demo Student: <code>24-09303</code> / <code>student123</code></span>
+                    </div>
+                </form>
+
+                <!-- STUDENT REGISTRATION FORM (CREATE OWN ACCOUNT) -->
+                <form id="signUpForm" style="display: none;" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label>Student SR-Code</label>
+                        <input type="text" id="regSrCode" class="form-control mono" placeholder="e.g. 24-09303" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="regFullName" class="form-control" placeholder="e.g. Juan P. Dela Cruz" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                        <div class="form-group">
+                            <label>Age</label>
+                            <input type="number" id="regAge" class="form-control" value="20" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select id="regGender" class="form-control">
+                                <option>Male</option>
+                                <option>Female</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Set Password</label>
+                        <input type="password" id="regPassword" class="form-control" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.8rem;">
+                        <i class='bx bx-user-check'></i> Register Student Account
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ================= 2. INTERACTIVE STAT CARDS ================= -->
+        <section id="statSection" class="stats-grid" style="display: none;">
+            <div class="stat-card" onclick="handleStatCardClick('directory')">
+                <div>
+                    <div class="lbl">Total Registered</div>
+                    <div class="val mono" id="statRegistered">0</div>
+                </div>
+                <i class='bx bx-id-card'></i>
+            </div>
+            <div class="stat-card" onclick="handleStatCardClick('emergency')">
+                <div>
+                    <div class="lbl">Emergency Waiting</div>
+                    <div class="val mono" id="statEmergency" style="color: #ef4444;">0</div>
+                </div>
+                <i class='bx bx-pulse' style="color: #ef4444;"></i>
+            </div>
+            <div class="stat-card" onclick="handleStatCardClick('routine')">
+                <div>
+                    <div class="lbl">Routine Waiting</div>
+                    <div class="val mono" id="statRoutine" style="color: #60a5fa;">0</div>
+                </div>
+                <i class='bx bx-time' style="color: #60a5fa;"></i>
+            </div>
+            <div class="stat-card" onclick="handleStatCardClick('treated')">
+                <div>
+                    <div class="lbl">Total Treated</div>
+                    <div class="val mono" id="statTreated" style="color: #4ade80;">0</div>
+                </div>
+                <i class='bx bx-check-shield' style="color: #4ade80;"></i>
+            </div>
+        </section>
+
+        <!-- ================= 3. PERSONAL PATIENT VIEW ================= -->
+        <section id="patientView" style="display: none;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                
+                <!-- MY ACTIVE TICKET STATUS -->
+                <div class="card" style="border: 2px solid var(--bsu-gold);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 class="cinzel" style="color: var(--bsu-gold);"><i class='bx bx-receipt'></i> My Active Consultation Ticket</h3>
+                        <span id="ticketBadge" class="tag tag-routine">No Active Ticket</span>
+                    </div>
+
+                    <div id="activeTicketDisplay">
+                        <div style="text-align: center; padding: 2rem 1rem;">
+                            <i class='bx bx-info-circle' style="font-size: 2.5rem; color: var(--text-secondary);"></i>
+                            <p style="margin-top: 0.5rem; color: var(--text-secondary);">You are not currently in the triage queue.</p>
+                            <button class="btn btn-gold" style="margin-top: 1rem;" onclick="openTicketModal()">
+                                <i class='bx bx-plus-circle'></i> Request Consultation / Join Queue
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MY PRIVATE MEDICAL HISTORY & DOCTOR NOTES -->
+                <div class="card">
+                    <h3 class="cinzel" style="color: var(--bsu-gold); margin-bottom: 1rem;">
+                        <i class='bx bx-shield-quarter'></i> My Confidential Medical Records
+                    </h3>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                        Records and physician assessments are strictly confidential to your student account.
+                    </p>
+                    <div id="patientHistoryList" style="max-height: 250px; overflow-y: auto;"></div>
+                </div>
+
+            </div>
+
+            <!-- CONFIDENTIAL CALLING BOARD (NO SYMPTOMS SHOWN) -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 class="cinzel" style="color: var(--bsu-gold);">
+                        <i class='bx bx-broadcast'></i> Live Clinic Calling Board (Confidential View)
+                    </h3>
+                    <span style="font-size: 0.75rem; color: var(--text-secondary);">Symptoms & Full Names Concealed</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div>
+                        <h4 style="color: #f87171; margin-bottom: 0.75rem; font-size: 0.9rem;">
+                            <i class='bx bx-pulse'></i> Urgent Emergency Line
+                        </h4>
+                        <div id="pubEmergencyList"></div>
+                    </div>
+                    <div>
+                        <h4 style="color: #60a5fa; margin-bottom: 0.75rem; font-size: 0.9rem;">
+                            <i class='bx bx-time'></i> Routine Consultation Line
+                        </h4>
+                        <div id="pubRoutineList"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 4. CLINIC STAFF / ADMIN VIEW ================= -->
+        <!-- Registration Form is completely removed from this view -->
+        <section id="adminView" style="display: none;">
+            <div class="card">
+                <div class="tabs">
+                    <button class="tab-btn active" id="tabBtn-emergency" onclick="switchAdminTab('emergency')">
+                        <i class='bx bx-pulse'></i> Emergency Heap (Max-Heap)
+                    </button>
+                    <button class="tab-btn" id="tabBtn-routine" onclick="switchAdminTab('routine')">
+                        <i class='bx bx-list-ol'></i> Routine Queue (FIFO)
+                    </button>
+                    <button class="tab-btn" id="tabBtn-directory" onclick="switchAdminTab('directory')">
+                        <i class='bx bx-folder-open'></i> Master Directory (BST)
+                    </button>
+                    <button class="tab-btn" id="tabBtn-treated" onclick="switchAdminTab('treated')">
+                        <i class='bx bx-history'></i> Treatment History
+                    </button>
+                </div>
+
+                <!-- ADMIN TAB 1: EMERGENCY MAX-HEAP -->
+                <div id="adminPanel-emergency" class="admin-panel">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                        <div>
+                            <h3 style="color: var(--bsu-gold);">Emergency Triage Queue</h3>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary);">Sorted by Max-Heap Priority (Severity 10 down to 1)</p>
+                        </div>
+                        <button class="btn btn-maroon" onclick="callNextPatient('emergency')">
+                            <i class='bx bx-bell'></i> Admit Next Emergency Patient
+                        </button>
+                    </div>
+                    <div id="adminEmergencyTable"></div>
+                </div>
+
+                <!-- ADMIN TAB 2: ROUTINE FIFO -->
+                <div id="adminPanel-routine" class="admin-panel" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                        <div>
+                            <h3 style="color: var(--bsu-gold);">Routine Consultation Queue</h3>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary);">First-In, First-Out Queue O(1)</p>
+                        </div>
+                        <button class="btn btn-gold" onclick="callNextPatient('routine')">
+                            <i class='bx bx-user-check'></i> Call Next Patient
+                        </button>
+                    </div>
+                    <div id="adminRoutineTable"></div>
+                </div>
+
+                <!-- ADMIN TAB 3: BST DIRECTORY -->
+                <div id="adminPanel-directory" class="admin-panel" style="display: none;">
+                    <h3 style="color: var(--bsu-gold); margin-bottom: 0.25rem;">Student Records Directory</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">Managed via Binary Search Tree O(log n)</p>
+                    <div id="adminDirectoryTable"></div>
+                </div>
+
+                <!-- ADMIN TAB 4: HISTORY -->
+                <div id="adminPanel-treated" class="admin-panel" style="display: none;">
+                    <h3 style="color: var(--bsu-gold); margin-bottom: 0.25rem;">Completed Treatments Log</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">Log of completed consultations with doctor notes</p>
+                    <div id="adminHistoryTable"></div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ================= MODAL: SUBMIT CONSULTATION TICKET ================= -->
+    <div id="ticketModal" class="modal-wrap">
+        <div class="modal-body">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <h3 class="cinzel" style="color: var(--bsu-gold);">Request Medical Consultation</h3>
+                <button class="btn btn-outline" onclick="closeTicketModal()"><i class='bx bx-x'></i> Cancel</button>
+            </div>
+            <form onsubmit="handleJoinQueue(event)">
+                <div class="form-group">
+                    <label>Consultation Type</label>
+                    <select id="reqType" class="form-control" onchange="toggleReqSeverity()">
+                        <option value="Routine">Routine Consultation / Medical Certificate</option>
+                        <option value="Emergency">Emergency / Acute Triage Care</option>
+                    </select>
+                </div>
+                <div class="form-group" id="reqSeverityGroup" style="display: none;">
+                    <label>Severity Score (1 = Minor, 10 = Critical)</label>
+                    <input type="range" id="reqSeverity" min="1" max="10" value="7" class="form-control" oninput="document.getElementById('sevVal').innerText = this.value">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--bsu-gold); margin-top: 3px;">
+                        <span>Mild</span><span class="mono" id="sevVal">7</span><span>Critical</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Confidential Symptoms / Chief Complaint</label>
+                    <textarea id="reqSymptoms" class="form-control" rows="3" placeholder="Describe symptoms or reasons for visit..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.8rem;">
+                    <i class='bx bx-plus-circle'></i> Submit & Enter Queue
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: PATIENT INSPECTOR & DOCTOR NOTES (ADMIN) ================= -->
+    <div id="inspectorModal" class="modal-wrap">
+        <div class="modal-body">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-glass); padding-bottom: 0.75rem;">
+                <div>
+                    <h3 class="cinzel" id="inspName" style="color: var(--bsu-gold);">Student Medical File</h3>
+                    <span class="mono" id="inspSrCode" style="font-size: 0.85rem; color: #fff;"></span>
+                </div>
+                <button class="btn btn-outline" onclick="closeInspectorModal()"><i class='bx bx-x'></i> Close</button>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.85rem; margin-bottom: 0.75rem;">
+                    <div><strong>Ticket:</strong> <span class="mono" id="inspTicket"></span></div>
+                    <div><strong>Severity:</strong> <span class="mono" id="inspSeverity"></span></div>
+                    <div><strong>Age / Gender:</strong> <span id="inspAgeGender"></span></div>
+                    <div><strong>Service Type:</strong> <span id="inspType"></span></div>
+                </div>
+                <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.5rem;">
+                    <div style="font-size: 0.75rem; color: var(--bsu-gold); text-transform: uppercase; font-weight: 700;">Confidential Symptoms:</div>
+                    <p id="inspSymptoms" style="font-size: 0.9rem; color: #fecaca; margin-top: 0.25rem;"></p>
+                </div>
+            </div>
+
+            <!-- Doctor Notes / Comments -->
+            <div>
+                <h4 style="font-size: 0.85rem; color: var(--bsu-gold); text-transform: uppercase; margin-bottom: 0.5rem;">
+                    <i class='bx bx-notepad'></i> Doctor's Clinical Assessments
+                </h4>
+                <div id="inspCommentsList" style="max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 6px; padding: 0.5rem; margin-bottom: 0.75rem; font-size: 0.8rem;"></div>
+                
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" id="newCommentInput" class="form-control" placeholder="Write medical note, diagnosis, or prescription...">
+                    <button class="btn btn-gold" onclick="submitComment()"><i class='bx bx-check'></i> Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        let userRole = null;
+        let selectedStudentSrCode = null;
+
+        window.onload = function() {
+            checkSession();
+        };
+
+        function checkSession() {
+            fetch('/api/auth/session')
+                .then(r => r.json())
+                .then(d => {
+                    if (d.logged_in) {
+                        userRole = d.role;
+                        renderRoleUI(d.role, d.name, d.sr_code);
+                    } else {
+                        showAuthGate();
+                    }
+                });
+        }
+
+        function showAuthGate() {
+            document.getElementById('authGate').style.display = 'flex';
+            document.getElementById('statSection').style.display = 'none';
+            document.getElementById('patientView').style.display = 'none';
+            document.getElementById('adminView').style.display = 'none';
+            document.getElementById('navUserBadge').style.display = 'none';
+            document.getElementById('navLogoutBtn').style.display = 'none';
+        }
+
+        function renderRoleUI(role, name, srCode) {
+            document.getElementById('authGate').style.display = 'none';
+            document.getElementById('statSection').style.display = 'grid';
+            document.getElementById('navLogoutBtn').style.display = 'inline-flex';
+
+            const badge = document.getElementById('navUserBadge');
+            badge.style.display = 'inline-block';
+
+            if (role === 'admin') {
+                badge.className = 'tag tag-emergency';
+                badge.innerText = `Physician: ${name}`;
+                document.getElementById('adminView').style.display = 'block';
+                document.getElementById('patientView').style.display = 'none';
+                loadAdminData();
+            } else {
+                badge.className = 'tag tag-routine';
+                badge.innerText = `Student: ${srCode}`;
+                document.getElementById('patientView').style.display = 'block';
+                document.getElementById('adminView').style.display = 'none';
+                loadPatientPortal();
+                loadPublicQueue();
+            }
+        }
+
+        // ================= AUTH SWITCHING & LOGIC =================
+        function switchAuthTab(tab) {
+            if (tab === 'login') {
+                document.getElementById('tabBtnLogin').classList.add('active');
+                document.getElementById('tabBtnRegister').classList.remove('active');
+                document.getElementById('signInForm').style.display = 'block';
+                document.getElementById('signUpForm').style.display = 'none';
+            } else {
+                document.getElementById('tabBtnRegister').classList.add('active');
+                document.getElementById('tabBtnLogin').classList.remove('active');
+                document.getElementById('signUpForm').style.display = 'block';
+                document.getElementById('signInForm').style.display = 'none';
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const data = {
+                sr_code: document.getElementById('regSrCode').value.trim(),
+                name: document.getElementById('regFullName').value.trim(),
+                age: document.getElementById('regAge').value,
+                gender: document.getElementById('regGender').value,
+                password: document.getElementById('regPassword').value.trim()
+            };
+
+            fetch('/api/auth/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
             })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    alert(res.message);
+                    switchAuthTab('login');
+                    document.getElementById('loginSrCode').value = data.sr_code;
+                } else {
+                    alert(res.message);
+                }
+            });
+        }
 
-        # Students / public board: masked SR-Codes only, no names or symptoms
-        return jsonify({
-            "patients": [],
-            "emergency_queue": [{"srcode": mask_srcode(e["srcode"])} for e in emergency_heap.sorted_view()],
-            "routine_queue": [{"srcode": mask_srcode(e["srcode"])} for e in routine_queue.to_list()],
-            "treated_history": [],
-        })
+        function handleLogin(e) {
+            e.preventDefault();
+            const sr = document.getElementById('loginSrCode').value.trim();
+            const pw = document.getElementById('loginPassword').value.trim();
 
-
-@app.route("/api/admin/call_next", methods=["POST"])
-def call_next():
-    if not is_admin():
-        return error("Staff access only.", 403)
-
-    data = request.get_json(silent=True) or {}
-    queue_type = str(data.get("type", "")).strip().lower()
-
-    with lock:
-        if queue_type == "emergency":
-            entry = emergency_heap.pop()
-        elif queue_type == "routine":
-            entry = routine_queue.dequeue()
-        else:
-            return error("Invalid queue type.")
-
-        if entry is None:
-            return error(f"The {queue_type} queue is empty.")
-
-        patient = student_directory.search(entry["srcode"])
-        if patient:
-            for visit in reversed(patient["visits"]):
-                if visit.get("status") == "waiting":
-                    visit["status"] = "treated"
-                    break
-
-        treated_history.insert(0, {
-            "srcode": entry["srcode"],
-            "name": entry["name"],
-            "queue": queue_type,
-            "timestamp": now_str(),
-        })
-
-    return jsonify({"patient": {"srcode": entry["srcode"], "name": entry["name"]}})
-
-
-@app.route("/api/admin/add_comment", methods=["POST"])
-def add_comment():
-    if not is_admin():
-        return error("Staff access only.", 403)
-
-    data = request.get_json(silent=True) or {}
-    srcode = str(data.get("srcode", "")).strip().upper()
-    comment = str(data.get("comment", "")).strip()
-
-    if not srcode or not comment:
-        return error("Missing student or comment.")
-
-    with lock:
-        patient = student_directory.search(srcode)
-        if patient is None:
-            return error("Student not found.", 404)
-
-        if patient["visits"]:
-            latest = patient["visits"][-1]
-            latest["comment"] = (latest["comment"] + " | " + comment) if latest["comment"] else comment
-        else:
-            patient["visits"].append({
-                "symptoms": "Walk-in consultation",
-                "urgency": "routine",
-                "date": now_str(),
-                "comment": comment,
-                "status": "treated",
+            fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({sr_code: sr, password: pw})
             })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    userRole = res.role;
+                    renderRoleUI(res.role, res.name, res.sr_code);
+                } else {
+                    alert(res.message);
+                }
+            });
+        }
 
-    return jsonify({"message": "Assessment saved."})
+        function handleLogout() {
+            fetch('/api/auth/logout', {method: 'POST'}).then(() => location.reload());
+        }
 
+        // ================= PATIENT PORTAL FUNCTIONS =================
+        function loadPatientPortal() {
+            fetch('/api/patient/my_portal')
+                .then(r => r.json())
+                .then(data => {
+                    const disp = document.getElementById('activeTicketDisplay');
+                    const badge = document.getElementById('ticketBadge');
 
-@app.route("/api/benchmark")
-def benchmark():
-    """Linear vs Binary Search comparison (ILO2) - used for the technical report."""
-    return jsonify({"results": run_benchmark()})
+                    if (data.active_ticket) {
+                        const t = data.active_ticket;
+                        badge.className = t.type === 'Emergency' ? 'tag tag-emergency' : 'tag tag-routine';
+                        badge.innerText = t.status;
 
+                        disp.innerHTML = `
+                            <div style="background: rgba(128,0,0,0.25); border: 1px solid var(--bsu-gold); border-radius: 8px; padding: 1.5rem; text-align: center;">
+                                <span class="tag ${t.type === 'Emergency' ? 'tag-emergency' : 'tag-routine'}">${t.type} Consultation</span>
+                                <h1 class="mono cinzel" style="font-size: 2.75rem; color: var(--bsu-gold); margin: 0.5rem 0;">${t.ticket}</h1>
+                                <p style="font-weight: 700; color: #fff;">${data.user.name} <span class="mono" style="color:var(--text-secondary);">(${data.user.sr_code})</span></p>
+                                <p style="font-size: 0.95rem; color: #93c5fd; margin-top: 0.5rem;"><strong>Queue Status:</strong> ${data.queue_pos}</p>
+                                <div style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.5rem; font-size: 0.85rem; color: #fca5a5;">
+                                    <strong>My Symptoms:</strong> ${t.symptoms}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        badge.className = 'tag tag-routine';
+                        badge.innerText = 'No Active Ticket';
+                        disp.innerHTML = `
+                            <div style="text-align: center; padding: 2rem 1rem;">
+                                <i class='bx bx-info-circle' style="font-size: 2.5rem; color: var(--text-secondary);"></i>
+                                <p style="margin-top: 0.5rem; color: var(--text-secondary);">You are not currently in the triage queue.</p>
+                                <button class="btn btn-gold" style="margin-top: 1rem;" onclick="openTicketModal()">
+                                    <i class='bx bx-plus-circle'></i> Request Consultation / Join Queue
+                                </button>
+                            </div>
+                        `;
+                    }
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
+                    // Render personal medical history
+                    const histWrap = document.getElementById('patientHistoryList');
+                    if (!data.history || !data.history.length) {
+                        histWrap.innerHTML = `<p style="color: var(--text-secondary); font-size: 0.85rem;">No previous medical visits recorded on this account.</p>`;
+                    } else {
+                        histWrap.innerHTML = data.history.map(h => `
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <strong class="mono" style="color: var(--bsu-gold);">${h.ticket}</strong>
+                                    <span style="font-size: 0.75rem; color: var(--text-secondary);">${h.date}</span>
+                                </div>
+                                <div style="font-size: 0.85rem; color: #fecaca; margin-top: 4px;"><strong>Chief Complaint:</strong> ${h.symptoms}</div>
+                                ${h.comments && h.comments.length ? `
+                                    <div style="margin-top: 6px; font-size: 0.8rem; color: #86efac; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 4px;">
+                                        ${h.comments.map(c => `<div>${c}</div>`).join('')}
+                                    </div>` : ''}
+                            </div>
+                        `).join('');
+                    }
+                });
+        }
+
+        function loadPublicQueue() {
+            fetch('/api/public_queue')
+                .then(r => r.json())
+                .then(d => {
+                    updateStatNumbers(d.stats);
+
+                    const emg = document.getElementById('pubEmergencyList');
+                    emg.innerHTML = d.emergency_list.length ? d.emergency_list.map(p => `
+                        <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 8px; padding: 0.6rem 0.85rem; margin-bottom: 0.4rem; display: flex; justify-content: space-between;">
+                            <div><strong class="mono" style="color:#f87171;">${p.ticket}</strong> <span style="font-size:0.8rem; color:#cbd5e1; margin-left:0.5rem;">(${p.masked_sr})</span></div>
+                            <span class="tag tag-emergency">Waiting</span>
+                        </div>
+                    `).join('') : '<p style="color:var(--text-secondary); font-size:0.85rem;">No emergencies waiting.</p>';
+
+                    const rtn = document.getElementById('pubRoutineList');
+                    rtn.innerHTML = d.routine_list.length ? d.routine_list.map(p => `
+                        <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 8px; padding: 0.6rem 0.85rem; margin-bottom: 0.4rem; display: flex; justify-content: space-between;">
+                            <div><strong class="mono" style="color:#93c5fd;">${p.ticket}</strong> <span style="font-size:0.8rem; color:#cbd5e1; margin-left:0.5rem;">(${p.masked_sr})</span></div>
+                            <span class="tag tag-routine">Waiting</span>
+                        </div>
+                    `).join('') : '<p style="color:var(--text-secondary); font-size:0.85rem;">No routine patients in line.</p>';
+                });
+        }
+
+        function openTicketModal() { document.getElementById('ticketModal').classList.add('show'); }
+        function closeTicketModal() { document.getElementById('ticketModal').classList.remove('show'); }
+        function toggleReqSeverity() {
+            const isEmg = document.getElementById('reqType').value === 'Emergency';
+            document.getElementById('reqSeverityGroup').style.display = isEmg ? 'block' : 'none';
+        }
+
+        function handleJoinQueue(e) {
+            e.preventDefault();
+            const data = {
+                type: document.getElementById('reqType').value,
+                severity: document.getElementById('reqSeverity').value,
+                symptoms: document.getElementById('reqSymptoms').value
+            };
+
+            fetch('/api/patient/join_queue', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    alert(`Consultation Ticket Created: ${res.ticket.ticket}!`);
+                    closeTicketModal();
+                    loadPatientPortal();
+                    loadPublicQueue();
+                } else {
+                    alert(res.message);
+                }
+            });
+        }
+
+        // ================= ADMIN FUNCTIONS =================
+        function loadAdminData() {
+            fetch('/api/admin/all_data')
+                .then(r => r.json())
+                .then(d => {
+                    updateStatNumbers(d.stats);
+                    renderAdminQueueTable('adminEmergencyTable', d.emergency_queue, true);
+                    renderAdminQueueTable('adminRoutineTable', d.routine_queue, false);
+                    renderDirectoryTable('adminDirectoryTable', d.all_records);
+                    renderHistoryTable('adminHistoryTable', d.history);
+                });
+        }
+
+        function updateStatNumbers(s) {
+            document.getElementById('statRegistered').innerText = s.total_registered;
+            document.getElementById('statEmergency').innerText = s.emergency_count;
+            document.getElementById('statRoutine').innerText = s.routine_count;
+            document.getElementById('statTreated').innerText = s.total_treated;
+        }
+
+        function renderAdminQueueTable(containerId, list, isEmergency) {
+            const wrap = document.getElementById(containerId);
+            if (!list || !list.length) {
+                wrap.innerHTML = `<p style="padding: 1.5rem; text-align: center; color: var(--text-secondary);">Queue is currently empty.</p>`;
+                return;
+            }
+
+            let html = `<table class="custom-table">
+                <thead><tr>
+                    <th>Ticket</th><th>SR-Code</th><th>Name</th><th>${isEmergency ? 'Severity' : 'Type'}</th><th>Chief Symptoms</th><th>Action</th>
+                </tr></thead><tbody>`;
+
+            list.forEach(p => {
+                html += `<tr>
+                    <td class="mono" style="font-weight:700; color:var(--bsu-gold);">${p.ticket}</td>
+                    <td class="mono">${p.sr_code}</td>
+                    <td><strong>${p.name}</strong> (${p.age}/${p.gender})</td>
+                    <td>${isEmergency ? `<span class="tag tag-emergency">Lv ${p.severity}</span>` : `<span class="tag tag-routine">${p.type}</span>`}</td>
+                    <td style="color:#fca5a5; max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${p.symptoms}</td>
+                    <td>
+                        <button class="btn btn-outline" style="padding:0.3rem 0.65rem; font-size:0.75rem;" onclick='openInspectorModal(${JSON.stringify(p)})'>
+                            <i class='bx bx-search-alt'></i> View / Comment
+                        </button>
+                    </td>
+                </tr>`;
+            });
+            html += `</tbody></table>`;
+            wrap.innerHTML = html;
+        }
+
+        function renderDirectoryTable(containerId, list) {
+            const wrap = document.getElementById(containerId);
+            if (!list || !list.length) {
+                wrap.innerHTML = `<p style="padding: 1.5rem; text-align: center; color: var(--text-secondary);">No student records found in BST.</p>`;
+                return;
+            }
+            let html = `<table class="custom-table"><thead><tr>
+                <th>SR-Code</th><th>Full Name</th><th>Age / Gender</th><th>Last Ticket</th><th>Current Status</th>
+            </tr></thead><tbody>`;
+
+            list.forEach(r => {
+                html += `<tr>
+                    <td class="mono" style="font-weight:700; color:var(--bsu-gold);">${r.sr_code}</td>
+                    <td><strong>${r.name}</strong></td>
+                    <td>${r.age} y/o, ${r.gender}</td>
+                    <td class="mono">${r.last_ticket}</td>
+                    <td><span class="tag tag-routine">${r.status}</span></td>
+                </tr>`;
+            });
+            html += `</tbody></table>`;
+            wrap.innerHTML = html;
+        }
+
+        function renderHistoryTable(containerId, list) {
+            const wrap = document.getElementById(containerId);
+            if (!list || !list.length) {
+                wrap.innerHTML = `<p style="padding: 1.5rem; text-align: center; color: var(--text-secondary);">No completed treatments yet.</p>`;
+                return;
+            }
+            let html = `<table class="custom-table"><thead><tr>
+                <th>Ticket</th><th>SR-Code</th><th>Name</th><th>Treated At</th><th>Clinical Assessment</th><th>Action</th>
+            </tr></thead><tbody>`;
+
+            list.forEach(p => {
+                html += `<tr>
+                    <td class="mono" style="font-weight:700; color:var(--bsu-gold);">${p.ticket}</td>
+                    <td class="mono">${p.sr_code}</td>
+                    <td>${p.name}</td>
+                    <td class="mono">${p.treated_at}</td>
+                    <td style="color:#86efac; max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        ${p.comments.length ? p.comments[p.comments.length - 1] : 'No notes added'}
+                    </td>
+                    <td>
+                        <button class="btn btn-outline" style="padding:0.3rem 0.65rem; font-size:0.75rem;" onclick='openInspectorModal(${JSON.stringify(p)})'>
+                            <i class='bx bx-notepad'></i> View File
+                        </button>
+                    </td>
+                </tr>`;
+            });
+            html += `</tbody></table>`;
+            wrap.innerHTML = html;
+        }
+
+        // ================= INTERACTIVE STAT CARD NAVIGATION =================
+        function handleStatCardClick(tabName) {
+            if (userRole === 'admin') {
+                switchAdminTab(tabName);
+            }
+        }
+
+        function switchAdminTab(tabName) {
+            document.querySelectorAll('.admin-panel').forEach(p => p.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+            const panel = document.getElementById(`adminPanel-${tabName}`);
+            const btn = document.getElementById(`tabBtn-${tabName}`);
+            if (panel && btn) {
+                panel.style.display = 'block';
+                btn.classList.add('active');
+            }
+        }
+
+        // ================= INSPECTOR & DOCTOR COMMENTS =================
+        function openInspectorModal(p) {
+            selectedStudentSrCode = p.sr_code;
+            document.getElementById('inspName').innerText = p.name;
+            document.getElementById('inspSrCode').innerText = `SR-Code: ${p.sr_code}`;
+            document.getElementById('inspTicket').innerText = p.ticket || 'N/A';
+            document.getElementById('inspSeverity').innerText = p.severity ? `${p.severity} / 10` : 'N/A';
+            document.getElementById('inspAgeGender').innerText = `${p.age} y/o, ${p.gender}`;
+            document.getElementById('inspType').innerText = p.type || 'Routine';
+            document.getElementById('inspSymptoms').innerText = p.symptoms || 'None specified';
+
+            renderInspectorComments(p.comments || []);
+            document.getElementById('inspectorModal').classList.add('show');
+        }
+
+        function renderInspectorComments(comments) {
+            const wrap = document.getElementById('inspCommentsList');
+            if (!comments.length) {
+                wrap.innerHTML = `<span style="color: #9ca3af;">No clinical notes recorded yet.</span>`;
+                return;
+            }
+            wrap.innerHTML = comments.map(c => `<div style="margin-bottom: 4px; color: #e2e8f0;">• ${c}</div>`).join('');
+        }
+
+        function submitComment() {
+            const comment = document.getElementById('newCommentInput').value.trim();
+            if (!comment) return;
+
+            fetch('/api/admin/add_comment', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({sr_code: selectedStudentSrCode, comment: comment})
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    renderInspectorComments(res.comments);
+                    document.getElementById('newCommentInput').value = '';
+                    loadAdminData();
+                } else {
+                    alert(res.message);
+                }
+            });
+        }
+
+        function closeInspectorModal() {
+            document.getElementById('inspectorModal').classList.remove('show');
+            selectedStudentSrCode = null;
+        }
+
+        function callNextPatient(type) {
+            fetch('/api/admin/call_next', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({type: type})
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    alert(`Now Admitting Patient:\n\nName: ${res.patient.name}\nTicket: ${res.patient.ticket}\nSymptoms: ${res.patient.symptoms}`);
+                    loadAdminData();
+                } else {
+                    alert(res.message);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
