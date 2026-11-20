@@ -7,7 +7,6 @@
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-
     <style>
         :root {
             --bsu-maroon: #800000;
@@ -23,12 +22,11 @@
             --text-secondary: #d8c7c9;
             --radius-main: 14px;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg-canvas); color: var(--text-primary); min-height: 100vh; }
+        body { background: var(--bg-canvas); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
         .mono { font-family: 'JetBrains Mono', monospace; }
         .cinzel { font-family: 'Cinzel', serif; }
-
+        
         /* Top Brand Header */
         header {
             background: linear-gradient(180deg, rgba(77, 0, 0, 0.95) 0%, rgba(30, 4, 8, 0.95) 100%);
@@ -45,10 +43,10 @@
         }
         .brand-title h1 { font-size: 1.15rem; font-weight: 800; letter-spacing: 0.8px; color: var(--bsu-white); }
         .brand-title p { font-size: 0.72rem; color: var(--bsu-gold); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-
+        
         /* Container */
-        .page-container { max-width: 1350px; margin: 0 auto; padding: 2rem; }
-
+        .page-container { max-width: 1350px; margin: 0 auto; padding: 2rem; width: 100%; flex-grow: 1; }
+        
         /* Buttons */
         .btn {
             padding: 0.55rem 1.2rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem;
@@ -61,10 +59,10 @@
         .btn-maroon:hover { background: var(--bsu-maroon-light); }
         .btn-outline { background: transparent; border: 1px solid var(--border-glass); color: #fff; }
         .btn-outline:hover { background: rgba(255,255,255,0.06); }
-
-        /* ================= AUTHENTICATION GATE ================= */
+        
+        /* Authentication Gate */
         #authGate {
-            min-height: 80vh; display: flex; align-items: center; justify-content: center;
+            min-height: 75vh; display: flex; align-items: center; justify-content: center;
             background: radial-gradient(circle at center, rgba(128, 0, 0, 0.3) 0%, transparent 70%);
         }
         .auth-box {
@@ -73,7 +71,7 @@
             padding: 2.25rem; box-shadow: 0 15px 40px rgba(0,0,0,0.6); backdrop-filter: blur(12px);
         }
         .auth-seal-logo {
-            width: 140px; height: auto;
+            width: 130px; height: 130px;
             object-fit: contain;
             margin: 0 auto 1rem auto; display: block;
             filter: drop-shadow(0 0 15px rgba(255, 199, 44, 0.3));
@@ -84,7 +82,6 @@
             font-weight: 700; font-size: 0.9rem; cursor: pointer; border-bottom: 3px solid transparent;
         }
         .auth-tab-bar button.active { color: var(--bsu-gold); border-bottom-color: var(--bsu-gold); }
-
         .form-group { margin-bottom: 1.15rem; }
         .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--bsu-gold); margin-bottom: 0.4rem; text-transform: uppercase; }
         .form-control {
@@ -93,8 +90,8 @@
             font-size: 0.95rem; outline: none; transition: border-color 0.2s ease;
         }
         .form-control:focus { border-color: var(--bsu-gold); box-shadow: 0 0 10px rgba(255, 199, 44, 0.2); }
-
-        /* ================= STATS SECTION ================= */
+        
+        /* Stats Section */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
         .stat-card {
             background: var(--card-surface); border: 1px solid var(--border-glass);
@@ -109,19 +106,15 @@
         .stat-card .val { font-size: 2.2rem; font-weight: 800; color: var(--bsu-white); }
         .stat-card .lbl { font-size: 0.75rem; color: var(--bsu-gold); font-weight: 700; text-transform: uppercase; }
         .stat-card i { font-size: 2.5rem; color: var(--bsu-gold); opacity: 0.85; }
-
-        /* Cards & Tabs */
+        
+        /* Cards & Grids */
         .card {
             background: var(--card-surface); border: 1px solid var(--border-glass);
             border-radius: var(--radius-main); padding: 1.5rem; backdrop-filter: blur(8px);
+            margin-bottom: 1.5rem;
         }
-        .tabs { display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border-glass); margin-bottom: 1.5rem; }
-        .tab-btn {
-            padding: 0.75rem 1.4rem; background: none; border: none; color: var(--text-secondary);
-            font-weight: 700; font-size: 0.9rem; cursor: pointer; border-bottom: 3px solid transparent;
-            display: flex; align-items: center; gap: 0.5rem;
-        }
-        .tab-btn.active { color: var(--bsu-gold); border-bottom-color: var(--bsu-gold); background: rgba(255, 199, 44, 0.05); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-glass); padding-bottom: 1rem; margin-bottom: 1rem; }
+        .card-header h3 { font-size: 1.15rem; color: var(--bsu-gold); }
 
         /* Tables & Badges */
         .custom-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
@@ -130,12 +123,12 @@
             color: var(--bsu-gold); font-weight: 700; border-bottom: 1px solid var(--border-glass);
         }
         .custom-table td { padding: 0.85rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        .tag { padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .tag { padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; display: inline-block; }
         .tag-emergency { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
         .tag-routine { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
         .tag-treated { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
 
-        /* Modals */
+        /* Modal */
         .modal-wrap {
             position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 1000;
@@ -145,21 +138,22 @@
             background: #140508; border: 2px solid var(--bsu-gold); border-radius: var(--radius-main);
             width: 95%; max-width: 600px; padding: 2rem; box-shadow: 0 15px 50px rgba(0,0,0,0.8);
         }
+        footer {
+            border-top: 1px solid var(--border-glass); padding: 1.2rem; text-align: center;
+            font-size: 0.75rem; color: var(--text-secondary); background: #070102;
+        }
     </style>
 </head>
 <body>
-
     <!-- Header Navigation -->
     <header>
         <div class="brand-container">
-            <!-- URL points to the static folder you will create -->
-            <img src="/static/logo.png" alt="Spartan Logo" class="univ-seal-img" onerror="this.src='https://img.icons8.com/color/96/spartan-helmet.png'">
+            <img src="/static/spartan.png" alt="Spartan Logo" class="univ-seal-img" onerror="this.onerror=null; this.src='/static/logo.png';">
             <div class="brand-title">
                 <h1 class="cinzel">BATANGAS STATE UNIVERSITY</h1>
                 <p>Medical Clinic • Red Spartan Triage</p>
             </div>
         </div>
-
         <div style="display: flex; align-items: center; gap: 1rem;">
             <span id="navUserBadge" class="tag tag-routine" style="display: none;">Guest</span>
             <button id="navLogoutBtn" class="btn btn-outline" style="display: none;" onclick="handleLogout()">
@@ -169,17 +163,14 @@
     </header>
 
     <div class="page-container">
-
         <!-- ================= 1. AUTHENTICATION GATE ================= -->
         <section id="authGate">
             <div class="auth-box">
                 <div style="text-align: center; margin-bottom: 1.5rem;">
-                    <!-- URL points to the static folder you will create -->
-                    <img src="/static/logo.png" alt="Spartan Logo" class="auth-seal-logo" onerror="this.src='https://img.icons8.com/color/96/spartan-helmet.png'">
-                    <h2 class="cinzel" style="font-size: 1.3rem; margin-top: 0.5rem;">Clinic Portal Access</h2>
+                    <img src="/static/spartan.png" alt="Spartan Logo" class="auth-seal-logo" onerror="this.onerror=null; this.src='/static/logo.png';">
+                    <h2 class="cinzel" style="font-size: 1.3rem; margin-top: 0.5rem; color: var(--bsu-gold);">Clinic Portal Access</h2>
                     <p style="font-size: 0.8rem; color: var(--text-secondary);">Red Spartan Health Information System</p>
                 </div>
-
                 <div class="auth-tab-bar">
                     <button id="tabBtnLogin" class="active" onclick="switchAuthTab('login')">Sign In</button>
                     <button id="tabBtnRegister" onclick="switchAuthTab('register')">Create Student Account</button>
@@ -200,7 +191,7 @@
                     </button>
                 </form>
 
-                <!-- STUDENT REGISTRATION FORM (CREATE OWN ACCOUNT) -->
+                <!-- STUDENT REGISTRATION FORM -->
                 <form id="signUpForm" style="display: none;" onsubmit="handleRegister(event)">
                     <div class="form-group">
                         <label>Student SR-Code</label>
@@ -234,14 +225,437 @@
             </div>
         </section>
 
-        <!-- (REST OF THE HTML BODY REMAINS THE SAME AS PREVIOUS STEP) -->
-        <!-- ... (Stats Section, Patient View, Admin View, Modals, Script) ... -->
+        <!-- ================= 2. PATIENT VIEW ================= -->
+        <section id="patientView" style="display: none;">
+            <div style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 1.5rem;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="cinzel"><i class='bx bx-plus-medical'></i> Clinic Check-In</h3>
+                    </div>
+                    <form onsubmit="handleJoinQueue(event)">
+                        <div class="form-group">
+                            <label>Symptoms / Medical Complaint</label>
+                            <textarea id="patientSymptoms" class="form-control" rows="4" placeholder="Describe symptoms (e.g. fever, headache, sprain)..." required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Urgency Level</label>
+                            <select id="patientUrgency" class="form-control">
+                                <option value="routine">Routine Check / Consultation</option>
+                                <option value="emergency">Emergency / Severe Discomfort</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.8rem;">
+                            <i class='bx bx-check-circle'></i> Join Medical Queue
+                        </button>
+                    </form>
+                </div>
 
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="cinzel"><i class='bx bx-broadcast'></i> Live Calling Board</h3>
+                        <span class="tag tag-routine">Confidential</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 1rem;">
+                            <h4 style="color: #f87171; font-size: 0.8rem; margin-bottom: 0.5rem;" class="cinzel">Emergency Priority</h4>
+                            <div id="patientEmergencyBoard" style="font-size: 0.85rem; color: var(--text-secondary);">No emergency cases.</div>
+                        </div>
+                        <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59,130,246,0.3); border-radius: 10px; padding: 1rem;">
+                            <h4 style="color: #60a5fa; font-size: 0.8rem; margin-bottom: 0.5rem;" class="cinzel">Routine Queue</h4>
+                            <div id="patientRoutineBoard" style="font-size: 0.85rem; color: var(--text-secondary);">No routine patients.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 3. STAFF / ADMIN VIEW ================= -->
+        <section id="adminView" style="display: none;">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card" onclick="document.getElementById('directoryCard').scrollIntoView({behavior:'smooth'})">
+                    <div>
+                        <div class="lbl">Registered Students</div>
+                        <div class="val mono" id="statPatients">0</div>
+                    </div>
+                    <i class='bx bx-folder-open'></i>
+                </div>
+                <div class="stat-card" onclick="document.getElementById('emergencyCard').scrollIntoView({behavior:'smooth'})">
+                    <div>
+                        <div class="lbl">Emergency (Heap)</div>
+                        <div class="val mono" id="statEmergency" style="color: #f87171;">0</div>
+                    </div>
+                    <i class='bx bx-pulse' style="color: #f87171;"></i>
+                </div>
+                <div class="stat-card" onclick="document.getElementById('routineCard').scrollIntoView({behavior:'smooth'})">
+                    <div>
+                        <div class="lbl">Routine (FIFO)</div>
+                        <div class="val mono" id="statRoutine" style="color: #60a5fa;">0</div>
+                    </div>
+                    <i class='bx bx-time-five' style="color: #60a5fa;"></i>
+                </div>
+                <div class="stat-card">
+                    <div>
+                        <div class="lbl">Total Treated</div>
+                        <div class="val mono" id="statTreated" style="color: #4ade80;">0</div>
+                    </div>
+                    <i class='bx bx-check-double' style="color: #4ade80;"></i>
+                </div>
+            </div>
+
+            <!-- Queues -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="card" id="emergencyCard">
+                    <div class="card-header">
+                        <h3 class="cinzel" style="color: #f87171;"><i class='bx bx-bell'></i> Emergency Queue (Max-Heap)</h3>
+                        <button onclick="callNext('emergency')" class="btn btn-maroon" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Call Next</button>
+                    </div>
+                    <div id="adminEmergencyList" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 250px; overflow-y: auto;"></div>
+                </div>
+
+                <div class="card" id="routineCard">
+                    <div class="card-header">
+                        <h3 class="cinzel" style="color: #60a5fa;"><i class='bx bx-list-ol'></i> Routine Queue (FIFO)</h3>
+                        <button onclick="callNext('routine')" class="btn btn-gold" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Call Next</button>
+                    </div>
+                    <div id="adminRoutineList" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 250px; overflow-y: auto;"></div>
+                </div>
+            </div>
+
+            <!-- Directory -->
+            <div class="card" id="directoryCard">
+                <div class="card-header">
+                    <h3 class="cinzel"><i class='bx bx-user-pin'></i> Student Directory (BST Search)</h3>
+                    <input type="text" id="adminSearchInput" oninput="filterPatients(this.value)" placeholder="Search SR-Code or Name..." class="form-control mono" style="width: 250px; padding: 0.45rem 0.8rem; font-size: 0.85rem;">
+                </div>
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>SR-Code</th>
+                            <th>Student Name</th>
+                            <th>Age / Gender</th>
+                            <th>Visits</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patientTableBody"></tbody>
+                </table>
+            </div>
+        </section>
     </div>
 
-    <!-- (JavaScript is the same as the previous individual user account version) -->
+    <!-- Medical Modal -->
+    <div id="inspectorModal" class="modal-wrap">
+        <div class="modal-body">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-glass); padding-bottom: 0.8rem; margin-bottom: 1rem;">
+                <h3 class="cinzel" style="color: var(--bsu-gold);">Student Medical File</h3>
+                <button onclick="closeInspector()" class="btn btn-outline" style="padding: 0.2rem 0.5rem;">&times;</button>
+            </div>
+            <div id="modalInfo" class="mono" style="font-size: 0.85rem; margin-bottom: 1rem; color: var(--text-secondary);"></div>
+            <h4 style="font-size: 0.8rem; color: var(--bsu-gold); margin-bottom: 0.5rem;" class="cinzel">Clinical Visits & Diagnosis</h4>
+            <div id="modalVisits" style="max-height: 180px; overflow-y: auto; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem;"></div>
+            <div class="form-group">
+                <label>Add Doctor's Clinical Assessment</label>
+                <textarea id="modalCommentInput" class="form-control" rows="2" placeholder="Prescription, diagnosis, medical notes..."></textarea>
+            </div>
+            <button onclick="saveDoctorComment()" class="btn btn-gold" style="width: 100%; justify-content: center;">
+                Save Assessment
+            </button>
+        </div>
+    </div>
+
+    <footer>
+        PHALANX HEALTH &bull; CpE 411 Data Structures and Algorithms &bull; Batangas State University Alangilan
+    </footer>
+
+    <!-- ================= JAVASCRIPT ================= -->
     <script>
-        // ... (Keep the exact same script from the previous message) ...
+        let currentUser = null;
+        let cachedData = null;
+        let selectedSrCode = null;
+
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('signInForm');
+            const regForm = document.getElementById('signUpForm');
+            const tabLogin = document.getElementById('tabBtnLogin');
+            const tabReg = document.getElementById('tabBtnRegister');
+
+            if(tab === 'login') {
+                loginForm.style.display = 'block';
+                regForm.style.display = 'none';
+                tabLogin.classList.add('active');
+                tabReg.classList.remove('active');
+            } else {
+                loginForm.style.display = 'none';
+                regForm.style.display = 'block';
+                tabReg.classList.add('active');
+                tabLogin.classList.remove('active');
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const srcode = document.getElementById('loginSrCode').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ srcode, password })
+                });
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error || 'Login failed');
+
+                currentUser = data.user;
+                initSession();
+            } catch(err) {
+                alert(err.message);
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const payload = {
+                srcode: document.getElementById('regSrCode').value.trim(),
+                name: document.getElementById('regFullName').value.trim(),
+                age: document.getElementById('regAge').value,
+                gender: document.getElementById('regGender').value,
+                password: document.getElementById('regPassword').value.trim()
+            };
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error || 'Registration failed');
+
+                alert('Account registered successfully! You may now sign in.');
+                switchAuthTab('login');
+            } catch(err) {
+                alert(err.message);
+            }
+        }
+
+        function initSession() {
+            document.getElementById('authGate').style.display = 'none';
+            document.getElementById('navUserBadge').style.display = 'inline-block';
+            document.getElementById('navLogoutBtn').style.display = 'inline-flex';
+            document.getElementById('navUserBadge').innerText = `${currentUser.name} (${currentUser.role.toUpperCase()})`;
+
+            if(currentUser.role === 'admin') {
+                document.getElementById('adminView').style.display = 'block';
+                fetchAdminData();
+            } else {
+                document.getElementById('patientView').style.display = 'block';
+                fetchStudentData();
+            }
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            location.reload();
+        }
+
+        // ================= PATIENT LOGIC =================
+        async function fetchStudentData() {
+            try {
+                const res = await fetch('/api/admin/all_data');
+                const data = await res.json();
+
+                const emergBoard = document.getElementById('patientEmergencyBoard');
+                emergBoard.innerHTML = data.emergency_queue.length === 0 ? 
+                    `<p style="font-size:0.8rem; color:#888;">No emergency cases.</p>` :
+                    data.emergency_queue.map(p => `
+                        <div style="padding:0.4rem; background:rgba(255,255,255,0.05); border-radius:6px; margin-bottom:0.3rem;">
+                            <span class="mono" style="color:#f87171;">${p.srcode}</span> - High Priority
+                        </div>
+                    `).join('');
+
+                const routineBoard = document.getElementById('patientRoutineBoard');
+                routineBoard.innerHTML = data.routine_queue.length === 0 ?
+                    `<p style="font-size:0.8rem; color:#888;">No routine patients.</p>` :
+                    data.routine_queue.map((p, idx) => `
+                        <div style="padding:0.4rem; background:rgba(255,255,255,0.05); border-radius:6px; margin-bottom:0.3rem;">
+                            <span class="mono" style="color:#60a5fa;">${p.srcode}</span> - #${idx+1} in Line
+                        </div>
+                    `).join('');
+            } catch(err) {
+                console.error(err);
+            }
+        }
+
+        async function handleJoinQueue(e) {
+            e.preventDefault();
+            const symptoms = document.getElementById('patientSymptoms').value.trim();
+            const urgency = document.getElementById('patientUrgency').value;
+
+            try {
+                const res = await fetch('/api/patient/join_queue', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ srcode: currentUser.srcode, symptoms, urgency })
+                });
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error || 'Failed to join queue');
+
+                alert('You are now in the clinic queue!');
+                document.getElementById('patientSymptoms').value = '';
+                fetchStudentData();
+            } catch(err) {
+                alert(err.message);
+            }
+        }
+
+        // ================= STAFF LOGIC =================
+        async function fetchAdminData() {
+            if(!currentUser || currentUser.role !== 'admin') return;
+            try {
+                const res = await fetch('/api/admin/all_data');
+                const data = await res.json();
+                cachedData = data;
+
+                document.getElementById('statPatients').innerText = data.patients.length;
+                document.getElementById('statEmergency').innerText = data.emergency_queue.length;
+                document.getElementById('statRoutine').innerText = data.routine_queue.length;
+                document.getElementById('statTreated').innerText = data.treated_history.length;
+
+                // Emergency Queue
+                const emergList = document.getElementById('adminEmergencyList');
+                emergList.innerHTML = data.emergency_queue.length === 0 ?
+                    `<p style="font-size:0.8rem; color:#888;">Emergency queue empty.</p>` :
+                    data.emergency_queue.map(p => `
+                        <div style="padding:0.6rem; background:rgba(255,255,255,0.03); border:1px solid rgba(239,68,68,0.2); border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <span class="mono" style="color:#f87171; font-weight:700;">${p.srcode}</span> - ${p.name}
+                                <div style="font-size:0.75rem; color:#bbb; font-style:italic;">"${p.symptoms}"</div>
+                            </div>
+                            <button onclick="openInspector('${p.srcode}')" class="btn btn-outline" style="padding:0.25rem 0.6rem; font-size:0.75rem;">View</button>
+                        </div>
+                    `).join('');
+
+                // Routine Queue
+                const routineList = document.getElementById('adminRoutineList');
+                routineList.innerHTML = data.routine_queue.length === 0 ?
+                    `<p style="font-size:0.8rem; color:#888;">Routine queue empty.</p>` :
+                    data.routine_queue.map(p => `
+                        <div style="padding:0.6rem; background:rgba(255,255,255,0.03); border:1px solid rgba(59,130,246,0.2); border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <span class="mono" style="color:#60a5fa; font-weight:700;">${p.srcode}</span> - ${p.name}
+                                <div style="font-size:0.75rem; color:#bbb; font-style:italic;">"${p.symptoms}"</div>
+                            </div>
+                            <button onclick="openInspector('${p.srcode}')" class="btn btn-outline" style="padding:0.25rem 0.6rem; font-size:0.75rem;">View</button>
+                        </div>
+                    `).join('');
+
+                filterPatients(document.getElementById('adminSearchInput').value);
+            } catch(err) {
+                console.error(err);
+            }
+        }
+
+        function filterPatients(query) {
+            if(!cachedData) return;
+            const q = (query || '').toLowerCase().trim();
+            const list = cachedData.patients.filter(p => 
+                p.srcode.toLowerCase().includes(q) || p.name.toLowerCase().includes(q)
+            );
+
+            const tbody = document.getElementById('patientTableBody');
+            tbody.innerHTML = list.map(p => `
+                <tr>
+                    <td class="mono" style="color:var(--bsu-gold);">${p.srcode}</td>
+                    <td><strong>${p.name}</strong></td>
+                    <td>${p.age || 20} / ${p.gender || 'N/A'}</td>
+                    <td class="mono">${(p.visits || []).length}</td>
+                    <td style="text-align: right;">
+                        <button onclick="openInspector('${p.srcode}')" class="btn btn-outline" style="padding:0.25rem 0.65rem; font-size:0.75rem;">Inspect</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function callNext(type) {
+            try {
+                const res = await fetch('/api/admin/call_next', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ type })
+                });
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error || 'Failed to call next');
+                alert(`Called: ${data.patient.name} (${data.patient.srcode})`);
+                fetchAdminData();
+            } catch(err) {
+                alert(err.message);
+            }
+        }
+
+        // ================= MODAL LOGIC =================
+        function openInspector(srcode) {
+            if(!cachedData) return;
+            const patient = cachedData.patients.find(p => p.srcode === srcode);
+            if(!patient) return;
+
+            selectedSrCode = srcode;
+            document.getElementById('modalInfo').innerHTML = `
+                <div><strong>SR-Code:</strong> ${patient.srcode}</div>
+                <div><strong>Name:</strong> ${patient.name}</div>
+                <div><strong>Details:</strong> Age ${patient.age || 20} &bull; ${patient.gender || 'N/A'}</div>
+            `;
+
+            const visitList = document.getElementById('modalVisits');
+            visitList.innerHTML = (!patient.visits || patient.visits.length === 0) ?
+                `<p style="font-size:0.8rem; color:#888;">No medical history recorded yet.</p>` :
+                patient.visits.map(v => `
+                    <div style="padding:0.6rem; background:rgba(255,255,255,0.04); border-radius:6px; font-size:0.8rem;">
+                        <div style="display:flex; justify-content:space-between; color:var(--bsu-gold); font-weight:700;">
+                            <span>${v.symptoms}</span>
+                            <span class="mono" style="font-size:0.7rem; color:#888;">${v.date}</span>
+                        </div>
+                        <div style="color:#ddd; margin-top:0.3rem;">Doctor Note: ${v.comment || 'None'}</div>
+                    </div>
+                `).join('');
+
+            document.getElementById('inspectorModal').classList.add('show');
+        }
+
+        function closeInspector() {
+            document.getElementById('inspectorModal').classList.remove('show');
+            document.getElementById('modalCommentInput').value = '';
+            selectedSrCode = null;
+        }
+
+        async function saveDoctorComment() {
+            const comment = document.getElementById('modalCommentInput').value.trim();
+            if(!comment || !selectedSrCode) return;
+
+            try {
+                const res = await fetch('/api/admin/add_comment', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ srcode: selectedSrCode, comment })
+                });
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error || 'Failed to save comment');
+
+                alert('Doctor assessment saved.');
+                closeInspector();
+                fetchAdminData();
+            } catch(err) {
+                alert(err.message);
+            }
+        }
+
+        setInterval(() => {
+            if(currentUser) {
+                if(currentUser.role === 'admin') fetchAdminData();
+                else fetchStudentData();
+            }
+        }, 10000);
     </script>
 </body>
 </html>
