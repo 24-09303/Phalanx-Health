@@ -29,7 +29,6 @@
         .mono { font-family: 'JetBrains Mono', monospace; }
         .cinzel { font-family: 'Cinzel', serif; }
 
-        /* Top Brand Header */
         header {
             background: linear-gradient(180deg, rgba(77, 0, 0, 0.95) 0%, rgba(30, 4, 8, 0.95) 100%);
             border-bottom: 2px solid var(--bsu-gold);
@@ -38,21 +37,15 @@
             position: sticky; top: 0; z-index: 100;
         }
         .brand-container { display: flex; align-items: center; gap: 1.25rem; }
-        
-        /* Spartan Logo Styling */
         .univ-seal-img {
             width: 65px; height: 65px;
             object-fit: contain;
             filter: drop-shadow(0 0 8px rgba(255, 199, 44, 0.5));
         }
-
         .brand-title h1 { font-size: 1.7rem; font-weight: 800; letter-spacing: 2px; color: var(--bsu-white); }
-        .brand-title p { font-size: 0.72rem; color: var(--bsu-gold); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
 
-        /* Container */
         .page-container { max-width: 1350px; margin: 0 auto; padding: 2rem; }
 
-        /* Buttons */
         .btn {
             padding: 0.55rem 1.2rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem;
             cursor: pointer; transition: all 0.25s ease; border: none; display: inline-flex;
@@ -65,7 +58,6 @@
         .btn-outline { background: transparent; border: 1px solid var(--border-glass); color: #fff; }
         .btn-outline:hover { background: rgba(255,255,255,0.06); }
 
-        /* ================= AUTHENTICATION GATE ================= */
         #authGate {
             min-height: 80vh; display: flex; align-items: center; justify-content: center;
             background: radial-gradient(circle at center, rgba(128, 0, 0, 0.3) 0%, transparent 70%);
@@ -75,8 +67,6 @@
             border: 2px solid var(--border-glass); border-radius: var(--radius-main);
             padding: 2.25rem; box-shadow: 0 15px 40px rgba(0,0,0,0.6); backdrop-filter: blur(12px);
         }
-        
-        /* Spartan Logo on Login */
         .auth-seal-logo {
             width: 150px; height: auto;
             object-fit: contain;
@@ -100,7 +90,6 @@
         }
         .form-control:focus { border-color: var(--bsu-gold); box-shadow: 0 0 10px rgba(255, 199, 44, 0.2); }
 
-        /* ... (rest of the CSS remains identical) ... */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
         .stat-card {
             background: var(--card-surface); border: 1px solid var(--border-glass);
@@ -133,14 +122,11 @@
 </head>
 <body>
 
-    <!-- Header Navigation -->
     <header>
         <div class="brand-container">
-            <!-- Spartan Logo Stays Here -->
             <img src="/static/logo.png" alt="Spartan Logo" class="univ-seal-img" onerror="this.src='https://img.icons8.com/color/96/spartan-helmet.png'">
             <div class="brand-title">
                 <h1 class="cinzel">PHALANX HEALTH</h1>
-                <p>Smart Medical Triage • Red Spartan System</p>
             </div>
         </div>
 
@@ -154,14 +140,11 @@
 
     <div class="page-container">
 
-        <!-- ================= 1. AUTHENTICATION GATE ================= -->
         <section id="authGate">
             <div class="auth-box">
                 <div style="text-align: center; margin-bottom: 1.5rem;">
-                    <!-- Spartan Logo Stays Here too -->
                     <img src="/static/logo.png" alt="Spartan Logo" class="auth-seal-logo" onerror="this.src='https://img.icons8.com/color/96/spartan-helmet.png'">
                     <h2 class="cinzel" style="font-size: 1.5rem; margin-top: 0.5rem; color: var(--bsu-white); letter-spacing: 2px;">PHALANX HEALTH</h2>
-                    <p style="font-size: 0.8rem; color: var(--bsu-gold); font-weight: 600;">Red Spartan Information System</p>
                 </div>
 
                 <div class="auth-tab-bar">
@@ -169,7 +152,6 @@
                     <button id="tabBtnRegister" onclick="switchAuthTab('register')">Create Account</button>
                 </div>
 
-                <!-- SIGN IN FORM -->
                 <form id="signInForm" onsubmit="handleLogin(event)">
                     <div class="form-group">
                         <label>SR-Code or Staff ID</label>
@@ -184,7 +166,6 @@
                     </button>
                 </form>
 
-                <!-- REGISTRATION FORM -->
                 <form id="signUpForm" style="display: none;" onsubmit="handleRegister(event)">
                     <div class="form-group">
                         <label>Student SR-Code</label>
@@ -218,7 +199,6 @@
             </div>
         </section>
 
-        <!-- (REST OF THE BODY REMAINS THE SAME...) -->
         <section id="statSection" class="stats-grid" style="display: none;">
             <div class="stat-card" onclick="handleStatCardClick('directory')">
                 <div><div class="lbl">Total Registered</div><div class="val mono" id="statRegistered">0</div></div><i class='bx bx-id-card'></i>
@@ -257,7 +237,6 @@
 
     </div>
 
-    <!-- MODALS -->
     <div id="ticketModal" class="modal-wrap"><div class="modal-body"><h3 class="cinzel" style="color: var(--bsu-gold);">Join Triage</h3><form onsubmit="handleJoinQueue(event)"><div class="form-group"><label>Type</label><select id="reqType" class="form-control" onchange="toggleReqSeverity()"><option value="Routine">Routine</option><option value="Emergency">Emergency</option></select></div><div class="form-group" id="reqSeverityGroup" style="display:none;"><label>Severity (1-10)</label><input type="range" id="reqSeverity" min="1" max="10" value="7" class="form-control"></div><div class="form-group"><label>Symptoms</label><textarea id="reqSymptoms" class="form-control" rows="3" required></textarea></div><button type="submit" class="btn btn-gold" style="width:100%;">Submit</button></form></div></div>
 
     <div id="inspectorModal" class="modal-wrap"><div class="modal-body"><h3 class="cinzel" id="inspName">File</h3><div id="inspCommentsList"></div><div style="display:flex; gap:0.5rem;"><input type="text" id="newCommentInput" class="form-control" placeholder="Clinical Note..."><button class="btn btn-gold" onclick="submitComment()">Add</button></div><button class="btn btn-outline" style="width:100%; margin-top:1rem;" onclick="closeInspectorModal()">Close</button></div></div>
