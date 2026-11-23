@@ -1,6 +1,6 @@
 import os
 import time
-import random
+import secrets
 import sqlite3
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify
@@ -12,18 +12,18 @@ app = Flask(__name__)
 # ==============================================================================
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'clinic.db')
 
+
 def get_db():
     conn = sqlite3.connect(DB_PATH, timeout=10.0)
     conn.row_factory = sqlite3.Row
     return conn
 
+
 def init_db():
-    """Initializes persistent tables for students, active triage queues, and history."""
     conn = get_db()
-    cursor = conn.cursor()
-    
-    # 1. Students Table (Permanent Accounts)
-    cursor.execute('''
+    cur = conn.cursor()
+
+    cur.execute('''
         CREATE TABLE IF NOT EXISTS students (
             srcode TEXT PRIMARY KEY,
             name TEXT NOT NULL,
@@ -34,19 +34,16 @@ def init_db():
         )
     ''')
 
-    # 2. Clinical History Table (Doctor Notes)
-    cursor.execute('''
+    cur.execute('''
         CREATE TABLE IF NOT EXISTS clinical_notes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             srcode TEXT NOT NULL,
             note TEXT NOT NULL,
-            timestamp TEXT NOT NULL,
-            FOREIGN KEY (srcode) REFERENCES students (srcode)
+            timestamp TEXT NOT NULL
         )
     ''')
 
-    # 3. Active Queue Table (Persists Active Waiting Patients)
-    cursor.execute('''
+    cur.execute('''
         CREATE TABLE IF NOT EXISTS active_queue (
             srcode TEXT PRIMARY KEY,
             name TEXT NOT NULL,
@@ -57,31 +54,34 @@ def init_db():
         )
     ''')
 
-    # 4. Seed Demo Student if not exists
-    cursor.execute("SELECT srcode FROM students WHERE srcode = '24-09303'")
-    if not cursor.fetchone():
-        cursor.execute('''
-            INSERT INTO students (srcode, name, age, gender, password, created_at)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', ('24-09303', 'Juan P. Dela Cruz', 20, 'Male', 'student123', '2026-01-15 08:30'))
+    # Seed demo student (no-op if it already exists)
+    cur.execute('''
+        INSERT OR IGNORE INTO students (srcode, name, age, gender, password, created_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', ('24-09303', 'Juan P. Dela Cruz', 20, 'Male', 'student123', '2026-01-15 08:30'))
 
     conn.commit()
     conn.close()
 
-# Initialize DB on launch
+
 init_db()
 
-# Staff Credentials
+# Staff credentials. Tokens are issued at login and kept in memory.
 STAFF_CREDENTIALS = {
     "ADMIN": {
         "password": "batstateu411",
         "name": "Dr. A. Castillo, MD",
-        "role": "admin"
     }
 }
+STAFF_TOKENS = set()
+
+
+def is_staff(req):
+    return req.headers.get('X-Staff-Token', '') in STAFF_TOKENS
+
 
 # ==============================================================================
-# DATA STRUCTURE 1: BINARY SEARCH TREE (BST) FOR STUDENT DIRECTORY
+# DATA STRUCTURE 1: BINARY SEARCH TREE (STUDENT DIRECTORY)
 # ==============================================================================
 class BSTNode:
     def __init__(self, data):
@@ -89,6 +89,7 @@ class BSTNode:
         self.data = data
         self.left = None
         self.right = None
+
 
 class BST:
     def __init__(self):
@@ -112,7 +113,7 @@ class BST:
                     return True
                 current = current.right
             else:
-                current.data = data  # Update existing
+                current.data = data
                 return False
 
     def search(self, srcode):
@@ -128,52 +129,19 @@ class BST:
 
     def inorder(self):
         result = []
-        def _inorder(node):
+
+        def _walk(node):
             if node:
-                _inorder(node.left)
+                _walk(node.left)
                 result.append(node.data)
-                _inorder(node.right)
-        _inorder(self.root)
+                _walk(node.right)
+
+        _walk(self.root)
         return result
 
-student_directory = BST()
-
-def sync_bst_from_db():
-    """Hydrates the in-memory Binary Search Tree from the persistent SQLite database."""
-    global student_directory
-    student_directory = BST()
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM students")
-    rows = cursor.fetchall()
-    for r in rows:
-        cursor.execute("SELECT note, timestamp FROM clinical_notes WHERE srcode = ? ORDER BY id ASC", (r['srcode'],))
-        history_rows = cursor.fetchall()
-        history = [{'note': h['note'], 'timestamp': h['timestamp']} for h in history_rows]
-
-        # Check if currently has active symptoms in queue
-        cursor.execute("SELECT symptoms FROM active_queue WHERE srcode = ?", (r['srcode'],))
-        active_q = cursor.fetchone()
-        current_symp = active_q['symptoms'] if active_q else ''
-
-        student_data = {
-            'srcode': r['srcode'],
-            'name': r['name'],
-            'age': r['age'],
-            'gender': r['gender'],
-            'password': r['password'],
-            'created_at': r['created_at'],
-            'history': history,
-            'current_symptoms': current_symp
-        }
-        student_directory.insert(student_data)
-    conn.close()
-
-# Perform initial sync
-sync_bst_from_db()
 
 # ==============================================================================
-# DATA STRUCTURE 2: MAX-HEAP FOR EMERGENCY QUEUE
+# DATA STRUCTURE 2: MAX-HEAP (EMERGENCY QUEUE)
 # ==============================================================================
 class MaxHeap:
     def __init__(self):
@@ -194,11 +162,13 @@ class MaxHeap:
         return root
 
     def _sift_up(self, idx):
-        parent = (idx - 1) // 2
-        while idx > 0 and self.heap[idx]['severity'] > self.heap[parent]['severity']:
-            self.heap[idx], self.heap[parent] = self.heap[parent], self.heap[idx]
-            idx = parent
+        while idx > 0:
             parent = (idx - 1) // 2
+            if self.heap[idx]['severity'] > self.heap[parent]['severity']:
+                self.heap[idx], self.heap[parent] = self.heap[parent], self.heap[idx]
+                idx = parent
+            else:
+                break
 
     def _sift_down(self, idx):
         size = len(self.heap)
@@ -210,31 +180,17 @@ class MaxHeap:
                 largest = left
             if right < size and self.heap[right]['severity'] > self.heap[largest]['severity']:
                 largest = right
-            if largest != idx:
-                self.heap[idx], self.heap[largest] = self.heap[largest], self.heap[idx]
-                idx = largest
-            else:
+            if largest == idx:
                 break
+            self.heap[idx], self.heap[largest] = self.heap[largest], self.heap[idx]
+            idx = largest
 
     def to_list(self):
-        return sorted(self.heap, key=lambda p: -p['severity'])
+        return sorted(self.heap, key=lambda p: (-p['severity'], p['created_at']))
 
-    def contains(self, srcode):
-        return any(p['srcode'] == srcode for p in self.heap)
-
-    def remove(self, srcode):
-        for i, p in enumerate(self.heap):
-            if p['srcode'] == srcode:
-                last = self.heap.pop()
-                if i < len(self.heap):
-                    self.heap[i] = last
-                    self._sift_down(i)
-                    self._sift_up(i)
-                return p
-        return None
 
 # ==============================================================================
-# DATA STRUCTURE 3: FIFO QUEUE FOR ROUTINE CLINIC CASES
+# DATA STRUCTURE 3: FIFO QUEUE (ROUTINE CASES)
 # ==============================================================================
 class FIFOQueue:
     def __init__(self):
@@ -251,30 +207,55 @@ class FIFOQueue:
     def to_list(self):
         return list(self.queue)
 
-    def contains(self, srcode):
-        return any(p['srcode'] == srcode for p in self.queue)
 
-    def remove(self, srcode):
-        for i, p in enumerate(self.queue):
-            if p['srcode'] == srcode:
-                return self.queue.pop(i)
-        return None
-
+student_directory = BST()
 emergency_heap = MaxHeap()
 routine_queue = FIFOQueue()
 
-def sync_queues_from_db():
-    """Syncs the in-memory Max-Heap and FIFO Queue from the database."""
-    global emergency_heap, routine_queue
-    emergency_heap = MaxHeap()
-    routine_queue = FIFOQueue()
-    
+
+def sync_bst_from_db():
+    """Rebuilds the in-memory BST from the database (source of truth)."""
+    global student_directory
+    new_tree = BST()
+
     conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM active_queue ORDER BY created_at ASC")
-    rows = cursor.fetchall()
+    students = conn.execute("SELECT * FROM students").fetchall()
+    notes = conn.execute("SELECT srcode, note, timestamp FROM clinical_notes ORDER BY id ASC").fetchall()
+    queued = conn.execute("SELECT srcode, symptoms FROM active_queue").fetchall()
+    conn.close()
+
+    history_map = {}
+    for n in notes:
+        history_map.setdefault(n['srcode'], []).append({'note': n['note'], 'timestamp': n['timestamp']})
+    symptom_map = {q['srcode']: q['symptoms'] for q in queued}
+
+    for r in students:
+        new_tree.insert({
+            'srcode': r['srcode'],
+            'name': r['name'],
+            'age': r['age'],
+            'gender': r['gender'],
+            'password': r['password'],
+            'created_at': r['created_at'],
+            'history': history_map.get(r['srcode'], []),
+            'current_symptoms': symptom_map.get(r['srcode'], '')
+        })
+
+    student_directory = new_tree
+
+
+def sync_queues_from_db():
+    """Rebuilds the Max-Heap and FIFO Queue from the database."""
+    global emergency_heap, routine_queue
+    new_heap = MaxHeap()
+    new_routine = FIFOQueue()
+
+    conn = get_db()
+    rows = conn.execute("SELECT * FROM active_queue ORDER BY created_at ASC").fetchall()
+    conn.close()
+
     for r in rows:
-        p_data = {
+        p = {
             'srcode': r['srcode'],
             'name': r['name'],
             'urgency': r['urgency'],
@@ -283,21 +264,28 @@ def sync_queues_from_db():
             'created_at': r['created_at']
         }
         if r['urgency'] == 'emergency':
-            emergency_heap.insert(p_data)
+            new_heap.insert(p)
         else:
-            routine_queue.enqueue(p_data)
-    conn.close()
+            new_routine.enqueue(p)
 
+    emergency_heap = new_heap
+    routine_queue = new_routine
+
+
+sync_bst_from_db()
 sync_queues_from_db()
 
-# Clinical Triage Severity Keyword Scorer
+
+# ==============================================================================
+# HELPERS
+# ==============================================================================
 def calculate_severity(symptoms, urgency):
     s = symptoms.lower()
-    score = 2
-    if urgency == 'emergency':
-        score = 6
-    high_critical = ['chest pain', 'unconscious', 'breathing', 'seizure', 'kidney failure', 'stroke', 'cardiac', 'bleed', 'fracture', 'poison']
-    medium_critical = ['severe', 'fainting', 'high fever', 'asthma', 'head trauma', 'vomiting blood', 'palpitations']
+    score = 6 if urgency == 'emergency' else 2
+    high_critical = ['chest pain', 'unconscious', 'breathing', 'seizure', 'kidney failure',
+                     'stroke', 'cardiac', 'bleed', 'fracture', 'poison']
+    medium_critical = ['severe', 'fainting', 'high fever', 'asthma', 'head trauma',
+                       'vomiting blood', 'palpitations']
     for kw in high_critical:
         if kw in s:
             score += 3
@@ -306,159 +294,149 @@ def calculate_severity(symptoms, urgency):
             score += 2
     return min(max(score, 1), 10)
 
+
 def mask_srcode(srcode):
-    """Privacy masking for public calling board (e.g. 24-09303 -> 24-***03)"""
+    """Privacy masking for the public board: 24-09303 -> 24-***03"""
     if len(srcode) >= 8:
         return srcode[:3] + "***" + srcode[-2:]
-    return srcode
+    return "***"
+
+
+def find_student(srcode):
+    """BST lookup first, database fallback if the tree is out of date."""
+    record = student_directory.search(srcode)
+    if record:
+        return record
+    conn = get_db()
+    row = conn.execute("SELECT srcode FROM students WHERE srcode = ?", (srcode,)).fetchone()
+    conn.close()
+    if row:
+        sync_bst_from_db()
+        return student_directory.search(srcode)
+    return None
+
+
+def public_student_view(s):
+    """Strips the password before any data leaves the server."""
+    return {k: v for k, v in s.items() if k != 'password'}
+
 
 # ==============================================================================
-# FLASK WEB & API ROUTES
+# ROUTES
 # ==============================================================================
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# 1. Student Registration
+
 @app.route('/api/auth/register', methods=['POST'])
 def api_register():
-    data = request.get_json() or {}
-    srcode = data.get('srcode', '').strip()
-    name = data.get('name', '').strip()
-    age = data.get('age')
-    gender = data.get('gender', 'Other').strip()
-    password = data.get('password', '').strip()
+    data = request.get_json(silent=True) or {}
+    srcode = str(data.get('srcode', '')).strip()
+    name = str(data.get('name', '')).strip()
+    gender = str(data.get('gender', 'Other')).strip() or 'Other'
+    password = str(data.get('password', '')).strip()
 
-    if not srcode or not name or not password or not age:
+    try:
+        age = int(data.get('age'))
+    except (TypeError, ValueError):
+        return jsonify({'success': False, 'message': 'Age must be a valid number.'}), 400
+
+    if not srcode or not name or not password:
         return jsonify({'success': False, 'message': 'All registration fields are required.'}), 400
 
     conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT srcode FROM students WHERE srcode = ?", (srcode,))
-    if cursor.fetchone():
+    existing = conn.execute("SELECT srcode FROM students WHERE srcode = ?", (srcode,)).fetchone()
+    if existing:
         conn.close()
-        return jsonify({'success': False, 'message': f'Student record with SR-Code {srcode} already exists.'}), 400
+        return jsonify({'success': False, 'message': f'SR-Code {srcode} is already registered.'}), 400
 
     created_at = datetime.now().strftime('%Y-%m-%d %H:%M')
-    cursor.execute('''
-        INSERT INTO students (srcode, name, age, gender, password, created_at)
-        VALUES (?, ?, ?, ?, ?, ?)
-    ''', (srcode, name, int(age), gender, password, created_at))
+    conn.execute(
+        "INSERT INTO students (srcode, name, age, gender, password, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+        (srcode, name, age, gender, password, created_at)
+    )
     conn.commit()
     conn.close()
 
-    # Insert into BST
-    student_record = {
+    student_directory.insert({
         'srcode': srcode,
         'name': name,
-        'age': int(age),
+        'age': age,
         'gender': gender,
         'password': password,
         'created_at': created_at,
         'history': [],
         'current_symptoms': ''
-    }
-    student_directory.insert(student_record)
+    })
 
     return jsonify({
         'success': True,
-        'message': 'Account created successfully and saved permanently.',
-        'user': {
-            'role': 'student',
-            'srcode': srcode,
-            'name': name
-        }
+        'message': 'Account created and saved permanently.',
+        'user': {'role': 'student', 'srcode': srcode, 'name': name}
     })
 
-# 2. Login Endpoint
+
 @app.route('/api/auth/login', methods=['POST'])
 def api_login():
-    data = request.get_json() or {}
-    user_id = data.get('id', '').strip()
-    password = data.get('password', '').strip()
+    data = request.get_json(silent=True) or {}
+    user_id = str(data.get('id', '')).strip()
+    password = str(data.get('password', '')).strip()
 
-    # Check Staff Login
+    # Staff login issues a session token
     if user_id.upper() in STAFF_CREDENTIALS:
-        staff_info = STAFF_CREDENTIALS[user_id.upper()]
-        if staff_info['password'] == password:
+        info = STAFF_CREDENTIALS[user_id.upper()]
+        if info['password'] == password:
+            token = secrets.token_hex(16)
+            STAFF_TOKENS.add(token)
             return jsonify({
                 'success': True,
-                'user': {
-                    'role': 'admin',
-                    'srcode': user_id.upper(),
-                    'name': staff_info['name']
-                }
+                'user': {'role': 'admin', 'srcode': user_id.upper(), 'name': info['name'], 'token': token}
             })
         return jsonify({'success': False, 'message': 'Invalid staff credentials.'}), 401
 
-    # Check Student Login: First search in BST
-    student = student_directory.search(user_id)
-    if not student:
-        # Fallback check against persistent SQLite database
-        conn = get_db()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM students WHERE srcode = ?", (user_id,))
-        row = cursor.fetchone()
-        conn.close()
-        if row:
-            sync_bst_from_db()
-            student = student_directory.search(user_id)
-
+    # Student login
+    student = find_student(user_id)
     if student and student['password'] == password:
         return jsonify({
             'success': True,
-            'user': {
-                'role': 'student',
-                'srcode': student['srcode'],
-                'name': student['name']
-            }
+            'user': {'role': 'student', 'srcode': student['srcode'], 'name': student['name']}
         })
 
     return jsonify({'success': False, 'message': 'Invalid SR-Code or password.'}), 401
 
-# 3. Join Triage Queue
+
 @app.route('/api/patient/join_queue', methods=['POST'])
 def api_join_queue():
-    data = request.get_json() or {}
-    srcode = data.get('srcode', '').strip()
-    symptoms = data.get('symptoms', '').strip()
-    urgency = data.get('urgency', 'routine').strip().lower()
+    data = request.get_json(silent=True) or {}
+    srcode = str(data.get('srcode', '')).strip()
+    symptoms = str(data.get('symptoms', '')).strip()
+    urgency = str(data.get('urgency', 'routine')).strip().lower()
+    if urgency not in ('routine', 'emergency'):
+        urgency = 'routine'
 
     if not srcode or not symptoms:
-        return jsonify({'success': False, 'message': 'Symptoms are required for medical check-in.'}), 400
+        return jsonify({'success': False, 'message': 'Symptoms are required for check-in.'}), 400
 
-    # Check if student exists
-    student = student_directory.search(srcode)
+    student = find_student(srcode)
     if not student:
-        conn = get_db()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM students WHERE srcode = ?", (srcode,))
-        row = cursor.fetchone()
-        conn.close()
-        if not row:
-            return jsonify({'success': False, 'message': 'Student record not found. Please register first.'}), 404
-        sync_bst_from_db()
-        student = student_directory.search(srcode)
+        return jsonify({'success': False, 'message': 'Student record not found. Please register first.'}), 404
 
-    # Check if already waiting in persistent queue
     conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT srcode FROM active_queue WHERE srcode = ?", (srcode,))
-    if cursor.fetchone():
+    if conn.execute("SELECT srcode FROM active_queue WHERE srcode = ?", (srcode,)).fetchone():
         conn.close()
         return jsonify({'success': False, 'message': 'You are already waiting in the queue.'}), 400
 
     severity = calculate_severity(symptoms, urgency)
     created_at = time.time()
-
-    cursor.execute('''
-        INSERT INTO active_queue (srcode, name, urgency, symptoms, severity, created_at)
-        VALUES (?, ?, ?, ?, ?, ?)
-    ''', (srcode, student['name'], urgency, symptoms, severity, created_at))
+    conn.execute(
+        "INSERT INTO active_queue (srcode, name, urgency, symptoms, severity, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+        (srcode, student['name'], urgency, symptoms, severity, created_at)
+    )
     conn.commit()
     conn.close()
 
-    patient_entry = {
+    entry = {
         'srcode': srcode,
         'name': student['name'],
         'urgency': urgency,
@@ -466,119 +444,122 @@ def api_join_queue():
         'severity': severity,
         'created_at': created_at
     }
-
     if urgency == 'emergency':
-        emergency_heap.insert(patient_entry)
+        emergency_heap.insert(entry)
     else:
-        routine_queue.enqueue(patient_entry)
+        routine_queue.enqueue(entry)
 
     student['current_symptoms'] = symptoms
-    return jsonify({'success': True, 'message': 'Checked into clinic triage queue successfully.'})
+    return jsonify({'success': True, 'message': 'You have successfully joined the medical triage queue.'})
 
-# 4. Fetch All Data (Queues and Directory)
+
+@app.route('/api/board', methods=['GET'])
+def api_board():
+    """PUBLIC calling board: masked SR-Codes, no names, no symptoms."""
+    emergency = [
+        {'srcode': mask_srcode(p['srcode']), 'position': i + 1}
+        for i, p in enumerate(emergency_heap.to_list())
+    ]
+    routine = [
+        {'srcode': mask_srcode(p['srcode']), 'position': i + 1}
+        for i, p in enumerate(routine_queue.to_list())
+    ]
+    return jsonify({'emergency': emergency, 'routine': routine})
+
+
 @app.route('/api/admin/all_data', methods=['GET'])
 def api_all_data():
-    raw_emergency = emergency_heap.to_list()
-    raw_routine = routine_queue.to_list()
-    all_students = student_directory.inorder()
+    """STAFF ONLY: full queues and student directory."""
+    if not is_staff(request):
+        return jsonify({'success': False, 'message': 'Staff authentication required.'}), 401
 
-    # Mask public queue data for board view
-    public_emergency = [{'srcode': mask_srcode(p['srcode']), 'severity': p['severity']} for p in raw_emergency]
-    public_routine = [{'srcode': mask_srcode(p['srcode']), 'severity': p['severity']} for p in raw_routine]
+    emergency = emergency_heap.to_list()
+    routine = routine_queue.to_list()
+    patients = [public_student_view(s) for s in student_directory.inorder()]
 
     return jsonify({
-        'emergency_queue': raw_emergency,
-        'routine_queue': raw_routine,
-        'public_emergency': public_emergency,
-        'public_routine': public_routine,
-        'all_patients': all_students
+        'emergency_queue': emergency,
+        'routine_queue': routine,
+        'all_patients': patients
     })
 
-# 5. Staff: Call Next Patient
+
 @app.route('/api/admin/call_next', methods=['POST'])
 def api_call_next():
-    data = request.get_json() or {}
+    if not is_staff(request):
+        return jsonify({'success': False, 'message': 'Staff authentication required.'}), 401
+
+    data = request.get_json(silent=True) or {}
     queue_type = data.get('queue_type', 'emergency')
 
-    patient = None
     if queue_type == 'emergency':
         patient = emergency_heap.extract_max()
     else:
         patient = routine_queue.dequeue()
 
     if not patient:
-        return jsonify({'success': False, 'message': f'No active patients in {queue_type.upper()} queue.'})
+        return jsonify({'success': False, 'message': f'No active patients in the {queue_type} queue.'})
 
-    # Remove from persistent database queue
     conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM active_queue WHERE srcode = ?", (patient['srcode'],))
+    conn.execute("DELETE FROM active_queue WHERE srcode = ?", (patient['srcode'],))
     conn.commit()
     conn.close()
 
     return jsonify({
         'success': True,
-        'message': f"Now Calling: {patient['name']} ({patient['srcode']})",
+        'message': f"Now calling {patient['name']} ({patient['srcode']}).",
         'patient': patient
     })
 
-# 6. Staff: Add Medical Assessment Note
+
 @app.route('/api/admin/add_comment', methods=['POST'])
 def api_add_comment():
-    data = request.get_json() or {}
-    srcode = data.get('srcode', '').strip()
-    comment = data.get('comment', '').strip()
+    if not is_staff(request):
+        return jsonify({'success': False, 'message': 'Staff authentication required.'}), 401
+
+    data = request.get_json(silent=True) or {}
+    srcode = str(data.get('srcode', '')).strip()
+    comment = str(data.get('comment', '')).strip()
 
     if not srcode or not comment:
-        return jsonify({'success': False, 'message': 'SR-Code and diagnosis comment are required.'}), 400
+        return jsonify({'success': False, 'message': 'SR-Code and assessment note are required.'}), 400
 
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M')
-
-    # Save to SQLite
     conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO clinical_notes (srcode, note, timestamp)
-        VALUES (?, ?, ?)
-    ''', (srcode, comment, timestamp))
+    conn.execute(
+        "INSERT INTO clinical_notes (srcode, note, timestamp) VALUES (?, ?, ?)",
+        (srcode, comment, timestamp)
+    )
     conn.commit()
     conn.close()
 
-    # Update in BST
     student = student_directory.search(srcode)
     if student:
         student.setdefault('history', []).append({'note': comment, 'timestamp': timestamp})
 
-    return jsonify({'success': True, 'message': 'Clinical assessment saved successfully.'})
+    return jsonify({'success': True, 'message': 'Clinical assessment saved to the student record.'})
 
-# 7. Search Benchmark (Linear vs Binary Search)
+
 @app.route('/api/benchmark', methods=['GET'])
 def api_benchmark():
     dataset_sizes = [100, 1000, 10000, 100000]
     results = []
 
     for n in dataset_sizes:
-        data = sorted([f"24-{i:05d}" for i in range(n)])
+        data = sorted(f"24-{i:05d}" for i in range(n))
         target = data[-1]
 
-        # Linear Search O(N)
         t0 = time.perf_counter()
-        found_lin = False
         for item in data:
             if item == target:
-                found_lin = True
                 break
         linear_ms = (time.perf_counter() - t0) * 1000.0
 
-        # Binary Search O(log N)
         t1 = time.perf_counter()
-        low = 0
-        high = len(data) - 1
-        found_bin = False
+        low, high = 0, len(data) - 1
         while low <= high:
             mid = (low + high) // 2
             if data[mid] == target:
-                found_bin = True
                 break
             elif data[mid] < target:
                 low = mid + 1
@@ -593,6 +574,7 @@ def api_benchmark():
         })
 
     return jsonify({'success': True, 'results': results})
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
