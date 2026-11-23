@@ -3,599 +3,1287 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PHALANX HEALTH</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <title>PHALANX HEALTH - Smart Campus Medical Triage</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <script>
+        function spartanLogoFallback(img) {
+            img.onerror = null;
+            img.src = "data:image/svg+xml;utf8," + encodeURIComponent(
+                "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>" +
+                "<path d='M32 4L56 14V32C56 46 46 56 32 60C18 56 8 46 8 32V14Z' fill='#800000' stroke='#FFC72C' stroke-width='3'/>" +
+                "<text x='32' y='40' font-size='17' text-anchor='middle' fill='#FFC72C' font-family='serif' font-weight='bold'>PH</text>" +
+                "</svg>"
+            );
+        }
+    </script>
+
     <style>
         :root {
-            --bg: #0d0305;
-            --card-bg: rgba(28, 8, 12, 0.88);
+            --bg-canvas: #0d0305;
+            --surface-card: rgba(28, 8, 12, 0.88);
+            --surface-inner: rgba(16, 4, 7, 0.8);
             --maroon: #800000;
             --maroon-light: #9c1c1c;
             --gold: #FFC72C;
-            --gold-glow: rgba(255, 199, 44, 0.3);
-            --glass-border: rgba(255, 199, 44, 0.22);
+            --gold-hover: #e0ac1e;
+            --gold-glow: rgba(255, 199, 44, 0.35);
+            --border-glass: rgba(255, 199, 44, 0.22);
             --text-main: #FFFFFF;
-            --text-dim: #d8c7c9;
+            --text-muted: #d8c7c9;
+            --text-dim: #9e8588;
+            --routine-blue: #38bdf8;
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+
         body {
-            background: var(--bg);
+            background-color: var(--bg-canvas);
+            background-image:
+                radial-gradient(circle at 15% 15%, rgba(128, 0, 0, 0.45) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(77, 0, 0, 0.35) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(13, 3, 5, 0.9) 0%, #0d0305 100%);
+            background-attachment: fixed;
             color: var(--text-main);
-            font-family: 'Inter', sans-serif;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
             overflow-x: hidden;
         }
 
-        /* --- THEMES --- */
-        .hidden { display: none !important; }
-
-        /* --- NAVIGATION --- */
-        nav {
-            background: rgba(0,0,0,0.8);
-            border-bottom: 2px solid var(--maroon);
-            padding: 1rem 2rem;
+        .navbar {
+            background: linear-gradient(180deg, rgba(20, 4, 7, 0.98) 0%, rgba(13, 3, 5, 0.92) 100%);
+            border-bottom: 2px solid var(--border-glass);
+            padding: 12px 28px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.65);
         }
 
-        .logo-area { display: flex; align-items: center; gap: 15px; }
-        .logo-img { width: 45px; height: 45px; object-fit: contain; }
-        .brand-name {
+        .brand-container { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+
+        .brand-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            border: 1.5px solid var(--gold);
+            padding: 2px;
+            background: radial-gradient(circle, var(--maroon) 0%, #1a0407 100%);
+            box-shadow: 0 0 14px var(--gold-glow);
+            object-fit: contain;
+            display: block;
+        }
+
+        .brand-title {
             font-family: 'Cinzel', serif;
-            font-size: 1.6rem;
+            font-size: 1.45rem;
+            font-weight: 800;
             color: var(--gold);
             letter-spacing: 2px;
-            text-shadow: 0 0 10px var(--gold-glow);
+            text-shadow: 0 0 12px rgba(255, 199, 44, 0.4);
+            line-height: 1;
         }
 
-        /* --- MODAL (CUSTOM ALERTS) --- */
+        .auth-status-container { display: flex; align-items: center; gap: 12px; }
+
+        .btn-auth-switch {
+            background: rgba(128, 0, 0, 0.35);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 8px 18px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.5px;
+            transition: all 0.25s ease;
+        }
+
+        .btn-auth-switch:hover { background: var(--gold); color: #140407; box-shadow: 0 0 15px var(--gold-glow); }
+
+        .badge-user-session {
+            background: rgba(30, 8, 12, 0.9);
+            border: 1px solid rgba(255, 199, 44, 0.3);
+            color: #60a5fa;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .main-container { max-width: 1400px; width: 100%; margin: 0 auto; padding: 24px; flex: 1; }
+
+        .glass-card {
+            background: var(--surface-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .glass-card:hover { border-color: rgba(255, 199, 44, 0.4); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7); }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            border-bottom: 1px solid rgba(255, 199, 44, 0.15);
+            padding-bottom: 12px;
+        }
+
+        .card-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.15rem;
+            color: var(--gold);
+            font-weight: 700;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 24px; }
+        @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr; } }
+
+        .triage-calling-board { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 640px) { .triage-calling-board { grid-template-columns: 1fr; } }
+
+        .auth-container { max-width: 440px; margin: 40px auto; }
+
+        .form-group { margin-bottom: 16px; }
+
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gold);
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .form-control {
+            width: 100%;
+            background: var(--surface-inner);
+            border: 1px solid rgba(255, 199, 44, 0.25);
+            border-radius: 6px;
+            padding: 10px 14px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .form-control:focus { border-color: var(--gold); box-shadow: 0 0 10px var(--gold-glow); background: rgba(24, 6, 11, 0.95); }
+        .form-control::placeholder { color: var(--text-dim); }
+        textarea.form-control { resize: vertical; min-height: 90px; }
+
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-hover) 100%);
+            color: #140407;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px rgba(255, 199, 44, 0.25);
+        }
+
+        .btn-primary:hover { box-shadow: 0 0 20px var(--gold-glow); transform: translateY(-1px); }
+
+        .btn-action-sm {
+            background: rgba(128, 0, 0, 0.4);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action-sm:hover { background: var(--gold); color: #140407; }
+
+        .queue-col-emergency { background: rgba(38, 8, 12, 0.6); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 8px; padding: 14px; }
+        .queue-col-routine { background: rgba(10, 22, 38, 0.6); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 8px; padding: 14px; }
+
+        .queue-col-title {
+            font-family: 'Cinzel', serif;
+            font-size: 0.88rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .queue-list { display: flex; flex-direction: column; gap: 8px; min-height: 100px; }
+
+        .queue-item {
+            background: var(--surface-inner);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .queue-item:hover { border-color: rgba(255, 199, 44, 0.3); background: rgba(30, 8, 12, 0.9); }
+
+        .patient-srcode { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text-main); }
+
+        .severity-badge {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #f87171;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .routine-badge {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            color: #38bdf8;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .empty-state { font-size: 0.8rem; color: var(--text-dim); text-align: center; margin-top: 24px; }
+
+        .badge-confidential {
+            background: rgba(128, 0, 0, 0.25);
+            border: 1px solid var(--maroon-light);
+            color: #fca5a5;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .admin-table-container { overflow-x: auto; margin-top: 12px; }
+        table.admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
+        table.admin-table th {
+            background: rgba(20, 4, 7, 0.95);
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+            padding: 10px 12px;
+            border-bottom: 2px solid var(--border-glass);
+            font-size: 0.8rem;
+        }
+        table.admin-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: var(--text-muted); }
+        table.admin-table tr:hover td { background: rgba(128, 0, 0, 0.15); color: #fff; }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 2, 4, 0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-card {
+            background: #1c080c;
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            max-width: 580px;
+            width: 100%;
+            padding: 24px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), 0 0 20px var(--gold-glow);
+            animation: modalFadeIn 0.3s var(--ease-smooth);
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-15px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .history-box {
+            background: var(--surface-inner);
+            border: 1px solid rgba(255, 199, 44, 0.15);
+            border-radius: 6px;
+            padding: 10px;
+            max-height: 140px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        .history-entry { border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding: 6px 0; }
+        .history-entry:last-child { border-bottom: none; }
+
+        /* ==========================================================================
+           SPARTAN NOTICE (SMOOTH POPUP TRANSITION)
+           ========================================================================== */
         .spartan-modal-backdrop {
             position: fixed;
-            top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.85);
+            inset: 0;
+            background: rgba(10, 2, 4, 0.84);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9999;
+            padding: 16px;
             opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
+            visibility: hidden;
+            transition: opacity 0.32s var(--ease-smooth), visibility 0.32s;
         }
-        .spartan-modal-backdrop.show { opacity: 1; pointer-events: auto; }
-        .spartan-modal {
-            background: var(--card-bg);
-            border: 1px solid var(--gold);
-            width: 90%;
-            max-width: 450px;
-            padding: 2rem;
-            border-radius: 4px;
-            position: relative;
-            transform: scale(0.8) translateY(20px);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 0 40px rgba(0,0,0,0.8), inset 0 0 15px var(--maroon);
-            text-align: center;
-        }
-        .spartan-modal-backdrop.show .spartan-modal { transform: scale(1) translateY(0); }
-        .modal-icon { font-size: 3.5rem; color: var(--gold); margin-bottom: 1rem; }
-        .modal-title { font-family: 'Cinzel', serif; color: var(--gold); margin-bottom: 1rem; font-size: 1.3rem; }
-        .modal-text { margin-bottom: 2rem; color: var(--text-dim); line-height: 1.5; }
-        .modal-btn {
-            background: var(--maroon);
-            color: white;
-            border: 1px solid var(--gold);
-            padding: 0.8rem 2rem;
-            cursor: pointer;
-            font-family: 'Cinzel', serif;
-            transition: 0.3s;
-        }
-        .modal-btn:hover { background: var(--maroon-light); box-shadow: 0 0 15px var(--gold-glow); }
 
-        /* --- LAYOUTS --- */
-        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-        @media (max-width: 850px) { .grid { grid-template-columns: 1fr; } }
+        .spartan-modal-backdrop.show { opacity: 1; visibility: visible; }
 
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--glass-border);
-            padding: 2rem;
-            border-radius: 8px;
+        .spartan-modal-box {
             position: relative;
             overflow: hidden;
-        }
-        .card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--maroon);
-        }
-
-        h2 { font-family: 'Cinzel', serif; margin-bottom: 1.5rem; color: var(--gold); display: flex; align-items: center; gap: 10px; }
-
-        /* --- FORMS --- */
-        .form-group { margin-bottom: 1.2rem; }
-        label { display: block; margin-bottom: 0.5rem; color: var(--gold); font-size: 0.85rem; text-transform: uppercase; }
-        input, select, textarea {
+            background: radial-gradient(circle at top, #2b0c13 0%, #160408 100%);
+            border: 1.5px solid rgba(255, 199, 44, 0.45);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(128, 0, 0, 0.45), inset 0 1px 0 rgba(255, 199, 44, 0.25);
+            border-radius: 14px;
+            max-width: 440px;
             width: 100%;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid #444;
-            padding: 0.8rem;
-            color: white;
-            border-radius: 4px;
-            font-family: inherit;
+            padding: 28px 24px 22px 24px;
+            text-align: center;
+            transform: translateY(28px) scale(0.9);
+            opacity: 0;
+            transition: transform 0.5s var(--ease-spring), opacity 0.3s ease-out;
         }
-        input:focus { border-color: var(--gold); outline: none; }
 
-        .btn {
-            width: 100%;
-            padding: 1rem;
-            background: var(--maroon);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-family: 'Cinzel', serif;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 10px;
+        .spartan-modal-backdrop.show .spartan-modal-box { transform: translateY(0) scale(1); opacity: 1; }
+
+        .spartan-modal-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -75%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 199, 44, 0.16), transparent);
+            pointer-events: none;
         }
-        .btn:hover { background: var(--maroon-light); box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
-        .btn-gold { background: var(--gold); color: #000; }
-        .btn-gold:hover { background: #e0ac1e; }
 
-        /* --- BOARD TABLES --- */
-        .board-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        .board-table th { text-align: left; color: var(--gold); font-size: 0.8rem; padding: 0.8rem; border-bottom: 1px solid var(--maroon); }
-        .board-table td { padding: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .status-badge { padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; background: var(--maroon); }
+        .spartan-modal-backdrop.show .spartan-modal-box::before { animation: noticeSweep 1.1s 0.2s var(--ease-smooth) forwards; }
 
-        /* --- STAFF SIDEBAR --- */
-        .staff-layout { display: flex; height: calc(100vh - 75px); }
-        .sidebar { width: 280px; background: #160a0c; border-right: 1px solid var(--maroon); padding: 2rem 1rem; }
-        .main-content { flex: 1; padding: 2rem; overflow-y: auto; }
-        .nav-item {
-            padding: 1rem;
-            color: var(--text-dim);
-            cursor: pointer;
+        @keyframes noticeSweep {
+            from { left: -75%; }
+            to { left: 130%; }
+        }
+
+        .spartan-modal-backdrop.show .spartan-modal-badge,
+        .spartan-modal-backdrop.show .spartan-modal-title,
+        .spartan-modal-backdrop.show .spartan-modal-message,
+        .spartan-modal-backdrop.show .spartan-modal-actions {
+            animation: noticeRise 0.5s var(--ease-smooth) both;
+        }
+        .spartan-modal-backdrop.show .spartan-modal-badge { animation-delay: 0.08s; }
+        .spartan-modal-backdrop.show .spartan-modal-title { animation-delay: 0.14s; }
+        .spartan-modal-backdrop.show .spartan-modal-message { animation-delay: 0.2s; }
+        .spartan-modal-backdrop.show .spartan-modal-actions { animation-delay: 0.26s; }
+
+        @keyframes noticeRise {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .spartan-modal-icon-wrapper {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px auto;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 12px;
-            border-radius: 4px;
-            transition: 0.2s;
-            margin-bottom: 0.5rem;
+            justify-content: center;
+            font-size: 32px;
+            background: rgba(128, 0, 0, 0.35);
+            border: 2px solid rgba(255, 199, 44, 0.4);
+            color: var(--gold);
+            box-shadow: 0 0 24px rgba(255, 199, 44, 0.2);
+            animation: pulseGlow 2.5s infinite ease-in-out;
         }
-        .nav-item:hover, .nav-item.active { background: var(--maroon); color: white; }
 
-        /* --- DIRECTORY SEARCH --- */
-        .search-box { position: relative; margin-bottom: 1.5rem; }
-        .search-box i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--gold); }
-        .search-box input { padding-left: 3rem; }
+        .spartan-modal-icon-wrapper.error { background: rgba(156, 28, 28, 0.4); border-color: rgba(239, 68, 68, 0.6); color: #ef4444; box-shadow: 0 0 24px rgba(239, 68, 68, 0.25); }
+        .spartan-modal-icon-wrapper.success { background: rgba(20, 83, 45, 0.4); border-color: rgba(34, 197, 94, 0.6); color: #22c55e; box-shadow: 0 0 24px rgba(34, 197, 94, 0.25); }
+        .spartan-modal-icon-wrapper.warning { background: rgba(128, 0, 0, 0.4); border-color: rgba(255, 199, 44, 0.6); color: var(--gold); }
+        .spartan-modal-icon-wrapper.info { background: rgba(128, 0, 0, 0.4); border-color: rgba(255, 199, 44, 0.6); color: var(--gold); }
 
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 6px var(--gold-glow)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 14px var(--gold-glow)); }
+        }
+
+        .spartan-modal-badge {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 4px 14px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 199, 44, 0.3);
+            margin-bottom: 12px;
+            color: var(--gold);
+        }
+
+        .spartan-modal-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            line-height: 1.25;
+        }
+
+        .spartan-modal-message { font-size: 0.95rem; color: #e2d3d5; line-height: 1.55; margin-bottom: 24px; }
+        .spartan-modal-actions { display: flex; gap: 12px; justify-content: center; }
+
+        .spartan-modal-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-hover) 100%);
+            color: #140407;
+            font-family: 'Cinzel', serif;
+            font-size: 0.88rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 199, 44, 0.3);
+            transition: transform 0.25s var(--ease-smooth), box-shadow 0.25s var(--ease-smooth), filter 0.25s;
+        }
+
+        .spartan-modal-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(255, 199, 44, 0.5); filter: brightness(1.05); }
+        .spartan-modal-btn:active { transform: translateY(0); }
+
+        footer {
+            border-top: 1px solid rgba(255, 199, 44, 0.15);
+            padding: 16px 24px;
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            background: rgba(13, 3, 5, 0.95);
+        }
     </style>
 </head>
 <body>
 
-    <!-- CUSTOM ALERT MODAL -->
-    <div id="spartanAlert" class="spartan-modal-backdrop">
-        <div class="spartan-modal">
-            <i class='bx bxs-shield-quarter modal-icon'></i>
-            <h3 id="alertTitle" class="modal-title">NOTIFICATION</h3>
-            <p id="alertMsg" class="modal-text">Message goes here.</p>
-            <button class="modal-btn" onclick="closeNotice()">ACKNOWLEDGE</button>
-        </div>
-    </div>
+    <nav class="navbar">
+        <a href="/" class="brand-container">
+            <img src="/static/spartan.png" alt="Spartan Logo" class="brand-logo" onerror="spartanLogoFallback(this)">
+            <div class="brand-title">PHALANX HEALTH</div>
+        </a>
 
-    <!-- TOP NAV -->
-    <nav>
-        <div class="logo-area">
-            <img src="/spartan.png" alt="Spartan" class="logo-img">
-            <span class="brand-name">PHALANX HEALTH</span>
-        </div>
-        <div id="user-controls">
-            <button class="btn btn-gold" style="width: auto; padding: 0.5rem 1.5rem;" onclick="showLogin()">STAFF LOGIN</button>
+        <div class="auth-status-container">
+            <div id="sessionBadge" class="badge-user-session" style="display: none;">
+                <i class='bx bxs-user-circle'></i>
+                <span id="sessionUserName">User</span>
+            </div>
+            <button id="authBtn" class="btn-auth-switch" onclick="handleAuthAction()">
+                <i class='bx bx-log-in'></i>
+                <span id="authBtnText">Sign In / Register</span>
+            </button>
         </div>
     </nav>
 
-    <!-- PATIENT VIEW (DEFAULT) -->
-    <div id="view-patient" class="container">
-        <div class="grid">
-            <!-- Check-in Card -->
-            <div class="card">
-                <h2><i class='bx bxs-edit-alt'></i> Clinic Check-In</h2>
-                <div id="checkin-unauth">
-                    <p style="color: var(--text-dim); margin-bottom: 1.5rem;">Please register or login to join the medical queue.</p>
-                    <button class="btn" onclick="showAuth('register')">Create Account</button>
-                    <button class="btn btn-gold" onclick="showAuth('login')">Student Login</button>
+    <main class="main-container">
+
+        <!-- AUTH VIEW -->
+        <div id="authView" class="auth-container" style="display: none;">
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class='bx bxs-shield-plus'></i>
+                        <span id="authFormTitle">Student & Staff Portal</span>
+                    </div>
                 </div>
-                <div id="checkin-form" class="hidden">
-                    <p id="welcome-msg" style="margin-bottom: 1rem; font-weight: bold;"></p>
+
+                <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,199,44,0.15); padding-bottom: 10px;">
+                    <button type="button" id="tabLogin" class="btn-action-sm" style="flex: 1; padding: 8px;" onclick="switchAuthTab('login')">SIGN IN</button>
+                    <button type="button" id="tabRegister" class="btn-action-sm" style="flex: 1; padding: 8px; opacity: 0.6;" onclick="switchAuthTab('register')">SELF-REGISTRATION</button>
+                </div>
+
+                <form id="formLogin" onsubmit="submitLogin(event)">
                     <div class="form-group">
-                        <label>Urgency Level</label>
-                        <select id="q-urgency">
-                            <option value="Routine">Routine</option>
-                            <option value="Emergency">Emergency</option>
+                        <label class="form-label">SR-Code or Staff ID</label>
+                        <input type="text" id="loginId" class="form-control" placeholder="e.g. 24-09303 or ADMIN" required autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="Enter password" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn-primary" style="margin-top: 10px;">
+                        <i class='bx bx-lock-open-alt'></i> Authenticate
+                    </button>
+                </form>
+
+                <form id="formRegister" onsubmit="submitRegister(event)" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">SR-Code</label>
+                        <input type="text" id="regSrcode" class="form-control" placeholder="e.g. 24-12345" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="regName" class="form-control" placeholder="First Name Last Name" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label class="form-label">Age</label>
+                            <input type="number" id="regAge" class="form-control" placeholder="19" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Gender</label>
+                            <select id="regGender" class="form-control">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="regPassword" class="form-control" placeholder="Create secure password" required>
+                    </div>
+                    <button type="submit" class="btn-primary" style="margin-top: 10px;">
+                        <i class='bx bx-user-plus'></i> Register Student Account
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- PATIENT VIEW -->
+        <div id="studentDashboardView" class="dashboard-grid">
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-title"><i class='bx bx-plus-medical'></i> Clinic Check-In</div>
+                </div>
+
+                <form id="checkInForm" onsubmit="submitCheckIn(event)">
+                    <div class="form-group">
+                        <label class="form-label">Symptoms / Medical Complaint</label>
+                        <textarea id="patientSymptoms" class="form-control" placeholder="Describe symptoms (e.g. Severe chest pain, dizziness, mild cough)" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Urgency Level</label>
+                        <select id="patientUrgency" class="form-control">
+                            <option value="routine">Routine Check / Consultation</option>
+                            <option value="emergency">Emergency (Severe Symptoms / Critical Pain)</option>
                         </select>
                     </div>
+                    <button type="submit" class="btn-primary" style="margin-top: 20px;">
+                        <i class='bx bx-check-shield'></i> Join Medical Queue
+                    </button>
+                </form>
+            </div>
+
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-title"><i class='bx bx-broadcast'></i> Live Calling Board</div>
+                    <span class="badge-confidential">CONFIDENTIAL</span>
+                </div>
+
+                <div class="triage-calling-board">
+                    <div class="queue-col-emergency">
+                        <div class="queue-col-title" style="color: #f87171;">
+                            <span>EMERGENCY PRIORITY</span>
+                            <i class='bx bxs-flame'></i>
+                        </div>
+                        <div id="publicEmergencyQueue" class="queue-list">
+                            <div class="empty-state">No emergency cases.</div>
+                        </div>
+                    </div>
+
+                    <div class="queue-col-routine">
+                        <div class="queue-col-title" style="color: var(--routine-blue);">
+                            <span>ROUTINE QUEUE</span>
+                            <i class='bx bx-time-five'></i>
+                        </div>
+                        <div id="publicRoutineQueue" class="queue-list">
+                            <div class="empty-state">No routine cases.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STAFF VIEW -->
+        <div id="adminDashboardView" style="display: none;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 24px;">
+                <div class="glass-card" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-dim);">EMERGENCY QUEUE</div>
+                        <div id="adminEmergencyCount" style="font-family: 'JetBrains Mono', monospace; font-size: 1.8rem; font-weight: 700; color: #f87171;">0</div>
+                    </div>
+                    <button class="btn-action-sm" onclick="callNextPatient('emergency')" style="padding: 10px 16px;">
+                        <i class='bx bx-phone-call'></i> Call Emergency
+                    </button>
+                </div>
+
+                <div class="glass-card" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-dim);">ROUTINE QUEUE</div>
+                        <div id="adminRoutineCount" style="font-family: 'JetBrains Mono', monospace; font-size: 1.8rem; font-weight: 700; color: var(--routine-blue);">0</div>
+                    </div>
+                    <button class="btn-action-sm" onclick="callNextPatient('routine')" style="padding: 10px 16px;">
+                        <i class='bx bx-user-voice'></i> Call Routine
+                    </button>
+                </div>
+
+                <div class="glass-card" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-dim);">STUDENT DIRECTORY</div>
+                        <div id="adminRegisteredCount" style="font-family: 'JetBrains Mono', monospace; font-size: 1.8rem; font-weight: 700; color: var(--gold);">0</div>
+                    </div>
+                    <button class="btn-action-sm" onclick="runBenchmarkModal()" style="padding: 10px 16px;">
+                        <i class='bx bx-tachometer'></i> Run Benchmark
+                    </button>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-title"><i class='bx bx-folder-open'></i> Student Directory</div>
+                    </div>
+
                     <div class="form-group">
-                        <label>Symptoms / Complaint</label>
-                        <textarea id="q-symptoms" rows="3" placeholder="Describe how you feel..."></textarea>
+                        <input type="text" id="adminSearchInput" class="form-control" placeholder="Search SR-Code or Student Name..." oninput="filterAdminDirectory()">
                     </div>
-                    <button class="btn" onclick="joinQueue()">Submit to Triage</button>
-                    <button class="btn btn-gold" style="background: transparent; color: var(--gold); border: 1px solid var(--gold); margin-top: 10px;" onclick="logout()">Logout</button>
-                </div>
-            </div>
 
-            <!-- Public Board -->
-            <div class="card">
-                <h2><i class='bx bxs-megaphone'></i> Live Calling Board</h2>
-                <div>
-                    <h3 style="color: var(--maroon-light); font-size: 0.9rem; border-bottom: 1px solid #333; padding-bottom: 5px;">EMERGENCY</h3>
-                    <table class="board-table" id="board-emergency">
-                        <thead><tr><th>SR-CODE</th><th>PATIENT</th><th>STATUS</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
+                    <div class="admin-table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>SR-CODE</th>
+                                    <th>NAME</th>
+                                    <th>ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminDirectoryTableBody">
+                                <tr><td colspan="3" style="text-align: center; color: var(--text-dim);">Loading records...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div style="margin-top: 2rem;">
-                    <h3 style="color: var(--gold); font-size: 0.9rem; border-bottom: 1px solid #333; padding-bottom: 5px;">ROUTINE</h3>
-                    <table class="board-table" id="board-routine">
-                        <thead><tr><th>SR-CODE</th><th>PATIENT</th><th>STATUS</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
+
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-title"><i class='bx bx-list-check'></i> Triage Queue Breakdown</div>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <div style="font-size: 0.82rem; font-weight: 700; color: #f87171; margin-bottom: 8px;">EMERGENCY CASES</div>
+                        <div id="adminEmergencyList" class="queue-list"></div>
+                    </div>
+
+                    <div>
+                        <div style="font-size: 0.82rem; font-weight: 700; color: var(--routine-blue); margin-bottom: 8px;">ROUTINE CASES</div>
+                        <div id="adminRoutineList" class="queue-list"></div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- AUTH VIEW -->
-    <div id="view-auth" class="container hidden">
-        <div class="card" style="max-width: 500px; margin: 0 auto;">
-            <h2 id="auth-title">Student Portal</h2>
-            <div id="auth-fields">
+    </main>
+
+    <!-- DOCTOR INSPECTOR MODAL -->
+    <div id="doctorModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="card-header">
+                <div class="card-title" style="font-size: 1.1rem;"><i class='bx bxs-user-detail'></i> Patient Clinical Record</div>
+                <button type="button" class="btn-action-sm" onclick="closeDoctorModal()">✕</button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.85rem; margin-bottom: 12px;">
+                <div><strong style="color: var(--gold);">SR-Code:</strong> <span id="docSrcode" class="patient-srcode"></span></div>
+                <div><strong style="color: var(--gold);">Name:</strong> <span id="docName"></span></div>
+                <div><strong style="color: var(--gold);">Age/Gender:</strong> <span id="docAgeGender"></span></div>
+                <div><strong style="color: var(--gold);">Registered:</strong> <span id="docRegisteredAt"></span></div>
+            </div>
+
+            <div style="margin-bottom: 12px;">
+                <label class="form-label">Active Symptoms</label>
+                <div id="docSymptoms" style="background: var(--surface-inner); border: 1px solid rgba(255,199,44,0.15); padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; color: #fff;"></div>
+            </div>
+
+            <div style="margin-bottom: 14px;">
+                <label class="form-label">Clinical History & Assessment Notes</label>
+                <div id="docHistory" class="history-box">
+                    <div style="color: var(--text-dim); text-align: center;">No previous medical notes.</div>
+                </div>
+            </div>
+
+            <form onsubmit="submitDoctorComment(event)">
                 <div class="form-group">
-                    <label>SR-Code</label>
-                    <input type="text" id="auth-srcode" placeholder="e.g. 24-09303">
+                    <label class="form-label">Add Doctor Assessment / Prescription</label>
+                    <textarea id="doctorAssessmentInput" class="form-control" placeholder="Enter clinical diagnosis, prescribed medication, or triage notes..." required></textarea>
                 </div>
-                <div id="reg-extra" class="hidden">
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" id="auth-name">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="auth-pass">
-                </div>
-                <button class="btn" id="auth-btn" onclick="handleAuth()">Login</button>
-                <p style="text-align:center; margin-top: 1rem; cursor:pointer; color: var(--gold);" onclick="toggleAuthMode()" id="auth-toggle">Need an account? Register</p>
-                <p style="text-align:center; margin-top: 0.5rem; cursor:pointer; color: var(--text-dim);" onclick="goHome()">Back to Board</p>
+                <button type="submit" class="btn-primary">
+                    <i class='bx bx-save'></i> Save Assessment Note
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- BENCHMARK MODAL -->
+    <div id="benchmarkModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="card-header">
+                <div class="card-title"><i class='bx bx-tachometer'></i> Search Algorithm Benchmark</div>
+                <button type="button" class="btn-action-sm" onclick="closeBenchmarkModal()">✕</button>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 16px;">
+                Empirical comparative execution time for Linear Search O(N) vs Binary Search O(log N) across N elements.
+            </p>
+            <div id="benchmarkResultsContainer" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div style="text-align: center; color: var(--text-dim); grid-column: span 2;">Running benchmark tests...</div>
             </div>
         </div>
     </div>
 
-    <!-- STAFF VIEW -->
-    <div id="view-staff" class="staff-layout hidden">
-        <div class="sidebar">
-            <div class="nav-item active" onclick="switchStaffTab('queue', this)">
-                <i class='bx bxs-layer'></i> Queue Management
+    <!-- SPARTAN NOTICE -->
+    <div id="spartanAlertModal" class="spartan-modal-backdrop" onclick="closeNoticeOnBackdrop(event)">
+        <div class="spartan-modal-box" onclick="event.stopPropagation()">
+            <div class="spartan-modal-icon-wrapper warning" id="spartanAlertIconWrapper">
+                <i class='bx bx-time-five' id="spartanAlertIcon"></i>
             </div>
-            <div class="nav-item" onclick="switchStaffTab('directory', this)">
-                <i class='bx bxs-contact'></i> Student Directory
-            </div>
-            <div style="margin-top: 2rem; padding: 1rem; border-top: 1px solid #333;">
-                <button class="btn" onclick="logout()">Exit System</button>
-            </div>
-        </div>
-        <div class="main-content">
-            <!-- Queue Tab -->
-            <div id="tab-queue">
-                <h2>Active Triage Queues</h2>
-                <div class="grid">
-                    <div class="card">
-                        <h3 style="color: var(--maroon-light);">Emergency Queue</h3>
-                        <div id="staff-e-list"></div>
-                        <button class="btn btn-gold" onclick="callNext('emergency')">Call Next Emergency</button>
-                    </div>
-                    <div class="card">
-                        <h3 style="color: var(--gold);">Routine Queue</h3>
-                        <div id="staff-r-list"></div>
-                        <button class="btn" onclick="callNext('routine')">Call Next Routine</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Directory Tab -->
-            <div id="tab-directory" class="hidden">
-                <h2>Student Records</h2>
-                <div class="search-box">
-                    <i class='bx bx-search'></i>
-                    <input type="text" placeholder="Search by SR-Code..." onkeyup="filterDirectory(this.value)">
-                </div>
-                <div class="card">
-                    <table class="board-table">
-                        <thead><tr><th>SR-CODE</th><th>NAME</th><th>HISTORY</th><th>ACTION</th></tr></thead>
-                        <tbody id="directory-list"></tbody>
-                    </table>
-                </div>
+            <div class="spartan-modal-badge" id="spartanAlertBadge">QUEUE NOTICE</div>
+            <h3 class="spartan-modal-title" id="spartanAlertTitle">Queue Status</h3>
+            <p class="spartan-modal-message" id="spartanAlertMessage"></p>
+            <div class="spartan-modal-actions">
+                <button type="button" id="noticeAckBtn" class="spartan-modal-btn" onclick="closeNotice()">
+                    <span>ACKNOWLEDGE</span>
+                    <i class='bx bx-check'></i>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- ASSESSMENT MODAL -->
-    <div id="assessment-modal" class="spartan-modal-backdrop">
-        <div class="spartan-modal" style="max-width: 550px; text-align: left;">
-            <h3 class="modal-title" id="assess-name">Medical Assessment</h3>
-            <div class="form-group">
-                <label>Diagnosis / Clinical Notes</label>
-                <textarea id="assess-note" rows="5" placeholder="Enter findings..."></textarea>
-            </div>
-            <div style="max-height: 150px; overflow-y: auto; margin-bottom: 1rem; background: rgba(0,0,0,0.3); padding: 10px;">
-                <label>Past History</label>
-                <div id="assess-history" style="font-size: 0.8rem; color: var(--text-dim);"></div>
-            </div>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn" onclick="saveAssessment()" style="margin: 0;">Save Note</button>
-                <button class="btn btn-gold" onclick="closeAssess()" style="margin: 0;">Close</button>
-            </div>
-        </div>
-    </div>
+    <footer>
+        PHALANX HEALTH • CpE 411 Data Structures and Algorithms • Batangas State University Alangilan
+    </footer>
 
     <script>
+        const SESSION_KEY = 'phalanx_session';
         let currentUser = null;
-        let authMode = 'login';
-        let staffToken = null;
-        let selectedStudent = null;
-        let alertCallback = null;
+        let currentInspectedSrcode = null;
+        let adminCachePatients = [];
+        let pollingInterval = null;
+        let noticeCallback = null;
 
-        // --- CORE UI ---
-        function showNotice(msg, title="NOTIFICATION", type="info", callback=null) {
-            document.getElementById('alertTitle').innerText = title;
-            document.getElementById('alertMsg').innerText = msg;
-            document.getElementById('spartanAlert').classList.add('show');
-            alertCallback = callback;
+        function el(id) { return document.getElementById(id); }
+
+        function esc(value) {
+            return String(value ?? '').replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
         }
+
+        function loadSession() {
+            try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch (e) { return null; }
+        }
+
+        function saveSession(user) {
+            currentUser = user;
+            localStorage.setItem(SESSION_KEY, JSON.stringify(user));
+        }
+
+        function clearSession() {
+            currentUser = null;
+            localStorage.removeItem(SESSION_KEY);
+        }
+
+        function staffHeaders() {
+            return currentUser && currentUser.role === 'admin' ? { 'X-Staff-Token': currentUser.token } : {};
+        }
+
+        const NOTICE_STYLES = {
+            success: { icon: 'bx-check-shield', badge: 'CLINIC SUCCESS', color: '#22c55e' },
+            error:   { icon: 'bx-error-circle', badge: 'TRIAGE ALERT',   color: '#ef4444' },
+            warning: { icon: 'bx-time-five',    badge: 'QUEUE NOTICE',   color: '#FFC72C' },
+            info:    { icon: 'bx-info-circle',  badge: 'CAMPUS NOTICE',  color: '#FFC72C' }
+        };
+
+        function showNotice(message, title = 'QUEUE NOTICE', type = 'warning', callback = null) {
+            const backdrop = el('spartanAlertModal');
+            const style = NOTICE_STYLES[type] || NOTICE_STYLES.warning;
+
+            el('spartanAlertIconWrapper').className = 'spartan-modal-icon-wrapper ' + (NOTICE_STYLES[type] ? type : 'warning');
+            el('spartanAlertIcon').className = 'bx ' + style.icon;
+            el('spartanAlertBadge').textContent = style.badge;
+            el('spartanAlertBadge').style.borderColor = style.color + '66';
+            el('spartanAlertBadge').style.color = style.color;
+            el('spartanAlertTitle').textContent = title;
+            el('spartanAlertMessage').textContent = message;
+
+            noticeCallback = callback;
+            document.body.style.overflow = 'hidden';
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    backdrop.classList.add('show');
+                    setTimeout(() => el('noticeAckBtn').focus({ preventScroll: true }), 350);
+                });
+            });
+        }
+
         function closeNotice() {
-            document.getElementById('spartanAlert').classList.remove('show');
-            if(alertCallback) alertCallback();
-            alertCallback = null;
+            const backdrop = el('spartanAlertModal');
+            if (!backdrop.classList.contains('show')) return;
+
+            backdrop.classList.remove('show');
+            document.body.style.overflow = '';
+
+            const cb = noticeCallback;
+            noticeCallback = null;
+            if (cb) setTimeout(cb, 320);
         }
 
-        // Global key listeners for modal
-        window.addEventListener('keydown', (e) => {
-            if(e.key === "Enter" || e.key === "Escape") {
-                if(document.getElementById('spartanAlert').classList.contains('show')) closeNotice();
+        function closeNoticeOnBackdrop(e) {
+            if (e.target.id === 'spartanAlertModal') closeNotice();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (el('spartanAlertModal').classList.contains('show')) { e.preventDefault(); closeNotice(); return; }
+                closeDoctorModal();
+                closeBenchmarkModal();
+            }
+            if (e.key === 'Enter' && el('spartanAlertModal').classList.contains('show')) {
+                e.preventDefault();
+                closeNotice();
             }
         });
 
-        function goHome() {
-            document.getElementById('view-patient').classList.remove('hidden');
-            document.getElementById('view-auth').classList.add('hidden');
-            document.getElementById('view-staff').classList.add('hidden');
-            refreshBoard();
+        function showView(name) {
+            el('authView').style.display = name === 'auth' ? 'block' : 'none';
+            el('studentDashboardView').style.display = name === 'patient' ? 'grid' : 'none';
+            el('adminDashboardView').style.display = name === 'admin' ? 'block' : 'none';
         }
 
-        function showAuth(mode) {
-            authMode = mode;
-            document.getElementById('view-patient').classList.add('hidden');
-            document.getElementById('view-auth').classList.remove('hidden');
-            updateAuthUI();
-        }
+        function renderView() {
+            const badge = el('sessionBadge');
+            const btnText = el('authBtnText');
+            const btnIcon = el('authBtn').querySelector('i');
 
-        function showLogin() {
-            authMode = 'staff';
-            document.getElementById('view-patient').classList.add('hidden');
-            document.getElementById('view-auth').classList.remove('hidden');
-            updateAuthUI();
-        }
-
-        function toggleAuthMode() {
-            authMode = (authMode === 'login') ? 'register' : 'login';
-            updateAuthUI();
-        }
-
-        function updateAuthUI() {
-            const extra = document.getElementById('reg-extra');
-            const title = document.getElementById('auth-title');
-            const btn = document.getElementById('auth-btn');
-            const toggle = document.getElementById('auth-toggle');
-
-            if(authMode === 'staff') {
-                title.innerText = "Clinic Operations";
-                btn.innerText = "Staff Login";
-                extra.classList.add('hidden');
-                toggle.classList.add('hidden');
-            } else if(authMode === 'register') {
-                title.innerText = "Student Registration";
-                btn.innerText = "Create Account";
-                extra.classList.remove('hidden');
-                toggle.classList.remove('hidden');
-                toggle.innerText = "Already have an account? Login";
+            if (currentUser && currentUser.role === 'admin') {
+                showView('admin');
+                badge.style.display = 'flex';
+                el('sessionUserName').textContent = currentUser.name + ' (STAFF)';
+            } else if (currentUser) {
+                showView('patient');
+                badge.style.display = 'flex';
+                el('sessionUserName').textContent = currentUser.name + ' (STUDENT)';
             } else {
-                title.innerText = "Student Portal";
-                btn.innerText = "Student Login";
-                extra.classList.add('hidden');
-                toggle.classList.remove('hidden');
-                toggle.innerText = "Need an account? Register";
+                showView('patient');
+                badge.style.display = 'none';
+            }
+
+            if (currentUser) {
+                btnText.textContent = 'Sign Out';
+                btnIcon.className = 'bx bx-log-out';
+            } else {
+                btnText.textContent = 'Sign In / Register';
+                btnIcon.className = 'bx bx-log-in';
             }
         }
 
-        // --- AUTH LOGIC ---
-        async function handleAuth() {
-            const id = document.getElementById('auth-srcode').value;
-            const name = document.getElementById('auth-name').value;
-            const pass = document.getElementById('auth-pass').value;
+        function handleAuthAction() {
+            if (currentUser) {
+                clearSession();
+                renderView();
+                fetchBoardData();
+                return;
+            }
+            const authOpen = el('authView').style.display === 'block';
+            showView(authOpen ? 'patient' : 'auth');
+        }
 
-            if(authMode === 'register') {
-                const res = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({srcode: id, name, password: pass})
-                });
-                const data = await res.json();
-                if(data.error) return showNotice(data.error);
-                showNotice("Registration complete! You can now login.");
-                authMode = 'login';
-                updateAuthUI();
-            } else {
+        function switchAuthTab(tab) {
+            const isLogin = tab === 'login';
+            el('formLogin').style.display = isLogin ? 'block' : 'none';
+            el('formRegister').style.display = isLogin ? 'none' : 'block';
+            el('tabLogin').style.opacity = isLogin ? '1' : '0.6';
+            el('tabRegister').style.opacity = isLogin ? '0.6' : '1';
+            el('authFormTitle').textContent = isLogin ? 'Student & Staff Portal' : 'Student Self-Registration';
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            currentUser = loadSession();
+            renderView();
+            startPolling();
+        });
+
+        function startPolling() {
+            if (pollingInterval) clearInterval(pollingInterval);
+            fetchBoardData();
+            pollingInterval = setInterval(fetchBoardData, 3000);
+        }
+
+        function handleExpiredStaffSession() {
+            clearSession();
+            renderView();
+            showNotice('Your staff session has ended. Please sign in again.', 'SESSION ENDED', 'info');
+        }
+
+        async function fetchBoardData() {
+            try {
+                if (currentUser && currentUser.role === 'admin') {
+                    const res = await fetch('/api/admin/all_data', { headers: staffHeaders() });
+                    if (res.status === 401) { handleExpiredStaffSession(); return; }
+                    const data = await res.json();
+
+                    renderAdminQueues(data.emergency_queue, data.routine_queue);
+                    adminCachePatients = data.all_patients || [];
+                    filterAdminDirectory();
+                    el('adminEmergencyCount').textContent = (data.emergency_queue || []).length;
+                    el('adminRoutineCount').textContent = (data.routine_queue || []).length;
+                    el('adminRegisteredCount').textContent = adminCachePatients.length;
+                } else {
+                    const res = await fetch('/api/board');
+                    const data = await res.json();
+                    renderPublicQueues(data.emergency_queue || data.emergency, data.routine_queue || data.routine);
+                }
+            } catch (err) {
+                console.error('Polling error', err);
+            }
+        }
+
+        async function submitLogin(e) {
+            e.preventDefault();
+            const id = el('loginId').value.trim();
+            const password = el('loginPassword').value;
+
+            try {
                 const res = await fetch('/api/auth/login', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({id, password: pass})
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, password })
                 });
                 const data = await res.json();
-                if(data.error) return showNotice("Authentication failed.");
-                
-                if(data.role === 'staff') {
-                    staffToken = data.token;
-                    loadStaffView();
+
+                if (data.success) {
+                    saveSession(data.user);
+                    renderView();
+                    fetchBoardData();
+                    el('loginPassword').value = '';
+                    showNotice('Welcome back, ' + data.user.name + '.', 'SIGN-IN SUCCESSFUL', 'success');
                 } else {
-                    currentUser = data.user;
-                    loadStudentView();
+                    showNotice(data.message || 'Authentication failed. Please verify your credentials.', 'AUTHENTICATION FAILED', 'error');
                 }
+            } catch (err) {
+                showNotice('Server connection error during authentication.', 'NETWORK ERROR', 'error');
             }
         }
 
-        function loadStudentView() {
-            document.getElementById('view-auth').classList.add('hidden');
-            document.getElementById('view-patient').classList.remove('hidden');
-            document.getElementById('checkin-unauth').classList.add('hidden');
-            document.getElementById('checkin-form').classList.remove('hidden');
-            document.getElementById('welcome-msg').innerText = `Welcome, ${currentUser.name}`;
-            refreshBoard();
+        async function submitRegister(e) {
+            e.preventDefault();
+            const payload = {
+                srcode: el('regSrcode').value.trim(),
+                name: el('regName').value.trim(),
+                age: el('regAge').value,
+                gender: el('regGender').value,
+                password: el('regPassword').value
+            };
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    saveSession(data.user);
+                    e.target.reset();
+                    showNotice('Account created successfully. Welcome to Phalanx Health, ' + data.user.name + '.', 'REGISTRATION COMPLETE', 'success', () => {
+                        renderView();
+                        fetchBoardData();
+                    });
+                } else {
+                    showNotice(data.message || 'Registration failed.', 'REGISTRATION ERROR', 'error');
+                }
+            } catch (err) {
+                showNotice('Server connection error during registration.', 'NETWORK ERROR', 'error');
+            }
         }
 
-        function loadStaffView() {
-            document.getElementById('view-auth').classList.add('hidden');
-            document.getElementById('view-staff').classList.remove('hidden');
-            refreshStaffData();
+        async function submitCheckIn(e) {
+            e.preventDefault();
+
+            if (!currentUser || currentUser.role !== 'student') {
+                showNotice('Please sign in with your student account to join the clinic queue.', 'AUTHENTICATION REQUIRED', 'info', () => {
+                    showView('auth');
+                });
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/patient/join_queue', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        srcode: currentUser.srcode,
+                        symptoms: el('patientSymptoms').value.trim(),
+                        urgency: el('patientUrgency').value
+                    })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    el('patientSymptoms').value = '';
+                    showNotice(data.message, 'QUEUE STATUS', 'success');
+                    fetchBoardData();
+                } else {
+                    showNotice(data.message || 'Failed to join the queue.', 'QUEUE NOTICE', 'warning');
+                }
+            } catch (err) {
+                showNotice('Server error while checking in to the queue.', 'NETWORK ERROR', 'error');
+            }
         }
 
-        function logout() {
-            currentUser = null;
-            staffToken = null;
-            document.getElementById('checkin-unauth').classList.remove('hidden');
-            document.getElementById('checkin-form').classList.add('hidden');
-            goHome();
+        function renderPublicQueues(emergency, routine) {
+            const emList = el('publicEmergencyQueue');
+            const roList = el('publicRoutineQueue');
+
+            const em = emergency || [];
+            const ro = routine || [];
+
+            emList.innerHTML = em.length
+                ? em.map(item => `
+                    <div class="queue-item">
+                        <span class="patient-srcode">${esc(item.srcode)} - #${item.position} in Line</span>
+                        <span class="severity-badge">Priority</span>
+                    </div>`).join('')
+                : `<div class="empty-state">No emergency cases.</div>`;
+
+            roList.innerHTML = ro.length
+                ? ro.map(item => `
+                    <div class="queue-item">
+                        <span class="patient-srcode">${esc(item.srcode)} - #${item.position} in Line</span>
+                        <span class="routine-badge">Routine</span>
+                    </div>`).join('')
+                : `<div class="empty-state">No routine cases.</div>`;
         }
 
-        // --- QUEUE LOGIC ---
-        async function joinQueue() {
-            const urgency = document.getElementById('q-urgency').value;
-            const symptoms = document.getElementById('q-symptoms').value;
-            if(!symptoms) return showNotice("Please describe your symptoms.");
+        function renderAdminQueues(emergency, routine) {
+            const emList = el('adminEmergencyList');
+            const roList = el('adminRoutineList');
 
-            await fetch('/api/patient/join_queue', {
+            const em = emergency || [];
+            const ro = routine || [];
+
+            emList.innerHTML = em.length
+                ? em.map(item => `
+                    <div class="queue-item">
+                        <div>
+                            <span class="patient-srcode">${esc(item.srcode)}</span>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: 8px;">${esc(item.name)}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="severity-badge">Score: ${esc(item.severity)}</span>
+                            <button class="btn-action-sm" data-srcode="${esc(item.srcode)}" onclick="inspectPatient(this.dataset.srcode)">Inspect</button>
+                        </div>
+                    </div>`).join('')
+                : `<div class="empty-state" style="padding: 12px;">No active emergency cases.</div>`;
+
+            roList.innerHTML = ro.length
+                ? ro.map(item => `
+                    <div class="queue-item">
+                        <div>
+                            <span class="patient-srcode">${esc(item.srcode)}</span>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: 8px;">${esc(item.name)}</span>
+                        </div>
+                        <button class="btn-action-sm" data-srcode="${esc(item.srcode)}" onclick="inspectPatient(this.dataset.srcode)">Inspect</button>
+                    </div>`).join('')
+                : `<div class="empty-state" style="padding: 12px;">No active routine cases.</div>`;
+        }
+
+        function renderAdminDirectory(patients) {
+            const tbody = el('adminDirectoryTableBody');
+            if (!patients || patients.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-dim);">No student records found.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = patients.map(p => `
+                <tr>
+                    <td class="patient-srcode">${esc(p.srcode)}</td>
+                    <td>${esc(p.name)} (${esc(p.age)})</td>
+                    <td><button class="btn-action-sm" data-srcode="${esc(p.srcode)}" onclick="inspectPatient(this.dataset.srcode)">Record</button></td>
+                </tr>`).join('');
+        }
+
+        function filterAdminDirectory() {
+            const term = el('adminSearchInput').value.toLowerCase().trim();
+            const filtered = adminCachePatients.filter(p =>
+                p.srcode.toLowerCase().includes(term) || p.name.toLowerCase().includes(term)
+            );
+            renderAdminDirectory(filtered);
+        }
+
+        async function staffPost(url, body) {
+            const res = await fetch(url, {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    srcode: currentUser.srcode,
-                    name: currentUser.name,
-                    urgency,
-                    symptoms
-                })
+                headers: { 'Content-Type': 'application/json', ...staffHeaders() },
+                body: JSON.stringify(body)
             });
-            showNotice("Your ticket has been submitted. Watch the calling board.");
-            refreshBoard();
+            if (res.status === 401) { handleExpiredStaffSession(); return null; }
+            return res.json();
         }
 
-        async function refreshBoard() {
-            const res = await fetch('/api/board');
-            const data = await res.json();
-            
-            const eTable = document.querySelector('#board-emergency tbody');
-            const rTable = document.querySelector('#board-routine tbody');
-            
-            eTable.innerHTML = data.emergency.map(p => `<tr><td>${p.srcode}</td><td>${p.name}</td><td><span class="status-badge">WAITING</span></td></tr>`).join('');
-            rTable.innerHTML = data.routine.map(p => `<tr><td>${p.srcode}</td><td>${p.name}</td><td><span class="status-badge" style="background:#444">WAITING</span></td></tr>`).join('');
+        async function callNextPatient(queueType) {
+            try {
+                const data = await staffPost('/api/admin/call_next', { queue_type: queueType });
+                if (!data) return;
+                if (data.success) {
+                    showNotice(data.message, 'PATIENT SUMMONED', 'success');
+                    fetchBoardData();
+                } else {
+                    showNotice(data.message, 'QUEUE NOTICE', 'info');
+                }
+            } catch (err) {
+                showNotice('Error executing call-next command.', 'SERVER ERROR', 'error');
+            }
         }
 
-        // --- STAFF OPS ---
-        async function refreshStaffData() {
-            const res = await fetch('/api/admin/all_data', {
-                headers: {'X-Staff-Token': staffToken}
-            });
-            const data = await res.json();
-            
-            const eList = document.getElementById('staff-e-list');
-            const rList = document.getElementById('staff-r-list');
-            
-            eList.innerHTML = data.emergency.map(p => `<div style="padding:10px; border-bottom:1px solid #333">
-                <b>${p.name}</b> <small>(${p.srcode})</small><br>
-                <span style="color:var(--maroon-light); font-size:0.8rem">Severity: ${p.severity}</span>
-            </div>`).join('') || 'Queue empty';
-            
-            rList.innerHTML = data.routine.map(p => `<div style="padding:10px; border-bottom:1px solid #333">
-                <b>${p.name}</b> <small>(${p.srcode})</small>
-            </div>`).join('') || 'Queue empty';
+        function inspectPatient(srcode) {
+            const patient = adminCachePatients.find(p => p.srcode === srcode);
+            if (!patient) return;
 
-            renderDirectory(data.directory);
+            currentInspectedSrcode = srcode;
+            el('docSrcode').textContent = patient.srcode;
+            el('docName').textContent = patient.name;
+            el('docAgeGender').textContent = `${patient.age} / ${patient.gender || 'N/A'}`;
+            el('docRegisteredAt').textContent = patient.created_at || 'N/A';
+            el('docSymptoms').textContent = patient.current_symptoms || 'No acute symptoms reported.';
+
+            const historyEl = el('docHistory');
+            historyEl.innerHTML = (patient.history && patient.history.length)
+                ? patient.history.map(h => `
+                    <div class="history-entry">
+                        <div style="font-size: 0.72rem; color: var(--gold);">${esc(h.timestamp)}</div>
+                        <div>${esc(h.note)}</div>
+                    </div>`).join('')
+                : `<div style="color: var(--text-dim); text-align: center;">No previous medical notes.</div>`;
+
+            el('doctorModal').classList.add('active');
         }
 
-        function renderDirectory(students) {
-            const list = document.getElementById('directory-list');
-            list.innerHTML = students.map(s => `<tr>
-                <td style="font-family:'JetBrains Mono'">${s.srcode}</td>
-                <td>${s.name}</td>
-                <td>${s.history ? s.history.length : 0} notes</td>
-                <td><button onclick='openAssessment(${JSON.stringify(s)})' style="background:none; border:1px solid var(--gold); color:var(--gold); padding:2px 10px; cursor:pointer">Assess</button></td>
-            </tr>`).join('');
+        function closeDoctorModal() {
+            el('doctorModal').classList.remove('active');
+            el('doctorAssessmentInput').value = '';
+            currentInspectedSrcode = null;
         }
 
-        async function callNext(type) {
-            const res = await fetch('/api/admin/call_next', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json', 'X-Staff-Token': staffToken},
-                body: JSON.stringify({type})
-            });
-            const data = await res.json();
-            if(data.error) showNotice(data.error);
-            else showNotice(`Now calling: ${data.srcode}`, "SUCCESS");
-            refreshStaffData();
+        async function submitDoctorComment(e) {
+            e.preventDefault();
+            if (!currentInspectedSrcode) return;
+
+            try {
+                const data = await staffPost('/api/admin/add_comment', {
+                    srcode: currentInspectedSrcode,
+                    comment: el('doctorAssessmentInput').value.trim()
+                });
+                if (!data) return;
+
+                if (data.success) {
+                    closeDoctorModal();
+                    showNotice('Medical assessment saved to the student record.', 'ASSESSMENT SAVED', 'success');
+                    fetchBoardData();
+                } else {
+                    showNotice(data.message || 'Failed to save the note.', 'SAVE ERROR', 'error');
+                }
+            } catch (err) {
+                showNotice('Server error while saving the assessment.', 'NETWORK ERROR', 'error');
+            }
         }
 
-        function openAssessment(student) {
-            selectedStudent = student;
-            document.getElementById('assess-name').innerText = `Record for ${student.name}`;
-            document.getElementById('assess-note').value = "";
-            const histDiv = document.getElementById('assess-history');
-            histDiv.innerHTML = student.history.map(h => `<div style="margin-bottom:8px; border-bottom:1px solid #444">
-                <small>${h.timestamp}</small><br>${h.note}</div>`).join('') || 'No previous history';
-            document.getElementById('assessment-modal').classList.add('show');
+        async function runBenchmarkModal() {
+            const container = el('benchmarkResultsContainer');
+            el('benchmarkModal').classList.add('active');
+            container.innerHTML = `<div style="text-align: center; color: var(--text-dim); grid-column: span 2;">Running search benchmark on server...</div>`;
+
+            try {
+                const res = await fetch('/api/benchmark');
+                const data = await res.json();
+
+                container.innerHTML = data.success
+                    ? data.results.map(r => `
+                        <div class="benchmark-metric-box" style="background: var(--surface-inner); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px; text-align: center;">
+                            <div style="font-size: 0.75rem; color: var(--text-dim);">DATASET SIZE: N = ${r.N.toLocaleString()}</div>
+                            <div style="display: flex; justify-content: space-around; margin-top: 8px;">
+                                <div>
+                                    <div style="font-size: 0.7rem; color: #f87171;">Linear Search</div>
+                                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: #f87171;">${r.linear_time_ms} ms</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.7rem; color: var(--gold);">Binary Search</div>
+                                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--gold);">${r.binary_time_ms} ms</div>
+                                </div>
+                            </div>
+                        </div>`).join('')
+                    : `<div style="text-align: center; color: #f87171; grid-column: span 2;">Benchmark failed.</div>`;
+            } catch (err) {
+                container.innerHTML = `<div style="text-align: center; color: #f87171; grid-column: span 2;">Error connecting to the benchmark endpoint.</div>`;
+            }
         }
 
-        function closeAssess() {
-            document.getElementById('assessment-modal').classList.remove('show');
+        function closeBenchmarkModal() {
+            el('benchmarkModal').classList.remove('active');
         }
-
-        async function saveAssessment() {
-            const note = document.getElementById('assess-note').value;
-            if(!note) return showNotice("Note cannot be empty.");
-            await fetch('/api/admin/add_comment', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json', 'X-Staff-Token': staffToken},
-                body: JSON.stringify({srcode: selectedStudent.srcode, note})
-            });
-            closeAssess();
-            refreshStaffData();
-        }
-
-        function switchStaffTab(tab, el) {
-            document.getElementById('tab-queue').classList.add('hidden');
-            document.getElementById('tab-directory').classList.add('hidden');
-            document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            el.classList.add('active');
-        }
-
-        // --- STARTUP ---
-        setInterval(refreshBoard, 10000);
-        refreshBoard();
-
     </script>
 </body>
 </html>
