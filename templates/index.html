@@ -280,14 +280,14 @@
                 </div>
                 <div class="stat-card" onclick="document.getElementById('emergencyCard').scrollIntoView({behavior:'smooth'})">
                     <div>
-                        <div class="lbl">Emergency (Heap)</div>
+                        <div class="lbl">Emergency</div>
                         <div class="val mono" id="statEmergency" style="color: #f87171;">0</div>
                     </div>
                     <i class='bx bx-pulse' style="color: #f87171;"></i>
                 </div>
                 <div class="stat-card" onclick="document.getElementById('routineCard').scrollIntoView({behavior:'smooth'})">
                     <div>
-                        <div class="lbl">Routine (FIFO)</div>
+                        <div class="lbl">Routine</div>
                         <div class="val mono" id="statRoutine" style="color: #60a5fa;">0</div>
                     </div>
                     <i class='bx bx-time-five' style="color: #60a5fa;"></i>
@@ -305,7 +305,7 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
                 <div class="card" id="emergencyCard">
                     <div class="card-header">
-                        <h3 class="cinzel" style="color: #f87171;"><i class='bx bx-bell'></i> Emergency Queue (Max-Heap)</h3>
+                        <h3 class="cinzel" style="color: #f87171;"><i class='bx bx-bell'></i> Emergency Queue</h3>
                         <button onclick="callNext('emergency')" class="btn btn-maroon" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Call Next</button>
                     </div>
                     <div id="adminEmergencyList" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 250px; overflow-y: auto;"></div>
@@ -313,7 +313,7 @@
 
                 <div class="card" id="routineCard">
                     <div class="card-header">
-                        <h3 class="cinzel" style="color: #60a5fa;"><i class='bx bx-list-ol'></i> Routine Queue (FIFO)</h3>
+                        <h3 class="cinzel" style="color: #60a5fa;"><i class='bx bx-list-ol'></i> Routine Queue</h3>
                         <button onclick="callNext('routine')" class="btn btn-gold" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Call Next</button>
                     </div>
                     <div id="adminRoutineList" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 250px; overflow-y: auto;"></div>
@@ -323,7 +323,7 @@
             <!-- Directory -->
             <div class="card" id="directoryCard">
                 <div class="card-header">
-                    <h3 class="cinzel"><i class='bx bx-user-pin'></i> Student Directory (BST Search)</h3>
+                    <h3 class="cinzel"><i class='bx bx-user-pin'></i> Student Directory</h3>
                     <input type="text" id="adminSearchInput" oninput="filterPatients(this.value)" placeholder="Search SR-Code or Name..." class="form-control mono" style="width: 250px; padding: 0.45rem 0.8rem; font-size: 0.85rem;">
                 </div>
                 <table class="custom-table">
