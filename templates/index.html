@@ -3,657 +3,2638 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PHALANX HEALTH</title>
-    <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <title>PHALANX HEALTH - Smart Campus Medical Triage</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
     <style>
         :root {
-            --bsu-maroon: #800000;
-            --bsu-maroon-dark: #4d0000;
-            --bsu-maroon-light: #9c1c1c;
-            --bsu-gold: #FFC72C;
-            --bsu-gold-hover: #e0ac1e;
-            --bsu-white: #FFFFFF;
             --bg-canvas: #0d0305;
-            --card-surface: rgba(28, 8, 12, 0.88);
+            --surface-card: rgba(28, 8, 12, 0.88);
+            --surface-inner: rgba(16, 4, 7, 0.82);
+            --maroon: #800000;
+            --maroon-dark: #4d0000;
+            --maroon-light: #9c1c1c;
+            --gold: #FFC72C;
+            --gold-hover: #e0ac1e;
+            --gold-glow: rgba(255, 199, 44, 0.35);
             --border-glass: rgba(255, 199, 44, 0.22);
-            --text-primary: #FFFFFF;
-            --text-secondary: #d8c7c9;
-            --radius-main: 14px;
+            --text-main: #FFFFFF;
+            --text-muted: #d8c7c9;
+            --text-dim: #9e8588;
+            --emergency-red: #ef4444;
+            --routine-blue: #38bdf8;
+            --success-green: #22c55e;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg-canvas); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
-        .mono { font-family: 'JetBrains Mono', monospace; }
-        .cinzel { font-family: 'Cinzel', serif; }
-        
-        /* Top Brand Header */
-        header {
-            background: linear-gradient(180deg, rgba(77, 0, 0, 0.95) 0%, rgba(30, 4, 8, 0.95) 100%);
-            border-bottom: 2px solid var(--bsu-gold);
-            padding: 0.75rem 2rem; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 25px rgba(128, 0, 0, 0.4);
-            position: sticky; top: 0; z-index: 100;
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
         }
-        .brand-container { display: flex; align-items: center; gap: 1rem; }
-        .univ-seal-img {
-            width: 55px; height: 55px;
+
+        body {
+            min-height: 100vh;
+            background-color: var(--bg-canvas);
+            background-image:
+                radial-gradient(circle at 15% 15%, rgba(128, 0, 0, 0.45) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(77, 0, 0, 0.38) 0%, transparent 50%),
+                linear-gradient(180deg, #120305 0%, #0d0305 100%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit;
+        }
+
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
+            outline: 2px solid var(--gold);
+            outline-offset: 2px;
+        }
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: linear-gradient(180deg, rgba(20, 4, 7, 0.98) 0%, rgba(13, 3, 5, 0.94) 100%);
+            border-bottom: 2px solid var(--border-glass);
+            padding: 12px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.65);
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .brand-logo {
+            width: 46px;
+            height: 46px;
+            border-radius: 9px;
+            border: 1.5px solid var(--gold);
+            padding: 2px;
+            background: radial-gradient(circle, var(--maroon) 0%, #1a0407 100%);
+            box-shadow: 0 0 14px var(--gold-glow);
             object-fit: contain;
-            filter: drop-shadow(0 0 5px rgba(255, 199, 44, 0.5));
         }
-        .brand-title h1 { font-size: 1.35rem; font-weight: 900; letter-spacing: 1.2px; color: var(--bsu-gold); }
-        
-        /* Container */
-        .page-container { max-width: 1350px; margin: 0 auto; padding: 2rem; width: 100%; flex-grow: 1; }
-        
-        /* Buttons */
-        .btn {
-            padding: 0.55rem 1.2rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem;
-            cursor: pointer; transition: all 0.25s ease; border: none; display: inline-flex;
-            align-items: center; gap: 0.5rem; text-decoration: none;
+
+        .brand-fallback {
+            display: none;
+            width: 46px;
+            height: 46px;
+            border-radius: 9px;
+            border: 1.5px solid var(--gold);
+            background: radial-gradient(circle, var(--maroon) 0%, #1a0407 100%);
+            box-shadow: 0 0 14px var(--gold-glow);
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            font-size: 25px;
         }
-        .btn-gold { background: var(--bsu-gold); color: #000; box-shadow: 0 0 15px rgba(255, 199, 44, 0.3); }
-        .btn-gold:hover { background: var(--bsu-gold-hover); transform: translateY(-1px); }
-        .btn-maroon { background: var(--bsu-maroon); color: #fff; border: 1px solid var(--bsu-gold); }
-        .btn-maroon:hover { background: var(--bsu-maroon-light); }
-        .btn-outline { background: transparent; border: 1px solid var(--border-glass); color: #fff; }
-        .btn-outline:hover { background: rgba(255,255,255,0.06); }
-        
-        /* Authentication Gate */
-        #authGate {
-            min-height: 75vh; display: flex; align-items: center; justify-content: center;
-            background: radial-gradient(circle at center, rgba(128, 0, 0, 0.3) 0%, transparent 70%);
+
+        .brand-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.45rem;
+            font-weight: 900;
+            color: var(--gold);
+            letter-spacing: 2px;
+            text-shadow: 0 0 12px rgba(255, 199, 44, 0.4);
+            line-height: 1;
+            white-space: nowrap;
         }
-        .auth-box {
-            width: 100%; max-width: 460px; background: var(--card-surface);
-            border: 2px solid var(--border-glass); border-radius: var(--radius-main);
-            padding: 2.25rem; box-shadow: 0 15px 40px rgba(0,0,0,0.6); backdrop-filter: blur(12px);
+
+        .auth-status-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        .auth-seal-logo {
-            width: 130px; height: 130px;
-            object-fit: contain;
-            margin: 0 auto 1rem auto; display: block;
-            filter: drop-shadow(0 0 15px rgba(255, 199, 44, 0.3));
-        }
-        .auth-tab-bar { display: flex; border-bottom: 1px solid var(--border-glass); margin-bottom: 1.5rem; }
-        .auth-tab-bar button {
-            flex: 1; padding: 0.75rem; background: none; border: none; color: var(--text-secondary);
-            font-weight: 700; font-size: 0.9rem; cursor: pointer; border-bottom: 3px solid transparent;
-        }
-        .auth-tab-bar button.active { color: var(--bsu-gold); border-bottom-color: var(--bsu-gold); }
-        .form-group { margin-bottom: 1.15rem; }
-        .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--bsu-gold); margin-bottom: 0.4rem; text-transform: uppercase; }
-        .form-control {
-            width: 100%; padding: 0.75rem 1rem; background: rgba(0, 0, 0, 0.45);
-            border: 1px solid var(--border-glass); border-radius: 8px; color: #fff;
-            font-size: 0.95rem; outline: none; transition: border-color 0.2s ease;
-        }
-        .form-control:focus { border-color: var(--bsu-gold); box-shadow: 0 0 10px rgba(255, 199, 44, 0.2); }
-        
-        /* Stats Section */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
-        .stat-card {
-            background: var(--card-surface); border: 1px solid var(--border-glass);
-            border-radius: var(--radius-main); padding: 1.25rem 1.5rem; display: flex;
-            align-items: center; justify-content: space-between; cursor: pointer;
+
+        .btn-auth-switch {
+            background: rgba(128, 0, 0, 0.35);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 8px 18px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.5px;
             transition: all 0.25s ease;
         }
-        .stat-card:hover {
-            transform: translateY(-3px); border-color: var(--bsu-gold);
-            box-shadow: 0 8px 25px rgba(255, 199, 44, 0.2);
-        }
-        .stat-card .val { font-size: 2.2rem; font-weight: 800; color: var(--bsu-white); }
-        .stat-card .lbl { font-size: 0.75rem; color: var(--bsu-gold); font-weight: 700; text-transform: uppercase; }
-        .stat-card i { font-size: 2.5rem; color: var(--bsu-gold); opacity: 0.85; }
-        
-        /* Cards & Grids */
-        .card {
-            background: var(--card-surface); border: 1px solid var(--border-glass);
-            border-radius: var(--radius-main); padding: 1.5rem; backdrop-filter: blur(8px);
-            margin-bottom: 1.5rem;
-        }
-        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-glass); padding-bottom: 1rem; margin-bottom: 1rem; }
-        .card-header h3 { font-size: 1.15rem; color: var(--bsu-gold); }
 
-        /* Tables & Badges */
-        .custom-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-        .custom-table th {
-            text-align: left; padding: 0.85rem; background: rgba(128, 0, 0, 0.45);
-            color: var(--bsu-gold); font-weight: 700; border-bottom: 1px solid var(--border-glass);
+        .btn-auth-switch:hover {
+            background: var(--gold);
+            color: #140407;
+            box-shadow: 0 0 15px var(--gold-glow);
+            transform: translateY(-1px);
         }
-        .custom-table td { padding: 0.85rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        .tag { padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; display: inline-block; }
-        .tag-emergency { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
-        .tag-routine { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
-        .tag-treated { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
 
-        /* Modal */
-        .modal-wrap {
-            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 1000;
+        .badge-user-session {
+            background: rgba(30, 8, 12, 0.9);
+            border: 1px solid rgba(255, 199, 44, 0.3);
+            color: #60a5fa;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 280px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
-        .modal-wrap.show { display: flex; }
-        .modal-body {
-            background: #140508; border: 2px solid var(--bsu-gold); border-radius: var(--radius-main);
-            width: 95%; max-width: 600px; padding: 2rem; box-shadow: 0 15px 50px rgba(0,0,0,0.8);
+
+        .main-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+            flex: 1;
         }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.6fr;
+            gap: 24px;
+        }
+
+        .auth-container {
+            max-width: 440px;
+            margin: 40px auto;
+        }
+
+        .glass-card {
+            background: var(--surface-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(255, 199, 44, 0.42);
+            box-shadow: 0 12px 42px rgba(0, 0, 0, 0.72);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid rgba(255, 199, 44, 0.15);
+            padding-bottom: 12px;
+        }
+
+        .card-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.15rem;
+            color: var(--gold);
+            font-weight: 800;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .triage-calling-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .form-control {
+            width: 100%;
+            background: var(--surface-inner);
+            border: 1px solid rgba(255, 199, 44, 0.25);
+            border-radius: 6px;
+            padding: 10px 14px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 10px var(--gold-glow);
+            background: rgba(24, 6, 11, 0.96);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-dim);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-hover) 100%);
+            color: #140407;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px rgba(255, 199, 44, 0.25);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 20px var(--gold-glow);
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-action-sm {
+            background: rgba(128, 0, 0, 0.4);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-action-sm:hover {
+            background: var(--gold);
+            color: #140407;
+            box-shadow: 0 0 12px var(--gold-glow);
+        }
+
+        .queue-col-emergency {
+            background: rgba(38, 8, 12, 0.6);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            border-radius: 8px;
+            padding: 14px;
+        }
+
+        .queue-col-routine {
+            background: rgba(10, 22, 38, 0.6);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            border-radius: 8px;
+            padding: 14px;
+        }
+
+        .queue-col-title {
+            font-family: 'Cinzel', serif;
+            font-size: 0.88rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .queue-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 100px;
+        }
+
+        .queue-item {
+            background: var(--surface-inner);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+        }
+
+        .queue-item:hover {
+            border-color: rgba(255, 199, 44, 0.3);
+            background: rgba(30, 8, 12, 0.92);
+            transform: translateY(-1px);
+        }
+
+        .empty-state {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-align: center;
+            margin-top: 24px;
+        }
+
+        .patient-srcode {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .severity-badge {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #f87171;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            white-space: nowrap;
+        }
+
+        .routine-badge {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            color: var(--routine-blue);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .badge-confidential {
+            background: rgba(128, 0, 0, 0.25);
+            border: 1px solid var(--maroon-light);
+            color: #fca5a5;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .admin-table-container {
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+
+        table.admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+
+        table.admin-table th {
+            background: rgba(20, 4, 7, 0.95);
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+            padding: 10px 12px;
+            border-bottom: 2px solid var(--border-glass);
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        table.admin-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+        }
+
+        table.admin-table tr:hover td {
+            background: rgba(128, 0, 0, 0.15);
+            color: #fff;
+        }
+
+        .benchmark-metric-box {
+            background: var(--surface-inner);
+            border: 1px solid var(--border-glass);
+            border-radius: 8px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .benchmark-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-top: 4px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 2, 4, 0.86);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 900;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.28s ease, visibility 0.28s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: radial-gradient(circle at top, #2a0b12 0%, #160408 100%);
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            max-width: 580px;
+            width: 100%;
+            padding: 24px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), 0 0 20px var(--gold-glow);
+            transform: translateY(18px) scale(0.98);
+            opacity: 0;
+            transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        .history-box {
+            background: var(--surface-inner);
+            border: 1px solid rgba(255, 199, 44, 0.15);
+            border-radius: 6px;
+            padding: 10px;
+            max-height: 140px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        .history-entry {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 6px 0;
+        }
+
+        .history-entry:last-child {
+            border-bottom: none;
+        }
+
+        /* Smooth notice popup */
+        .notice-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: rgba(10, 2, 4, 0.86);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .notice-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .notice-box {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 440px;
+            text-align: center;
+            padding: 28px 24px 22px;
+            border-radius: 14px;
+            border: 1.5px solid rgba(255, 199, 44, 0.45);
+            background: radial-gradient(circle at top, #2b0c13 0%, #160408 100%);
+            box-shadow:
+                0 25px 60px rgba(0, 0, 0, 0.85),
+                0 0 35px rgba(128, 0, 0, 0.45),
+                inset 0 1px 0 rgba(255, 199, 44, 0.25);
+            transform: translateY(24px) scale(0.88);
+            opacity: 0;
+            transition:
+                transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.25s ease;
+        }
+
+        .notice-backdrop.active .notice-box {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        .notice-box::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--maroon), var(--gold), var(--maroon));
+        }
+
+        .notice-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            border: 2px solid rgba(255, 199, 44, 0.4);
+            color: var(--gold);
+            background: rgba(128, 0, 0, 0.35);
+            box-shadow: 0 0 24px rgba(255, 199, 44, 0.2);
+            animation: noticePulse 2.5s infinite ease-in-out;
+        }
+
+        .notice-icon.error {
+            background: rgba(156, 28, 28, 0.4);
+            border-color: rgba(239, 68, 68, 0.6);
+            color: #ef4444;
+            box-shadow: 0 0 24px rgba(239, 68, 68, 0.25);
+        }
+
+        .notice-icon.success {
+            background: rgba(20, 83, 45, 0.4);
+            border-color: rgba(34, 197, 94, 0.6);
+            color: #22c55e;
+            box-shadow: 0 0 24px rgba(34, 197, 94, 0.25);
+        }
+
+        .notice-icon.info {
+            background: rgba(128, 0, 0, 0.4);
+            border-color: rgba(255, 199, 44, 0.6);
+            color: var(--gold);
+            box-shadow: 0 0 24px rgba(255, 199, 44, 0.25);
+        }
+
+        @keyframes noticePulse {
+            0%, 100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 6px var(--gold-glow));
+            }
+            50% {
+                transform: scale(1.05);
+                filter: drop-shadow(0 0 14px var(--gold-glow));
+            }
+        }
+
+        .notice-badge {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 4px 14px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 199, 44, 0.3);
+            margin-bottom: 12px;
+            color: var(--gold);
+            font-weight: 800;
+        }
+
+        .notice-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--gold);
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            line-height: 1.25;
+        }
+
+        .notice-message {
+            font-size: 0.95rem;
+            color: #e2d3d5;
+            line-height: 1.55;
+            margin-bottom: 24px;
+        }
+
+        .notice-btn {
+            width: 100%;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-hover) 100%);
+            color: #140407;
+            font-family: 'Cinzel', serif;
+            font-size: 0.88rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            box-shadow: 0 4px 15px rgba(255, 199, 44, 0.3);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .notice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 22px rgba(255, 199, 44, 0.5);
+            filter: brightness(1.05);
+        }
+
+        .notice-btn:active {
+            transform: translateY(0);
+        }
+
+        .spinner {
+            width: 34px;
+            height: 34px;
+            border: 3px solid rgba(255, 199, 44, 0.2);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         footer {
-            border-top: 1px solid var(--border-glass); padding: 1.2rem; text-align: center;
-            font-size: 0.75rem; color: var(--text-secondary); background: #070102;
+            border-top: 1px solid rgba(255, 199, 44, 0.15);
+            padding: 16px 24px;
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            background: rgba(13, 3, 5, 0.95);
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .navbar {
+                padding: 12px 16px;
+            }
+
+            .brand-title {
+                font-size: 1.1rem;
+                letter-spacing: 1px;
+            }
+
+            .badge-user-session {
+                display: none !important;
+            }
+
+            .btn-auth-switch {
+                padding: 8px 12px;
+                font-size: 0.75rem;
+            }
+
+            .main-container {
+                padding: 16px;
+            }
+
+            .triage-calling-board {
+                grid-template-columns: 1fr;
+            }
+
+            .glass-card {
+                padding: 18px;
+            }
+
+            .modal-card,
+            .notice-box {
+                padding: 18px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
+
 <body>
-    <!-- Header Navigation -->
-    <header>
-        <div class="brand-container">
-            <img src="/static/spartan.png" alt="Spartan Logo" class="univ-seal-img" onerror="this.onerror=null; this.src='/static/logo.png';">
-            <div class="brand-title">
-                <h1 class="cinzel">PHALANX HEALTH</h1>
+
+    <nav class="navbar">
+        <a href="#" class="brand-container" onclick="location.reload()">
+            <img
+                src="/static/spartan.png"
+                alt="Spartan Logo"
+                class="brand-logo"
+                onerror="this.style.display='none'; if (this.nextElementSibling) this.nextElementSibling.style.display='flex';"
+            >
+            <div class="brand-fallback">
+                <i class='bx bxs-shield'></i>
             </div>
-        </div>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <span id="navUserBadge" class="tag tag-routine" style="display: none;">Guest</span>
-            <button id="navLogoutBtn" class="btn btn-outline" style="display: none;" onclick="handleLogout()">
-                <i class='bx bx-log-out'></i> Sign Out
+            <div class="brand-title">PHALANX HEALTH</div>
+        </a>
+
+        <div class="auth-status-container">
+            <div id="sessionBadge" class="badge-user-session" style="display: none;">
+                <i class='bx bxs-user-circle'></i>
+                <span id="sessionUserName">User</span>
+            </div>
+
+            <button id="authBtn" class="btn-auth-switch" onclick="handleAuthAction()">
+                <i class='bx bx-log-in'></i>
+                <span id="authBtnText">Sign In / Register</span>
             </button>
         </div>
-    </header>
+    </nav>
 
-    <div class="page-container">
-        <!-- ================= 1. AUTHENTICATION GATE ================= -->
-        <section id="authGate">
-            <div class="auth-box">
-                <div style="text-align: center; margin-bottom: 1.5rem;">
-                    <img src="/static/spartan.png" alt="Spartan Logo" class="auth-seal-logo" onerror="this.onerror=null; this.src='/static/logo.png';">
-                    <h2 class="cinzel" style="font-size: 1.3rem; margin-top: 0.5rem; color: var(--bsu-gold);">Clinic Portal Access</h2>
-                    <p style="font-size: 0.8rem; color: var(--text-secondary);">Red Spartan Health Information System</p>
-                </div>
-                <div class="auth-tab-bar">
-                    <button id="tabBtnLogin" class="active" onclick="switchAuthTab('login')">Sign In</button>
-                    <button id="tabBtnRegister" onclick="switchAuthTab('register')">Create Student Account</button>
-                </div>
+    <main class="main-container">
 
-                <!-- SIGN IN FORM -->
-                <form id="signInForm" onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label>SR-Code or Staff ID</label>
-                        <input type="text" id="loginSrCode" class="form-control mono" placeholder="e.g. 24-09303 or ADMIN" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.85rem; margin-top: 0.5rem;">
-                        <i class='bx bx-log-in'></i> Sign In to Account
-                    </button>
-                </form>
-
-                <!-- STUDENT REGISTRATION FORM -->
-                <form id="signUpForm" style="display: none;" onsubmit="handleRegister(event)">
-                    <div class="form-group">
-                        <label>Student SR-Code</label>
-                        <input type="text" id="regSrCode" class="form-control mono" placeholder="e.g. 24-09303" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" id="regFullName" class="form-control" placeholder="e.g. Juan P. Dela Cruz" required>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                        <div class="form-group">
-                            <label>Age</label>
-                            <input type="number" id="regAge" class="form-control" value="20" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Gender</label>
-                            <select id="regGender" class="form-control">
-                                <option>Male</option>
-                                <option>Female</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Set Password</label>
-                        <input type="password" id="regPassword" class="form-control" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.85rem; margin-top: 0.5rem;">
-                        <i class='bx bx-user-check'></i> Register Student Account
-                    </button>
-                </form>
-            </div>
-        </section>
-
-        <!-- ================= 2. PATIENT VIEW ================= -->
-        <section id="patientView" style="display: none;">
-            <div style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 1.5rem;">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="cinzel"><i class='bx bx-plus-medical'></i> Clinic Check-In</h3>
-                    </div>
-                    <form onsubmit="handleJoinQueue(event)">
-                        <div class="form-group">
-                            <label>Symptoms / Medical Complaint</label>
-                            <textarea id="patientSymptoms" class="form-control" rows="4" placeholder="Describe symptoms (e.g. fever, headache, sprain)..." required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Urgency Level</label>
-                            <select id="patientUrgency" class="form-control">
-                                <option value="routine">Routine Check / Consultation</option>
-                                <option value="emergency">Emergency / Severe Discomfort</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 0.8rem;">
-                            <i class='bx bx-check-circle'></i> Join Medical Queue
-                        </button>
-                    </form>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="cinzel"><i class='bx bx-broadcast'></i> Live Calling Board</h3>
-                        <span class="tag tag-routine">Confidential</span>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 1rem;">
-                            <h4 style="color: #f87171; font-size: 0.8rem; margin-bottom: 0.5rem;" class="cinzel">Emergency Priority</h4>
-                            <div id="patientEmergencyBoard" style="font-size: 0.85rem; color: var(--text-secondary);">No emergency cases.</div>
-                        </div>
-                        <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59,130,246,0.3); border-radius: 10px; padding: 1rem;">
-                            <h4 style="color: #60a5fa; font-size: 0.8rem; margin-bottom: 0.5rem;" class="cinzel">Routine Queue</h4>
-                            <div id="patientRoutineBoard" style="font-size: 0.85rem; color: var(--text-secondary);">No routine patients.</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= 3. STAFF / ADMIN VIEW ================= -->
-        <section id="adminView" style="display: none;">
-            <!-- Stats -->
-            <div class="stats-grid">
-                <div class="stat-card" onclick="document.getElementById('directoryCard').scrollIntoView({behavior:'smooth'})">
-                    <div>
-                        <div class="lbl">Registered Students</div>
-                        <div class="val mono" id="statPatients">0</div>
-                    </div>
-                    <i class='bx bx-folder-open'></i>
-                </div>
-                <div class="stat-card" onclick="document.getElementById('emergencyCard').scrollIntoView({behavior:'smooth'})">
-                    <div>
-                        <div class="lbl">Emergency</div>
-                        <div class="val mono" id="statEmergency" style="color: #f87171;">0</div>
-                    </div>
-                    <i class='bx bx-pulse' style="color: #f87171;"></i>
-                </div>
-                <div class="stat-card" onclick="document.getElementById('routineCard').scrollIntoView({behavior:'smooth'})">
-                    <div>
-                        <div class="lbl">Routine</div>
-                        <div class="val mono" id="statRoutine" style="color: #60a5fa;">0</div>
-                    </div>
-                    <i class='bx bx-time-five' style="color: #60a5fa;"></i>
-                </div>
-                <div class="stat-card">
-                    <div>
-                        <div class="lbl">Total Treated</div>
-                        <div class="val mono" id="statTreated" style="color: #4ade80;">0</div>
-                    </div>
-                    <i class='bx bx-check-double' style="color: #4ade80;"></i>
-                </div>
-            </div>
-
-            <!-- Queues -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
-                <div class="card" id="emergencyCard">
-                    <div class="card-header">
-                        <h3 class="cinzel" style="color: #f87171;"><i class='bx bx-bell'></i> Emergency Queue</h3>
-                        <button onclick="callNext('emergency')" class="btn btn-maroon" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Call Next</button>
-                    </div>
-                    <div id="adminEmergencyList" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 250px; overflow-y: auto;"></div>
-                </div>
-
-                <div class="card" id="routineCard">
-                    <div class="card-header">
-                        <h3 class="cinzel" style="color: #60a5fa;"><i class='bx bx-list-ol'></i> Routine Queue</h3>
-                        <button onclick="callNext('routine')" class="btn btn-gold" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Call Next</button>
-                    </div>
-                    <div id="adminRoutineList" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 250px; overflow-y: auto;"></div>
-                </div>
-            </div>
-
-            <!-- Directory -->
-            <div class="card" id="directoryCard">
+        <!-- Auth View -->
+        <div id="authView" class="auth-container" style="display: none;">
+            <div class="glass-card">
                 <div class="card-header">
-                    <h3 class="cinzel"><i class='bx bx-user-pin'></i> Student Directory</h3>
-                    <input type="text" id="adminSearchInput" oninput="filterPatients(this.value)" placeholder="Search SR-Code or Name..." class="form-control mono" style="width: 250px; padding: 0.45rem 0.8rem; font-size: 0.85rem;">
+                    <div class="card-title">
+                        <i class='bx bxs-shield-plus'></i>
+                        <span id="authFormTitle">Student & Staff Portal</span>
+                    </div>
                 </div>
-                <table class="custom-table">
-                    <thead>
-                        <tr>
-                            <th>SR-Code</th>
-                            <th>Student Name</th>
-                            <th>Age / Gender</th>
-                            <th>Visits</th>
-                            <th style="text-align: right;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="patientTableBody"></tbody>
-                </table>
+
+                <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,199,44,0.15); padding-bottom: 10px;">
+                    <button type="button" id="tabLogin" class="btn-action-sm" style="flex: 1; padding: 8px;" onclick="switchAuthTab('login')">
+                        SIGN IN
+                    </button>
+                    <button type="button" id="tabRegister" class="btn-action-sm" style="flex: 1; padding: 8px; opacity: 0.6;" onclick="switchAuthTab('register')">
+                        SELF-REGISTRATION
+                    </button>
+                </div>
+
+                <form id="formLogin" onsubmit="submitLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label">SR-Code or Staff ID</label>
+                        <input type="text" id="loginId" class="form-control" placeholder="e.g. 24-09303 or ADMIN" required autocomplete="username">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="Enter password" required autocomplete="current-password">
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="margin-top: 10px;">
+                        <i class='bx bx-lock-open-alt'></i>
+                        Authenticate
+                    </button>
+                </form>
+
+                <form id="formRegister" onsubmit="submitRegister(event)" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">SR-Code</label>
+                        <input type="text" id="regSrcode" class="form-control" placeholder="e.g. 24-12345" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="regName" class="form-control" placeholder="First Name Last Name" required>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label class="form-label">Age</label>
+                            <input type="number" id="regAge" class="form-control" placeholder="19" required min="1">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Gender</label>
+                            <select id="regGender" class="form-control">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="regPassword" class="form-control" placeholder="Create secure password" required>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="margin-top: 10px;">
+                        <i class='bx bx-user-plus'></i>
+                        Register Student Account
+                    </button>
+                </form>
             </div>
-        </section>
+        </div>
+
+        <!-- Student / Public View: visible by default -->
+        <div id="studentDashboardView" class="dashboard-grid" style="display: grid;">
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class='bx bx-plus-medical'></i>
+                        Clinic Check-In
+                    </div>
+                </div>
+
+                <form id="checkInForm" onsubmit="submitCheckIn(event)">
+                    <div class="form-group">
+                        <label class="form-label">Symptoms / Medical Complaint</label>
+                        <textarea id="patientSymptoms" class="form-control" placeholder="Describe symptoms..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Urgency Level</label>
+                        <select id="patientUrgency" class="form-control">
+                            <option value="routine">Routine Check / Consultation</option>
+                            <option value="emergency">Emergency / Severe Symptoms</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="margin-top: 20px;">
+                        <i class='bx bx-check-shield'></i>
+                        Join Medical Queue
+                    </button>
+                </form>
+            </div>
+
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class='bx bx-broadcast'></i>
+                        Live Calling Board
+                    </div>
+                    <span class="badge-confidential">CONFIDENTIAL</span>
+                </div>
+
+                <div class="triage-calling-board">
+                    <div class="queue-col-emergency">
+                        <div class="queue-col-title" style="color: #f87171;">
+                            <span>EMERGENCY PRIORITY</span>
+                            <i class='bx bxs-flame'></i>
+                        </div>
+                        <div id="publicEmergencyQueue" class="queue-list">
+                            <div class="empty-state">No emergency cases.</div>
+                        </div>
+                    </div>
+
+                    <div class="queue-col-routine">
+                        <div class="queue-col-title" style="color: var(--routine-blue);">
+                            <span>ROUTINE QUEUE</span>
+                            <i class='bx bx-time-five'></i>
+                        </div>
+                        <div id="publicRoutineQueue" class="queue-list">
+                            <div class="empty-state">No routine cases.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 14px;">
+                    SR-Codes are masked publicly. Symptoms and medical notes are staff-only.
+                </p>
+            </div>
+        </div>
+
+        <!-- Admin View -->
+        <div id="adminDashboardView" style="display: none;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 24px;">
+                <div class="glass-card" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-dim);">EMERGENCY QUEUE</div>
+                        <div id="adminEmergencyCount" style="font-family: 'JetBrains Mono', monospace; font-size: 1.8rem; font-weight: 700; color: #f87171;">0</div>
+                    </div>
+                    <button class="btn-action-sm" onclick="callNextPatient('emergency')" style="padding: 10px 16px;">
+                        <i class='bx bx-phone-call'></i>
+                        Call Emergency
+                    </button>
+                </div>
+
+                <div class="glass-card" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-dim);">ROUTINE QUEUE</div>
+                        <div id="adminRoutineCount" style="font-family: 'JetBrains Mono', monospace; font-size: 1.8rem; font-weight: 700; color: var(--routine-blue);">0</div>
+                    </div>
+                    <button class="btn-action-sm" onclick="callNextPatient('routine')" style="padding: 10px 16px;">
+                        <i class='bx bx-user-voice'></i>
+                        Call Routine
+                    </button>
+                </div>
+
+                <div class="glass-card" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-dim);">STUDENT DIRECTORY</div>
+                        <div id="adminRegisteredCount" style="font-family: 'JetBrains Mono', monospace; font-size: 1.8rem; font-weight: 700; color: var(--gold);">0</div>
+                    </div>
+                    <button class="btn-action-sm" onclick="runBenchmarkModal()" style="padding: 10px 16px;">
+                        <i class='bx bx-tachometer'></i>
+                        Run Benchmark
+                    </button>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class='bx bx-folder-open'></i>
+                            Student Directory
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="adminSearchInput" class="form-control" placeholder="Search SR-Code or Student Name..." oninput="filterAdminDirectory()">
+                    </div>
+
+                    <div class="admin-table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>SR-CODE</th>
+                                    <th>NAME</th>
+                                    <th>ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminDirectoryTableBody">
+                                <tr>
+                                    <td colspan="3" style="text-align: center; color: var(--text-dim);">Loading records...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class='bx bx-list-check'></i>
+                            Triage Queue Breakdown
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <div style="font-size: 0.82rem; font-weight: 700; color: #f87171; margin-bottom: 8px;">EMERGENCY CASES</div>
+                        <div id="adminEmergencyList" class="queue-list">
+                            <div class="empty-state">No active emergency cases.</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div style="font-size: 0.82rem; font-weight: 700; color: var(--routine-blue); margin-bottom: 8px;">ROUTINE CASES</div>
+                        <div id="adminRoutineList" class="queue-list">
+                            <div class="empty-state">No active routine cases.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Doctor Modal -->
+    <div id="doctorModal" class="modal-overlay" onclick="closeModalOnBackdrop(event, 'doctorModal', closeDoctorModal)">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <div class="card-header">
+                <div class="card-title" style="font-size: 1.1rem;">
+                    <i class='bx bxs-user-detail'></i>
+                    Patient Clinical Record
+                </div>
+                <button type="button" class="btn-action-sm" onclick="closeDoctorModal()">✕</button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.85rem; margin-bottom: 12px;">
+                <div><strong style="color: var(--gold);">SR-Code:</strong> <span id="docSrcode" class="patient-srcode"></span></div>
+                <div><strong style="color: var(--gold);">Name:</strong> <span id="docName"></span></div>
+                <div><strong style="color: var(--gold);">Age/Gender:</strong> <span id="docAgeGender"></span></div>
+                <div><strong style="color: var(--gold);">Registered:</strong> <span id="docRegisteredAt"></span></div>
+            </div>
+
+            <div style="margin-bottom: 12px;">
+                <label class="form-label">Active Symptoms</label>
+                <div id="docSymptoms" style="background: var(--surface-inner); border: 1px solid rgba(255,199,44,0.15); padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; color: #fff;"></div>
+            </div>
+
+            <div style="margin-bottom: 14px;">
+                <label class="form-label">Clinical History & Assessment Notes</label>
+                <div id="docHistory" class="history-box"></div>
+            </div>
+
+            <form onsubmit="submitDoctorComment(event)">
+                <div class="form-group">
+                    <label class="form-label">Add Doctor Assessment / Prescription</label>
+                    <textarea id="doctorAssessmentInput" class="form-control" placeholder="Enter diagnosis, prescription, or triage notes..." required></textarea>
+                </div>
+                <button type="submit" class="btn-primary">
+                    <i class='bx bx-save'></i>
+                    Save Assessment Note
+                </button>
+            </form>
+        </div>
     </div>
 
-    <!-- Medical Modal -->
-    <div id="inspectorModal" class="modal-wrap">
-        <div class="modal-body">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-glass); padding-bottom: 0.8rem; margin-bottom: 1rem;">
-                <h3 class="cinzel" style="color: var(--bsu-gold);">Student Medical File</h3>
-                <button onclick="closeInspector()" class="btn btn-outline" style="padding: 0.2rem 0.5rem;">&times;</button>
+    <!-- Benchmark Modal -->
+    <div id="benchmarkModal" class="modal-overlay" onclick="closeModalOnBackdrop(event, 'benchmarkModal', closeBenchmarkModal)">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class='bx bx-tachometer'></i>
+                    Search Algorithm Benchmark
+                </div>
+                <button type="button" class="btn-action-sm" onclick="closeBenchmarkModal()">✕</button>
             </div>
-            <div id="modalInfo" class="mono" style="font-size: 0.85rem; margin-bottom: 1rem; color: var(--text-secondary);"></div>
-            <h4 style="font-size: 0.8rem; color: var(--bsu-gold); margin-bottom: 0.5rem;" class="cinzel">Clinical Visits & Diagnosis</h4>
-            <div id="modalVisits" style="max-height: 180px; overflow-y: auto; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem;"></div>
-            <div class="form-group">
-                <label>Add Doctor's Clinical Assessment</label>
-                <textarea id="modalCommentInput" class="form-control" rows="2" placeholder="Prescription, diagnosis, medical notes..."></textarea>
+
+            <p style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 16px;">
+                Comparative execution time for Linear Search O(N) versus Binary Search O(log N).
+            </p>
+
+            <div id="benchmarkResultsContainer" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div style="text-align: center; color: var(--text-dim); grid-column: span 2;">Running benchmark tests...</div>
             </div>
-            <button onclick="saveDoctorComment()" class="btn btn-gold" style="width: 100%; justify-content: center;">
-                Save Assessment
+        </div>
+    </div>
+
+    <!-- Smooth Notice Modal -->
+    <div id="noticeBackdrop" class="notice-backdrop" role="dialog" aria-modal="true" onclick="closeNoticeOnBackdrop(event)">
+        <div class="notice-box" onclick="event.stopPropagation()">
+            <div id="noticeIcon" class="notice-icon">
+                <i class='bx bx-time-five'></i>
+            </div>
+            <div id="noticeBadge" class="notice-badge">QUEUE NOTICE</div>
+            <h3 id="noticeTitle" class="notice-title">Queue Status</h3>
+            <p id="noticeMessage" class="notice-message">You are already waiting in the queue.</p>
+            <button type="button" class="notice-btn" onclick="closeNotice()">
+                <span>ACKNOWLEDGE</span>
+                <i class='bx bx-check'></i>
             </button>
         </div>
     </div>
 
     <footer>
-        PHALANX HEALTH &bull; CpE 411 Data Structures and Algorithms &bull; Batangas State University Alangilan
+        PHALANX HEALTH • CpE 411 Data Structures and Algorithms • Batangas State University Alangilan
     </footer>
 
-    <!-- ================= JAVASCRIPT ================= -->
     <script>
         let currentUser = null;
-        let cachedData = null;
-        let selectedSrCode = null;
+        let currentInspectedSrcode = null;
+        let adminCachePatients = [];
+        let pollingInterval = null;
+        let noticeCallback = null;
+        let noticeTimer = null;
 
-        function switchAuthTab(tab) {
-            const loginForm = document.getElementById('signInForm');
-            const regForm = document.getElementById('signUpForm');
-            const tabLogin = document.getElementById('tabBtnLogin');
-            const tabReg = document.getElementById('tabBtnRegister');
+        const $ = (id) => document.getElementById(id);
 
-            if(tab === 'login') {
-                loginForm.style.display = 'block';
-                regForm.style.display = 'none';
-                tabLogin.classList.add('active');
-                tabReg.classList.remove('active');
+        function escapeHTML(value) {
+            return String(value ?? '').replace(/[&<>'"]/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[char]));
+        }
+
+        function maskSrcode(code) {
+            const s = String(code || '');
+            if (s.length >= 8) {
+                return s.slice(0, 3) + '***' + s.slice(-2);
+            }
+            return s;
+        }
+
+        function showNotice(message, title = 'QUEUE NOTICE', type = 'warning', callback = null) {
+            if (noticeTimer) {
+                clearTimeout(noticeTimer);
+                noticeTimer = null;
+            }
+
+            const backdrop = $('noticeBackdrop');
+            const icon = $('noticeIcon');
+            const badge = $('noticeBadge');
+
+            noticeCallback = callback;
+
+            $('noticeTitle').textContent = title;
+            $('noticeMessage').textContent = message;
+
+            let normalized = String(type || 'warning').toLowerCase();
+            if (normalized === 'critical') normalized = 'error';
+            if (!['warning', 'error', 'success', 'info'].includes(normalized)) normalized = 'warning';
+
+            icon.className = 'notice-icon ' + normalized;
+
+            if (normalized === 'error') {
+                icon.innerHTML = "<i class='bx bx-error-circle'></i>";
+                badge.textContent = 'TRIAGE ALERT';
+                badge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+                badge.style.color = '#ef4444';
+            } else if (normalized === 'success') {
+                icon.innerHTML = "<i class='bx bx-check-shield'></i>";
+                badge.textContent = 'CLINIC SUCCESS';
+                badge.style.borderColor = 'rgba(34, 197, 94, 0.4)';
+                badge.style.color = '#22c55e';
+            } else if (normalized === 'info') {
+                icon.innerHTML = "<i class='bx bx-info-circle'></i>";
+                badge.textContent = 'CAMPUS NOTICE';
+                badge.style.borderColor = 'rgba(255, 199, 44, 0.4)';
+                badge.style.color = '#FFC72C';
             } else {
-                loginForm.style.display = 'none';
-                regForm.style.display = 'block';
-                tabReg.classList.add('active');
-                tabLogin.classList.remove('active');
+                icon.innerHTML = "<i class='bx bx-time-five'></i>";
+                badge.textContent = 'QUEUE NOTICE';
+                badge.style.borderColor = 'rgba(255, 199, 44, 0.4)';
+                badge.style.color = '#FFC72C';
+            }
+
+            backdrop.classList.remove('active');
+            void backdrop.offsetWidth;
+            backdrop.classList.add('active');
+
+            setTimeout(() => {
+                const btn = backdrop.querySelector('.notice-btn');
+                if (btn) btn.focus();
+            }, 180);
+        }
+
+        function closeNotice() {
+            const backdrop = $('noticeBackdrop');
+            if (!backdrop.classList.contains('active')) return;
+
+            backdrop.classList.remove('active');
+
+            const cb = noticeCallback;
+            noticeCallback = null;
+
+            noticeTimer = setTimeout(() => {
+                noticeTimer = null;
+                if (typeof cb === 'function') cb();
+            }, 260);
+        }
+
+        function closeNoticeOnBackdrop(event) {
+            if (event.target.id === 'noticeBackdrop') {
+                closeNotice();
             }
         }
 
-        async function handleLogin(e) {
-            e.preventDefault();
-            const srcode = document.getElementById('loginSrCode').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
+        function closeModalOnBackdrop(event, modalId, closeFunction) {
+            if (event.target.id === modalId) {
+                closeFunction();
+            }
+        }
+
+        function showView(viewName) {
+            const auth = $('authView');
+            const student = $('studentDashboardView');
+            const admin = $('adminDashboardView');
+
+            auth.style.display = viewName === 'auth' ? 'block' : 'none';
+            student.style.display = viewName === 'student' ? 'grid' : 'none';
+            admin.style.display = viewName === 'admin' ? 'block' : 'none';
+        }
+
+        function updateAuthChrome() {
+            const sessionBadge = $('sessionBadge');
+            const sessionUserName = $('sessionUserName');
+            const authBtn = $('authBtn');
+
+            if (!currentUser) {
+                sessionBadge.style.display = 'none';
+                authBtn.innerHTML = "<i class='bx bx-log-in'></i> <span id='authBtnText'>Sign In / Register</span>";
+                return;
+            }
+
+            const roleText = currentUser.role === 'admin' ? 'STAFF' : 'STUDENT';
+            sessionBadge.style.display = 'flex';
+            sessionUserName.textContent = currentUser.name + ' (' + roleText + ')';
+            authBtn.innerHTML = "<i class='bx bx-log-out'></i> <span id='authBtnText'>Sign Out</span>";
+        }
+
+        function renderView() {
+            updateAuthChrome();
+
+            if (!currentUser) {
+                showView('student');
+            } else if (currentUser.role === 'admin') {
+                showView('admin');
+            } else {
+                showView('student');
+            }
+
+            fetchBoardData();
+        }
+
+        function handleAuthAction() {
+            if (currentUser) {
+                currentUser = null;
+                localStorage.removeItem('phalanx_session');
+                adminCachePatients = [];
+                renderView();
+                return;
+            }
+
+            if ($('authView').style.display === 'block') {
+                showView('student');
+            } else {
+                showView('auth');
+                switchAuthTab('login');
+            }
+        }
+
+        function switchAuthTab(tab) {
+            if (tab === 'login') {
+                $('formLogin').style.display = 'block';
+                $('formRegister').style.display = 'none';
+                $('tabLogin').style.opacity = '1';
+                $('tabRegister').style.opacity = '0.6';
+                $('authFormTitle').textContent = 'Student & Staff Portal';
+            } else {
+                $('formLogin').style.display = 'none';
+                $('formRegister').style.display = 'block';
+                $('tabLogin').style.opacity = '0.6';
+                $('tabRegister').style.opacity = '1';
+                $('authFormTitle').textContent = 'Student Self-Registration';
+            }
+        }
+
+        function adminHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'X-Role': 'admin',
+                'X-User-Id': currentUser && currentUser.srcode ? currentUser.srcode : 'ADMIN'
+            };
+        }
+
+        async function submitLogin(event) {
+            event.preventDefault();
+
+            const id = $('loginId').value.trim();
+            const password = $('loginPassword').value;
 
             try {
                 const res = await fetch('/api/auth/login', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ srcode, password })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, password })
                 });
-                const data = await res.json();
-                if(!res.ok) throw new Error(data.error || 'Login failed');
 
-                currentUser = data.user;
-                initSession();
-            } catch(err) {
-                alert(err.message);
+                const data = await res.json();
+
+                if (data.success) {
+                    currentUser = data.user;
+                    localStorage.setItem('phalanx_session', JSON.stringify(currentUser));
+                    $('loginPassword').value = '';
+                    renderView();
+
+                    showNotice(
+                        'Welcome back, ' + currentUser.name + '.',
+                        'AUTHENTICATION SUCCESS',
+                        'success'
+                    );
+                } else {
+                    showNotice(
+                        data.message || 'Authentication failed. Please verify your credentials.',
+                        'AUTHENTICATION FAILED',
+                        'error'
+                    );
+                }
+            } catch (err) {
+                showNotice(
+                    'Server connection error during authentication.',
+                    'NETWORK ERROR',
+                    'error'
+                );
             }
         }
 
-        async function handleRegister(e) {
-            e.preventDefault();
-            const payload = {
-                srcode: document.getElementById('regSrCode').value.trim(),
-                name: document.getElementById('regFullName').value.trim(),
-                age: document.getElementById('regAge').value,
-                gender: document.getElementById('regGender').value,
-                password: document.getElementById('regPassword').value.trim()
-            };
+        async function submitRegister(event) {
+            event.preventDefault();
+
+            const srcode = $('regSrcode').value.trim();
+            const name = $('regName').value.trim();
+            const age = $('regAge').value;
+            const gender = $('regGender').value;
+            const password = $('regPassword').value;
 
             try {
                 const res = await fetch('/api/auth/register', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload)
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ srcode, name, age, gender, password })
                 });
-                const data = await res.json();
-                if(!res.ok) throw new Error(data.error || 'Registration failed');
 
-                alert('Account registered successfully! You may now sign in.');
-                switchAuthTab('login');
-            } catch(err) {
-                alert(err.message);
-            }
-        }
-
-        function initSession() {
-            document.getElementById('authGate').style.display = 'none';
-            document.getElementById('navUserBadge').style.display = 'inline-block';
-            document.getElementById('navLogoutBtn').style.display = 'inline-flex';
-            document.getElementById('navUserBadge').innerText = `${currentUser.name} (${currentUser.role.toUpperCase()})`;
-
-            if(currentUser.role === 'admin') {
-                document.getElementById('adminView').style.display = 'block';
-                fetchAdminData();
-            } else {
-                document.getElementById('patientView').style.display = 'block';
-                fetchStudentData();
-            }
-        }
-
-        function handleLogout() {
-            currentUser = null;
-            location.reload();
-        }
-
-        // ================= PATIENT LOGIC =================
-        async function fetchStudentData() {
-            try {
-                const res = await fetch('/api/admin/all_data');
                 const data = await res.json();
 
-                const emergBoard = document.getElementById('patientEmergencyBoard');
-                emergBoard.innerHTML = data.emergency_queue.length === 0 ? 
-                    `<p style="font-size:0.8rem; color:#888;">No emergency cases.</p>` :
-                    data.emergency_queue.map(p => `
-                        <div style="padding:0.4rem; background:rgba(255,255,255,0.05); border-radius:6px; margin-bottom:0.3rem;">
-                            <span class="mono" style="color:#f87171;">${p.srcode}</span> - High Priority
-                        </div>
-                    `).join('');
+                if (data.success) {
+                    currentUser = data.user || {
+                        role: 'student',
+                        srcode,
+                        name
+                    };
 
-                const routineBoard = document.getElementById('patientRoutineBoard');
-                routineBoard.innerHTML = data.routine_queue.length === 0 ?
-                    `<p style="font-size:0.8rem; color:#888;">No routine patients.</p>` :
-                    data.routine_queue.map((p, idx) => `
-                        <div style="padding:0.4rem; background:rgba(255,255,255,0.05); border-radius:6px; margin-bottom:0.3rem;">
-                            <span class="mono" style="color:#60a5fa;">${p.srcode}</span> - #${idx+1} in Line
-                        </div>
-                    `).join('');
-            } catch(err) {
-                console.error(err);
+                    localStorage.setItem('phalanx_session', JSON.stringify(currentUser));
+                    $('formRegister').reset();
+                    renderView();
+
+                    showNotice(
+                        'Account registered successfully and saved permanently. Welcome to PHALANX HEALTH.',
+                        'REGISTRATION COMPLETE',
+                        'success'
+                    );
+                } else {
+                    showNotice(
+                        data.message || 'Registration failed.',
+                        'REGISTRATION ERROR',
+                        'error'
+                    );
+                }
+            } catch (err) {
+                showNotice(
+                    'Server connection error during registration.',
+                    'NETWORK ERROR',
+                    'error'
+                );
             }
         }
 
-        async function handleJoinQueue(e) {
-            e.preventDefault();
-            const symptoms = document.getElementById('patientSymptoms').value.trim();
-            const urgency = document.getElementById('patientUrgency').value;
+        async function submitCheckIn(event) {
+            event.preventDefault();
+
+            if (!currentUser || currentUser.role !== 'student') {
+                showNotice(
+                    'Please sign in with your student account before joining the medical queue.',
+                    'AUTHENTICATION REQUIRED',
+                    'info',
+                    () => {
+                        showView('auth');
+                        switchAuthTab('login');
+                    }
+                );
+                return;
+            }
+
+            const symptoms = $('patientSymptoms').value.trim();
+            const urgency = $('patientUrgency').value;
 
             try {
                 const res = await fetch('/api/patient/join_queue', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ srcode: currentUser.srcode, symptoms, urgency })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        srcode: currentUser.srcode,
+                        symptoms,
+                        urgency
+                    })
                 });
-                const data = await res.json();
-                if(!res.ok) throw new Error(data.error || 'Failed to join queue');
 
-                alert('You are now in the clinic queue!');
-                document.getElementById('patientSymptoms').value = '';
-                fetchStudentData();
-            } catch(err) {
-                alert(err.message);
+                const data = await res.json();
+
+                if (data.success) {
+                    $('patientSymptoms').value = '';
+                    fetchBoardData();
+
+                    showNotice(
+                        'You have successfully joined the medical triage queue.',
+                        'QUEUE CHECK-IN',
+                        'success'
+                    );
+                } else {
+                    showNotice(
+                        data.message || 'Failed to join the queue.',
+                        'QUEUE NOTICE',
+                        'warning'
+                    );
+                }
+            } catch (err) {
+                showNotice(
+                    'Server error while checking in to the queue.',
+                    'NETWORK ERROR',
+                    'error'
+                );
             }
         }
 
-        // ================= STAFF LOGIC =================
-        async function fetchAdminData() {
-            if(!currentUser || currentUser.role !== 'admin') return;
+        function startPolling() {
+            if (pollingInterval) clearInterval(pollingInterval);
+            pollingInterval = setInterval(fetchBoardData, 3500);
+        }
+
+        async function fetchBoardData() {
             try {
-                const res = await fetch('/api/admin/all_data');
+                const isAdmin = currentUser && currentUser.role === 'admin';
+
+                const res = await fetch('/api/admin/all_data', {
+                    cache: 'no-store',
+                    headers: isAdmin ? adminHeaders() : {}
+                });
+
                 const data = await res.json();
-                cachedData = data;
 
-                document.getElementById('statPatients').innerText = data.patients.length;
-                document.getElementById('statEmergency').innerText = data.emergency_queue.length;
-                document.getElementById('statRoutine').innerText = data.routine_queue.length;
-                document.getElementById('statTreated').innerText = data.treated_history.length;
+                if (isAdmin) {
+                    const emergency = data.emergency_queue || [];
+                    const routine = data.routine_queue || [];
 
-                // Emergency Queue
-                const emergList = document.getElementById('adminEmergencyList');
-                emergList.innerHTML = data.emergency_queue.length === 0 ?
-                    `<p style="font-size:0.8rem; color:#888;">Emergency queue empty.</p>` :
-                    data.emergency_queue.map(p => `
-                        <div style="padding:0.6rem; background:rgba(255,255,255,0.03); border:1px solid rgba(239,68,68,0.2); border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-                            <div>
-                                <span class="mono" style="color:#f87171; font-weight:700;">${p.srcode}</span> - ${p.name}
-                                <div style="font-size:0.75rem; color:#bbb; font-style:italic;">"${p.symptoms}"</div>
-                            </div>
-                            <button onclick="openInspector('${p.srcode}')" class="btn btn-outline" style="padding:0.25rem 0.6rem; font-size:0.75rem;">View</button>
-                        </div>
-                    `).join('');
+                    renderAdminQueues(emergency, routine);
 
-                // Routine Queue
-                const routineList = document.getElementById('adminRoutineList');
-                routineList.innerHTML = data.routine_queue.length === 0 ?
-                    `<p style="font-size:0.8rem; color:#888;">Routine queue empty.</p>` :
-                    data.routine_queue.map(p => `
-                        <div style="padding:0.6rem; background:rgba(255,255,255,0.03); border:1px solid rgba(59,130,246,0.2); border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-                            <div>
-                                <span class="mono" style="color:#60a5fa; font-weight:700;">${p.srcode}</span> - ${p.name}
-                                <div style="font-size:0.75rem; color:#bbb; font-style:italic;">"${p.symptoms}"</div>
-                            </div>
-                            <button onclick="openInspector('${p.srcode}')" class="btn btn-outline" style="padding:0.25rem 0.6rem; font-size:0.75rem;">View</button>
-                        </div>
-                    `).join('');
+                    adminCachePatients = data.all_patients || [];
+                    renderAdminDirectory(adminCachePatients);
+                    filterAdminDirectory();
 
-                filterPatients(document.getElementById('adminSearchInput').value);
-            } catch(err) {
-                console.error(err);
+                    $('adminEmergencyCount').textContent = emergency.length;
+                    $('adminRoutineCount').textContent = routine.length;
+                    $('adminRegisteredCount').textContent = adminCachePatients.length;
+                } else {
+                    const publicEmergency = Array.isArray(data.public_emergency)
+                        ? data.public_emergency
+                        : (data.emergency_queue || []).map(p => ({
+                            srcode: maskSrcode(p.srcode),
+                            severity: p.severity
+                        }));
+
+                    const publicRoutine = Array.isArray(data.public_routine)
+                        ? data.public_routine
+                        : (data.routine_queue || []).map(p => ({
+                            srcode: maskSrcode(p.srcode),
+                            severity: p.severity
+                        }));
+
+                    renderPublicQueues(publicEmergency, publicRoutine);
+                }
+            } catch (err) {
+                console.error('Polling error:', err);
             }
         }
 
-        function filterPatients(query) {
-            if(!cachedData) return;
-            const q = (query || '').toLowerCase().trim();
-            const list = cachedData.patients.filter(p => 
-                p.srcode.toLowerCase().includes(q) || p.name.toLowerCase().includes(q)
-            );
+        function renderPublicQueues(emergency, routine) {
+            const emList = $('publicEmergencyQueue');
+            const roList = $('publicRoutineQueue');
 
-            const tbody = document.getElementById('patientTableBody');
-            tbody.innerHTML = list.map(p => `
+            if (!emergency || emergency.length === 0) {
+                emList.innerHTML = '<div class="empty-state">No emergency cases.</div>';
+            } else {
+                emList.innerHTML = emergency.map((item, idx) => `
+                    <div class="queue-item">
+                        <span class="patient-srcode">${escapeHTML(item.srcode)} - #${idx + 1} in Line</span>
+                        <span class="severity-badge">Priority</span>
+                    </div>
+                `).join('');
+            }
+
+            if (!routine || routine.length === 0) {
+                roList.innerHTML = '<div class="empty-state">No routine cases.</div>';
+            } else {
+                roList.innerHTML = routine.map((item, idx) => `
+                    <div class="queue-item">
+                        <span class="patient-srcode">${escapeHTML(item.srcode)} - #${idx + 1} in Line</span>
+                        <span class="routine-badge">Routine</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function renderAdminQueues(emergency, routine) {
+            const emList = $('adminEmergencyList');
+            const roList = $('adminRoutineList');
+
+            if (!emergency || emergency.length === 0) {
+                emList.innerHTML = '<div class="empty-state">No active emergency cases.</div>';
+            } else {
+                emList.innerHTML = emergency.map(item => `
+                    <div class="queue-item">
+                        <div>
+                            <span class="patient-srcode">${escapeHTML(item.srcode)}</span>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: 8px;">
+                                ${escapeHTML(item.name)}
+                            </span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="severity-badge">Score: ${escapeHTML(item.severity)}</span>
+                            <button type="button" class="btn-action-sm" data-inspect="${escapeHTML(item.srcode)}">Inspect</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            if (!routine || routine.length === 0) {
+                roList.innerHTML = '<div class="empty-state">No active routine cases.</div>';
+            } else {
+                roList.innerHTML = routine.map(item => `
+                    <div class="queue-item">
+                        <div>
+                            <span class="patient-srcode">${escapeHTML(item.srcode)}</span>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: 8px;">
+                                ${escapeHTML(item.name)}
+                            </span>
+                        </div>
+                        <button type="button" class="btn-action-sm" data-inspect="${escapeHTML(item.srcode)}">Inspect</button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function renderAdminDirectory(patients) {
+            const tbody = $('adminDirectoryTableBody');
+
+            if (!patients || patients.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: var(--text-dim);">
+                            No student records found.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = patients.map(p => `
                 <tr>
-                    <td class="mono" style="color:var(--bsu-gold);">${p.srcode}</td>
-                    <td><strong>${p.name}</strong></td>
-                    <td>${p.age || 20} / ${p.gender || 'N/A'}</td>
-                    <td class="mono">${(p.visits || []).length}</td>
-                    <td style="text-align: right;">
-                        <button onclick="openInspector('${p.srcode}')" class="btn btn-outline" style="padding:0.25rem 0.65rem; font-size:0.75rem;">Inspect</button>
+                    <td class="patient-srcode">${escapeHTML(p.srcode)}</td>
+                    <td>${escapeHTML(p.name)} (${escapeHTML(p.age || 'N/A')})</td>
+                    <td>
+                        <button type="button" class="btn-action-sm" data-inspect="${escapeHTML(p.srcode)}">Record</button>
                     </td>
                 </tr>
             `).join('');
         }
 
-        async function callNext(type) {
+        function filterAdminDirectory() {
+            const input = $('adminSearchInput');
+            if (!input) return;
+
+            const term = input.value.toLowerCase().trim();
+            const filtered = adminCachePatients.filter(p =>
+                String(p.srcode).toLowerCase().includes(term) ||
+                String(p.name).toLowerCase().includes(term)
+            );
+
+            renderAdminDirectory(filtered);
+        }
+
+        async function callNextPatient(queueType) {
             try {
                 const res = await fetch('/api/admin/call_next', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ type })
+                    headers: adminHeaders(),
+                    body: JSON.stringify({ queue_type: queueType })
                 });
+
                 const data = await res.json();
-                if(!res.ok) throw new Error(data.error || 'Failed to call next');
-                alert(`Called: ${data.patient.name} (${data.patient.srcode})`);
-                fetchAdminData();
-            } catch(err) {
-                alert(err.message);
+
+                if (data.success) {
+                    fetchBoardData();
+                    showNotice(
+                        data.message,
+                        'PATIENT SUMMONED',
+                        'success'
+                    );
+                } else {
+                    showNotice(
+                        data.message || 'No patient available to call.',
+                        'QUEUE NOTICE',
+                        'info'
+                    );
+                }
+            } catch (err) {
+                showNotice(
+                    'Error executing call next patient command.',
+                    'SERVER ERROR',
+                    'error'
+                );
             }
         }
 
-        // ================= MODAL LOGIC =================
-        function openInspector(srcode) {
-            if(!cachedData) return;
-            const patient = cachedData.patients.find(p => p.srcode === srcode);
-            if(!patient) return;
+        function inspectPatient(srcode) {
+            if (!currentUser || currentUser.role !== 'admin') {
+                showNotice(
+                    'Staff authentication is required to view clinical records.',
+                    'ACCESS RESTRICTED',
+                    'error'
+                );
+                return;
+            }
 
-            selectedSrCode = srcode;
-            document.getElementById('modalInfo').innerHTML = `
-                <div><strong>SR-Code:</strong> ${patient.srcode}</div>
-                <div><strong>Name:</strong> ${patient.name}</div>
-                <div><strong>Details:</strong> Age ${patient.age || 20} &bull; ${patient.gender || 'N/A'}</div>
-            `;
+            const patient = adminCachePatients.find(p => p.srcode === srcode);
 
-            const visitList = document.getElementById('modalVisits');
-            visitList.innerHTML = (!patient.visits || patient.visits.length === 0) ?
-                `<p style="font-size:0.8rem; color:#888;">No medical history recorded yet.</p>` :
-                patient.visits.map(v => `
-                    <div style="padding:0.6rem; background:rgba(255,255,255,0.04); border-radius:6px; font-size:0.8rem;">
-                        <div style="display:flex; justify-content:space-between; color:var(--bsu-gold); font-weight:700;">
-                            <span>${v.symptoms}</span>
-                            <span class="mono" style="font-size:0.7rem; color:#888;">${v.date}</span>
+            if (!patient) {
+                showNotice(
+                    'Patient record not found.',
+                    'RECORD ERROR',
+                    'error'
+                );
+                return;
+            }
+
+            currentInspectedSrcode = srcode;
+
+            $('docSrcode').textContent = patient.srcode;
+            $('docName').textContent = patient.name;
+            $('docAgeGender').textContent = (patient.age || 'N/A') + ' / ' + (patient.gender || 'N/A');
+            $('docRegisteredAt').textContent = patient.created_at || 'Registered';
+            $('docSymptoms').textContent = patient.current_symptoms || 'No acute symptoms reported.';
+
+            const historyEl = $('docHistory');
+
+            if (!patient.history || patient.history.length === 0) {
+                historyEl.innerHTML = `
+                    <div style="color: var(--text-dim); text-align: center;">
+                        No previous medical notes.
+                    </div>
+                `;
+            } else {
+                historyEl.innerHTML = patient.history.map(h => `
+                    <div class="history-entry">
+                        <div style="font-size: 0.72rem; color: var(--gold);">
+                            ${escapeHTML(h.timestamp)}
                         </div>
-                        <div style="color:#ddd; margin-top:0.3rem;">Doctor Note: ${v.comment || 'None'}</div>
+                        <div>${escapeHTML(h.note)}</div>
                     </div>
                 `).join('');
+            }
 
-            document.getElementById('inspectorModal').classList.add('show');
+            $('doctorModal').classList.add('active');
         }
 
-        function closeInspector() {
-            document.getElementById('inspectorModal').classList.remove('show');
-            document.getElementById('modalCommentInput').value = '';
-            selectedSrCode = null;
+        function closeDoctorModal() {
+            $('doctorModal').classList.remove('active');
+            $('doctorAssessmentInput').value = '';
+            currentInspectedSrcode = null;
         }
 
-        async function saveDoctorComment() {
-            const comment = document.getElementById('modalCommentInput').value.trim();
-            if(!comment || !selectedSrCode) return;
+        async function submitDoctorComment(event) {
+            event.preventDefault();
+
+            if (!currentInspectedSrcode) return;
+
+            const note = $('doctorAssessmentInput').value.trim();
 
             try {
                 const res = await fetch('/api/admin/add_comment', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ srcode: selectedSrCode, comment })
+                    headers: adminHeaders(),
+                    body: JSON.stringify({
+                        srcode: currentInspectedSrcode,
+                        comment: note
+                    })
                 });
-                const data = await res.json();
-                if(!res.ok) throw new Error(data.error || 'Failed to save comment');
 
-                alert('Doctor assessment saved.');
-                closeInspector();
-                fetchAdminData();
-            } catch(err) {
-                alert(err.message);
+                const data = await res.json();
+
+                if (data.success) {
+                    closeDoctorModal();
+                    fetchBoardData();
+
+                    showNotice(
+                        'Medical assessment note saved successfully.',
+                        'ASSESSMENT SAVED',
+                        'success'
+                    );
+                } else {
+                    showNotice(
+                        data.message || 'Failed to save assessment note.',
+                        'SAVE ERROR',
+                        'error'
+                    );
+                }
+            } catch (err) {
+                showNotice(
+                    'Server error saving assessment note.',
+                    'NETWORK ERROR',
+                    'error'
+                );
             }
         }
 
-        setInterval(() => {
-            if(currentUser) {
-                if(currentUser.role === 'admin') fetchAdminData();
-                else fetchStudentData();
+        async function runBenchmarkModal() {
+            const modal = $('benchmarkModal');
+            const container = $('benchmarkResultsContainer');
+
+            modal.classList.add('active');
+
+            container.innerHTML = `
+                <div style="text-align: center; color: var(--text-dim); grid-column: span 2;">
+                    <div class="spinner"></div>
+                    Running algorithmic search benchmark...
+                </div>
+            `;
+
+            try {
+                const res = await fetch('/api/benchmark');
+                const data = await res.json();
+
+                if (data.success) {
+                    container.innerHTML = data.results.map(r => `
+                        <div class="benchmark-metric-box">
+                            <div style="font-size: 0.75rem; color: var(--text-dim);">
+                                DATASET SIZE: N = ${Number(r.N).toLocaleString()}
+                            </div>
+                            <div style="display: flex; justify-content: space-around; margin-top: 8px; gap: 8px;">
+                                <div>
+                                    <div style="font-size: 0.7rem; color: #f87171;">Linear Search</div>
+                                    <div class="benchmark-val" style="color: #f87171;">${r.linear_time_ms} ms</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.7rem; color: var(--gold);">Binary Search</div>
+                                    <div class="benchmark-val">${r.binary_time_ms} ms</div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = `
+                        <div style="text-align: center; color: #f87171; grid-column: span 2;">
+                            Benchmark failed.
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: #f87171; grid-column: span 2;">
+                        Error connecting to benchmark endpoint.
+                    </div>
+                `;
             }
-        }, 10000);
+        }
+
+        function closeBenchmarkModal() {
+            $('benchmarkModal').classList.remove('active');
+        }
+
+        document.addEventListener('click', event => {
+            const inspectBtn = event.target.closest('[data-inspect]');
+            if (inspectBtn) {
+                inspectPatient(inspectBtn.dataset.inspect);
+            }
+        });
+
+        document.addEventListener('keydown', event => {
+            const noticeOpen = $('noticeBackdrop').classList.contains('active');
+
+            if (noticeOpen && (event.key === 'Enter' || event.key === 'Escape')) {
+                event.preventDefault();
+                closeNotice();
+                return;
+            }
+
+            if (event.key === 'Escape') {
+                if ($('doctorModal').classList.contains('active')) closeDoctorModal();
+                if ($('benchmarkModal').classList.contains('active')) closeBenchmarkModal();
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const stored = localStorage.getItem('phalanx_session');
+
+            if (stored) {
+                try {
+                    currentUser = JSON.parse(stored);
+                } catch (err) {
+                    currentUser = null;
+                    localStorage.removeItem('phalanx_session');
+                }
+            }
+
+            renderView();
+            startPolling();
+        });
     </script>
 </body>
 </html>
+```
+
+---
+
+## 2. Replace `app.py`
+
+```python
+import os
+import time
+import sqlite3
+from datetime import datetime
+
+from flask import Flask, render_template, request, jsonify
+
+app = Flask(__name__)
+
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "clinic.db")
+
+STAFF_CREDENTIALS = {
+    "ADMIN": {
+        "password": "batstateu411",
+        "name": "Dr. A. Castillo, MD",
+        "role": "admin"
+    }
+}
+
+
+# ==============================================================================
+# DATABASE
+# ==============================================================================
+
+def get_db():
+    conn = sqlite3.connect(DB_PATH, timeout=10)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
+
+
+def init_db():
+    conn = get_db()
+
+    try:
+        conn.execute("PRAGMA journal_mode = WAL")
+    except Exception:
+        pass
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS students (
+            srcode TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            age INTEGER NOT NULL,
+            gender TEXT NOT NULL,
+            password TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        )
+    """)
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS clinical_notes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            srcode TEXT NOT NULL,
+            note TEXT NOT NULL,
+            timestamp TEXT NOT NULL,
+            FOREIGN KEY (srcode) REFERENCES students(srcode)
+        )
+    """)
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS active_queue (
+            srcode TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            urgency TEXT NOT NULL,
+            symptoms TEXT NOT NULL,
+            severity INTEGER NOT NULL,
+            created_at REAL NOT NULL
+        )
+    """)
+
+    conn.execute("""
+        INSERT OR IGNORE INTO students 
+            (srcode, name, age, gender, password, created_at)
+        VALUES 
+            (?, ?, ?, ?, ?, ?)
+    """, (
+        "24-09303",
+        "Juan P. Dela Cruz",
+        20,
+        "Male",
+        "student123",
+        "2026-01-15 08:30"
+    ))
+
+    conn.commit()
+    conn.close()
+
+
+init_db()
+
+
+# ==============================================================================
+# DATA STRUCTURE 1: BST STUDENT DIRECTORY
+# ==============================================================================
+
+class BSTNode:
+    def __init__(self, data):
+        self.srcode = data["srcode"]
+        self.data = data
+        self.left = None
+        self.right = None
+
+
+class BST:
+    def __init__(self):
+        self.root = None
+
+    def insert(self, data):
+        new_node = BSTNode(data)
+
+        if self.root is None:
+            self.root = new_node
+            return True
+
+        current = self.root
+
+        while True:
+            if data["srcode"] < current.srcode:
+                if current.left is None:
+                    current.left = new_node
+                    return True
+                current = current.left
+
+            elif data["srcode"] > current.srcode:
+                if current.right is None:
+                    current.right = new_node
+                    return True
+                current = current.right
+
+            else:
+                current.data = data
+                return False
+
+    def search(self, srcode):
+        current = self.root
+
+        while current:
+            if srcode == current.srcode:
+                return current.data
+            elif srcode < current.srcode:
+                current = current.left
+            else:
+                current = current.right
+
+        return None
+
+    def inorder(self):
+        result = []
+
+        def traverse(node):
+            if node:
+                traverse(node.left)
+                result.append(node.data)
+                traverse(node.right)
+
+        traverse(self.root)
+        return result
+
+
+# ==============================================================================
+# DATA STRUCTURE 2: MAX HEAP EMERGENCY QUEUE
+# ==============================================================================
+
+class MaxHeap:
+    def __init__(self):
+        self.heap = []
+
+    def _higher_priority(self, a, b):
+        a_sev = int(a.get("severity", 1))
+        b_sev = int(b.get("severity", 1))
+
+        if a_sev != b_sev:
+            return a_sev > b_sev
+
+        # Same severity: earlier check-in goes first
+        return float(a.get("created_at", 0)) < float(b.get("created_at", 0))
+
+    def insert(self, patient):
+        self.heap.append(patient)
+        self._sift_up(len(self.heap) - 1)
+
+    def extract_max(self):
+        if not self.heap:
+            return None
+
+        if len(self.heap) == 1:
+            return self.heap.pop()
+
+        top = self.heap[0]
+        self.heap[0] = self.heap.pop()
+        self._sift_down(0)
+        return top
+
+    def _sift_up(self, idx):
+        while idx > 0:
+            parent = (idx - 1) // 2
+            if not self._higher_priority(self.heap[idx], self.heap[parent]):
+                break
+            self.heap[idx], self.heap[parent] = self.heap[parent], self.heap[idx]
+            idx = parent
+
+    def _sift_down(self, idx):
+        size = len(self.heap)
+
+        while True:
+            left = 2 * idx + 1
+            right = 2 * idx + 2
+            best = idx
+
+            if left < size and self._higher_priority(self.heap[left], self.heap[best]):
+                best = left
+
+            if right < size and self._higher_priority(self.heap[right], self.heap[best]):
+                best = right
+
+            if best == idx:
+                break
+
+            self.heap[idx], self.heap[best] = self.heap[best], self.heap[idx]
+            idx = best
+
+    def to_list(self):
+        return sorted(
+            self.heap,
+            key=lambda p: (-int(p.get("severity", 1)), float(p.get("created_at", 0)))
+        )
+
+
+# ==============================================================================
+# DATA STRUCTURE 3: FIFO ROUTINE QUEUE
+# ==============================================================================
+
+class FIFOQueue:
+    def __init__(self):
+        self.queue = []
+
+    def enqueue(self, patient):
+        self.queue.append(patient)
+
+    def dequeue(self):
+        if not self.queue:
+            return None
+        return self.queue.pop(0)
+
+    def to_list(self):
+        return list(self.queue)
+
+
+student_directory = BST()
+emergency_heap = MaxHeap()
+routine_queue = FIFOQueue()
+
+
+# ==============================================================================
+# HELPERS
+# ==============================================================================
+
+def calculate_severity(symptoms, urgency):
+    text = symptoms.lower()
+    score = 2
+
+    if urgency == "emergency":
+        score = 6
+
+    critical_keywords = [
+        "chest pain",
+        "unconscious",
+        "breathing",
+        "seizure",
+        "kidney failure",
+        "stroke",
+        "cardiac",
+        "bleeding",
+        "bleed",
+        "fracture",
+        "poison",
+        "severe pain"
+    ]
+
+    medium_keywords = [
+        "severe",
+        "fainting",
+        "high fever",
+        "asthma",
+        "head trauma",
+        "vomiting",
+        "palpitations",
+        "dizziness"
+    ]
+
+    for keyword in critical_keywords:
+        if keyword in text:
+            score += 3
+
+    for keyword in medium_keywords:
+        if keyword in text:
+            score += 2
+
+    return max(1, min(score, 10))
+
+
+def mask_srcode(srcode):
+    code = str(srcode or "")
+    if len(code) >= 8:
+        return code[:3] + "***" + code[-2:]
+    return code
+
+
+def safe_student(record):
+    return {
+        key: value
+        for key, value in record.items()
+        if key != "password"
+    }
+
+
+def is_admin_request():
+    return (
+        request.headers.get("X-Role", "").lower() == "admin"
+        or request.headers.get("X-User-Id", "").upper() == "ADMIN"
+    )
+
+
+def sync_all_from_db():
+    """
+    Rebuilds the BST, Max-Heap, and FIFO Queue from SQLite.
+    This keeps data structures functional while SQLite remains the persistent source.
+    """
+    global student_directory, emergency_heap, routine_queue
+
+    student_directory = BST()
+    emergency_heap = MaxHeap()
+    routine_queue = FIFOQueue()
+
+    conn = get_db()
+
+    students = conn.execute("""
+        SELECT * FROM students
+    """).fetchall()
+
+    for row in students:
+        notes = conn.execute("""
+            SELECT note, timestamp
+            FROM clinical_notes
+            WHERE srcode = ?
+            ORDER BY id ASC
+        """, (row["srcode"],)).fetchall()
+
+        history = [
+            {
+                "note": note["note"],
+                "timestamp": note["timestamp"]
+            }
+            for note in notes
+        ]
+
+        active = conn.execute("""
+            SELECT symptoms
+            FROM active_queue
+            WHERE srcode = ?
+        """, (row["srcode"],)).fetchone()
+
+        student_directory.insert({
+            "srcode": row["srcode"],
+            "name": row["name"],
+            "age": row["age"],
+            "gender": row["gender"],
+            "password": row["password"],
+            "created_at": row["created_at"],
+            "history": history,
+            "current_symptoms": active["symptoms"] if active else ""
+        })
+
+    active_patients = conn.execute("""
+        SELECT *
+        FROM active_queue
+        ORDER BY created_at ASC
+    """).fetchall()
+
+    for row in active_patients:
+        patient = {
+            "srcode": row["srcode"],
+            "name": row["name"],
+            "urgency": row["urgency"],
+            "symptoms": row["symptoms"],
+            "severity": row["severity"],
+            "created_at": row["created_at"]
+        }
+
+        if row["urgency"] == "emergency":
+            emergency_heap.insert(patient)
+        else:
+            routine_queue.enqueue(patient)
+
+    conn.close()
+
+
+sync_all_from_db()
+
+
+# ==============================================================================
+# ROUTES
+# ==============================================================================
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+
+@app.route("/api/auth/register", methods=["POST"])
+def api_register():
+    data = request.get_json() or {}
+
+    srcode = str(data.get("srcode", "")).strip()
+    name = str(data.get("name", "")).strip()
+    age_raw = data.get("age")
+    gender = str(data.get("gender", "Other")).strip()
+    password = str(data.get("password", ""))
+
+    if not srcode or not name or not password or age_raw in (None, ""):
+        return jsonify({
+            "success": False,
+            "message": "All registration fields are required."
+        }), 400
+
+    try:
+        age = int(age_raw)
+    except Exception:
+        return jsonify({
+            "success": False,
+            "message": "Age must be a valid number."
+        }), 400
+
+    conn = get_db()
+
+    existing = conn.execute(
+        "SELECT srcode FROM students WHERE srcode = ?",
+        (srcode,)
+    ).fetchone()
+
+    if existing:
+        conn.close()
+        return jsonify({
+            "success": False,
+            "message": "An account with this SR-Code already exists."
+        }), 400
+
+    created_at = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    conn.execute("""
+        INSERT INTO students 
+            (srcode, name, age, gender, password, created_at)
+        VALUES 
+            (?, ?, ?, ?, ?, ?)
+    """, (srcode, name, age, gender, password, created_at))
+
+    conn.commit()
+    conn.close()
+
+    sync_all_from_db()
+
+    return jsonify({
+        "success": True,
+        "message": "Account created and saved successfully.",
+        "user": {
+            "role": "student",
+            "srcode": srcode,
+            "name": name
+        }
+    })
+
+
+@app.route("/api/auth/login", methods=["POST"])
+def api_login():
+    sync_all_from_db()
+
+    data = request.get_json() or {}
+    user_id = str(data.get("id", "")).strip()
+    password = str(data.get("password", ""))
+
+    if user_id.upper() in STAFF_CREDENTIALS:
+        staff = STAFF_CREDENTIALS[user_id.upper()]
+
+        if staff["password"] == password:
+            return jsonify({
+                "success": True,
+                "user": {
+                    "role": "admin",
+                    "srcode": user_id.upper(),
+                    "name": staff["name"]
+                }
+            })
+
+        return jsonify({
+            "success": False,
+            "message": "Invalid staff credentials."
+        }), 401
+
+    student = student_directory.search(user_id)
+
+    if student and student["password"] == password:
+        return jsonify({
+            "success": True,
+            "user": {
+                "role": "student",
+                "srcode": student["srcode"],
+                "name": student["name"]
+            }
+        })
+
+    return jsonify({
+        "success": False,
+        "message": "Invalid SR-Code or password."
+    }), 401
+
+
+@app.route("/api/patient/join_queue", methods=["POST"])
+def api_join_queue():
+    sync_all_from_db()
+
+    data = request.get_json() or {}
+    srcode = str(data.get("srcode", "")).strip()
+    symptoms = str(data.get("symptoms", "")).strip()
+    urgency = str(data.get("urgency", "routine")).strip().lower()
+
+    if urgency not in ("emergency", "routine"):
+        urgency = "routine"
+
+    if not srcode or not symptoms:
+        return jsonify({
+            "success": False,
+            "message": "Symptoms are required for medical check-in."
+        }), 400
+
+    student = student_directory.search(srcode)
+
+    if not student:
+        return jsonify({
+            "success": False,
+            "message": "Student record not found. Please register first."
+        }), 404
+
+    conn = get_db()
+
+    already_waiting = conn.execute(
+        "SELECT srcode FROM active_queue WHERE srcode = ?",
+        (srcode,)
+    ).fetchone()
+
+    if already_waiting:
+        conn.close()
+        return jsonify({
+            "success": False,
+            "message": "You are already waiting in the queue."
+        }), 400
+
+    severity = calculate_severity(symptoms, urgency)
+    created_at = time.time()
+
+    conn.execute("""
+        INSERT INTO active_queue
+            (srcode, name, urgency, symptoms, severity, created_at)
+        VALUES
+            (?, ?, ?, ?, ?, ?)
+    """, (
+        srcode,
+        student["name"],
+        urgency,
+        symptoms,
+        severity,
+        created_at
+    ))
+
+    conn.commit()
+    conn.close()
+
+    sync_all_from_db()
+
+    return jsonify({
+        "success": True,
+        "message": "Checked into clinic triage queue successfully."
+    })
+
+
+@app.route("/api/admin/all_data", methods=["GET"])
+def api_all_data():
+    sync_all_from_db()
+
+    if is_admin_request():
+        return jsonify({
+            "emergency_queue": emergency_heap.to_list(),
+            "routine_queue": routine_queue.to_list(),
+            "all_patients": [safe_student(student) for student in student_directory.inorder()],
+
+            # Empty public arrays so admin frontend does not accidentally show public mode
+            "public_emergency": [],
+            "public_routine": []
+        })
+
+    # Public/student view: masked SR-Codes only, no symptoms, no full directory
+    return jsonify({
+        "emergency_queue": [],
+        "routine_queue": [],
+        "all_patients": [],
+        "public_emergency": [
+            {
+                "srcode": mask_srcode(patient["srcode"]),
+                "severity": patient["severity"]
+            }
+            for patient in emergency_heap.to_list()
+        ],
+        "public_routine": [
+            {
+                "srcode": mask_srcode(patient["srcode"]),
+                "severity": patient["severity"]
+            }
+            for patient in routine_queue.to_list()
+        ]
+    })
+
+
+@app.route("/api/admin/call_next", methods=["POST"])
+def api_call_next():
+    if not is_admin_request():
+        return jsonify({
+            "success": False,
+            "message": "Staff authentication required."
+        }), 403
+
+    sync_all_from_db()
+
+    data = request.get_json() or {}
+    queue_type = str(data.get("queue_type", "emergency")).strip().lower()
+
+    if queue_type == "emergency":
+        patient = emergency_heap.extract_max()
+    else:
+        patient = routine_queue.dequeue()
+
+    if not patient:
+        return jsonify({
+            "success": False,
+            "message": f"No active patients in {queue_type.upper()} queue."
+        })
+
+    conn = get_db()
+
+    conn.execute(
+        "DELETE FROM active_queue WHERE srcode = ?",
+        (patient["srcode"],)
+    )
+
+    conn.commit()
+    conn.close()
+
+    sync_all_from_db()
+
+    return jsonify({
+        "success": True,
+        "message": f"Now calling: {patient['name']} ({patient['srcode']})",
+        "patient": patient
+    })
+
+
+@app.route("/api/admin/add_comment", methods=["POST"])
+def api_add_comment():
+    if not is_admin_request():
+        return jsonify({
+            "success": False,
+            "message": "Staff authentication required."
+        }), 403
+
+    data = request.get_json() or {}
+    srcode = str(data.get("srcode", "")).strip()
+    comment = str(data.get("comment", "")).strip()
+
+    if not srcode or not comment:
+        return jsonify({
+            "success": False,
+            "message": "SR-Code and assessment note are required."
+        }), 400
+
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    conn = get_db()
+
+    student_exists = conn.execute(
+        "SELECT srcode FROM students WHERE srcode = ?",
+        (srcode,)
+    ).fetchone()
+
+    if not student_exists:
+        conn.close()
+        return jsonify({
+            "success": False,
+            "message": "Student record not found."
+        }), 404
+
+    conn.execute("""
+        INSERT INTO clinical_notes 
+            (srcode, note, timestamp)
+        VALUES 
+            (?, ?, ?)
+    """, (srcode, comment, timestamp))
+
+    conn.commit()
+    conn.close()
+
+    sync_all_from_db()
+
+    return jsonify({
+        "success": True,
+        "message": "Clinical assessment saved successfully."
+    })
+
+
+@app.route("/api/benchmark", methods=["GET"])
+def api_benchmark():
+    dataset_sizes = [100, 1000, 10000, 100000]
+    results = []
+
+    for n in dataset_sizes:
+        data = sorted([f"24-{i:05d}" for i in range(n)])
+        target = data[-1]
+
+        # Linear Search O(N)
+        start = time.perf_counter()
+        for item in data:
+            if item == target:
+                break
+        linear_ms = (time.perf_counter() - start) * 1000.0
+
+        # Binary Search O(log N)
+        start = time.perf_counter()
+        low = 0
+        high = len(data) - 1
+
+        while low <= high:
+            mid = (low + high) // 2
+
+            if data[mid] == target:
+                break
+            elif data[mid] < target:
+                low = mid + 1
+            else:
+                high = mid - 1
+
+        binary_ms = (time.perf_counter() - start) * 1000.0
+
+        results.append({
+            "N": n,
+            "linear_time_ms": round(linear_ms, 4),
+            "binary_time_ms": round(binary_ms, 4)
+        })
+
+    return jsonify({
+        "success": True,
+        "results": results
+    })
+
+
+if __name__ == "__main__":
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000)),
+        debug=False
+    )
