@@ -516,9 +516,274 @@
             color: var(--text-dim);
             background: rgba(13, 3, 5, 0.95);
         }
+
+        /* ==========================================================================
+           ANIMATED BACKGROUND
+           ========================================================================== */
+        .bg-fx { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+
+        .bg-fx::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 199, 44, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 199, 44, 0.05) 1px, transparent 1px);
+            background-size: 52px 52px;
+            -webkit-mask-image: radial-gradient(circle at center, black 25%, transparent 80%);
+            mask-image: radial-gradient(circle at center, black 25%, transparent 80%);
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            animation: orbFloat 18s ease-in-out infinite alternate;
+        }
+        .orb-1 { width: 480px; height: 480px; background: rgba(128, 0, 0, 0.55); top: -120px; left: -100px; }
+        .orb-2 { width: 420px; height: 420px; background: rgba(255, 199, 44, 0.16); bottom: -140px; right: -100px; animation-delay: -9s; }
+
+        @keyframes orbFloat {
+            from { transform: translate(0, 0) scale(1); }
+            to   { transform: translate(90px, 60px) scale(1.15); }
+        }
+
+        /* Scrolling heartbeat line */
+        .ecg {
+            position: absolute;
+            left: 0;
+            bottom: 14%;
+            width: 100%;
+            height: 120px;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='120' viewBox='0 0 600 120'><path d='M0 60 H130 L150 60 L165 22 L185 98 L205 60 H320 L340 60 L352 34 L368 84 L384 60 H600' fill='none' stroke='%23FFC72C' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/></svg>");
+            background-repeat: repeat-x;
+            background-size: 600px 120px;
+            opacity: 0.55;
+            filter: drop-shadow(0 0 6px rgba(255, 199, 44, 0.6));
+            -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 20%, #000 80%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, #000 20%, #000 80%, transparent 100%);
+            animation: ecgScroll 8s linear infinite;
+        }
+
+        @keyframes ecgScroll {
+            from { background-position-x: 0; }
+            to   { background-position-x: -600px; }
+        }
+
+        .main-container, footer { position: relative; z-index: 1; }
+
+        /* ==========================================================================
+           POLISH: MOTION & DETAILS
+           ========================================================================== */
+        html { scroll-behavior: smooth; }
+
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: #0d0305; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 199, 44, 0.25); border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 199, 44, 0.45); }
+
+        :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+        .glass-card { animation: cardIn 0.6s var(--ease-smooth) both; }
+        .dashboard-grid > .glass-card:nth-child(2) { animation-delay: 0.08s; }
+        .dashboard-grid > .glass-card:nth-child(3) { animation-delay: 0.16s; }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: none; }
+        }
+
+        .queue-item { animation: itemIn 0.4s var(--ease-smooth) both; }
+        .queue-item:nth-child(2) { animation-delay: 0.05s; }
+        .queue-item:nth-child(3) { animation-delay: 0.1s; }
+        .queue-item:nth-child(4) { animation-delay: 0.15s; }
+        .queue-item:nth-child(5) { animation-delay: 0.2s; }
+
+        @keyframes itemIn {
+            from { opacity: 0; transform: translateX(-12px); }
+            to   { opacity: 1; transform: none; }
+        }
+
+        .btn-primary { position: relative; overflow: hidden; }
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -120%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+            transform: skewX(-20deg);
+            transition: left 0.6s var(--ease-smooth);
+            pointer-events: none;
+        }
+        .btn-primary:hover::after { left: 140%; }
+        .btn-primary:active { transform: scale(0.98); }
+
+        /* Emergency column pulse */
+        .queue-col-emergency.has-cases { animation: emergencyPulse 2.4s ease-in-out infinite; }
+        @keyframes emergencyPulse {
+            0%, 100% { box-shadow: 0 0 0 rgba(239, 68, 68, 0); }
+            50%      { box-shadow: 0 0 22px rgba(239, 68, 68, 0.35); }
+        }
+
+        /* Count pills */
+        .count-pill {
+            display: inline-block;
+            min-width: 22px;
+            padding: 1px 7px;
+            margin-left: 8px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            text-align: center;
+        }
+
+        /* Live indicator */
+        .header-tags { display: flex; align-items: center; gap: 8px; }
+        .live-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 9px;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            color: #4ade80;
+            background: rgba(34, 197, 94, 0.12);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+        }
+        .live-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: liveBlink 1.4s infinite;
+        }
+        .live-pill.stale { color: #fbbf24; background: rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.4); }
+        .live-pill.stale .live-dot { background: #fbbf24; animation: none; }
+        @keyframes liveBlink {
+            0%, 100% { opacity: 1;   box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6); }
+            50%      { opacity: 0.5; box-shadow: 0 0 0 5px rgba(34, 197, 94, 0); }
+        }
+
+        /* Password show/hide */
+        .pw-wrap { position: relative; }
+        .pw-wrap .form-control { padding-right: 44px; }
+        .pw-toggle {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            padding: 6px 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s ease;
+        }
+        .pw-toggle:hover { color: var(--gold); }
+
+        /* Your ticket banner */
+        .ticket-banner {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 16px 22px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(128, 0, 0, 0.55), rgba(28, 8, 12, 0.92));
+            border: 1px solid var(--gold);
+            box-shadow: 0 0 28px var(--gold-glow);
+            animation: ticketIn 0.5s var(--ease-spring) both;
+        }
+        .ticket-banner.is-ro { border-color: rgba(56, 189, 248, 0.6); box-shadow: 0 0 28px rgba(56, 189, 248, 0.25); }
+        .ticket-banner.is-next { animation: ticketIn 0.5s var(--ease-spring) both, nextPulse 1.6s ease-in-out 0.5s infinite; }
+        .ticket-num {
+            min-width: 70px;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.4rem;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--gold);
+        }
+        .ticket-banner.is-ro .ticket-num { color: var(--routine-blue); }
+        .ticket-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 1.5px; color: var(--text-dim); }
+        .ticket-text { margin-top: 4px; font-size: 1rem; font-weight: 600; }
+        .ticket-bell { margin-left: auto; font-size: 1.6rem; color: var(--gold); }
+        .ticket-banner.is-next .ticket-bell { animation: bellRing 1.2s ease-in-out infinite; transform-origin: top center; }
+
+        @keyframes ticketIn {
+            from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+            to   { opacity: 1; transform: none; }
+        }
+        @keyframes nextPulse {
+            0%, 100% { box-shadow: 0 0 20px var(--gold-glow); }
+            50%      { box-shadow: 0 0 42px rgba(255, 199, 44, 0.65); }
+        }
+        @keyframes bellRing {
+            0%, 60%, 100% { transform: rotate(0); }
+            10% { transform: rotate(16deg); }
+            20% { transform: rotate(-14deg); }
+            30% { transform: rotate(10deg); }
+            40% { transform: rotate(-8deg); }
+            50% { transform: rotate(4deg); }
+        }
+
+        /* ==========================================================================
+           POLISH: MOBILE
+           ========================================================================== */
+        @media (max-width: 640px) {
+            .navbar { padding: 10px 14px; flex-wrap: wrap; gap: 8px; }
+            .brand-container { gap: 10px; }
+            .brand-logo { width: 38px; height: 38px; }
+            .brand-title { font-size: 1.05rem; letter-spacing: 1px; }
+            .auth-status-container { gap: 8px; margin-left: auto; }
+            .btn-auth-switch { padding: 7px 12px; font-size: 0.75rem; }
+            .badge-user-session { padding: 5px 10px; font-size: 0.72rem; }
+            #sessionUserName { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+            .main-container { padding: 14px; }
+            .glass-card { padding: 16px; }
+            .auth-container { margin: 16px auto; }
+            .dashboard-grid { gap: 16px; }
+            .card-title { font-size: 1rem; }
+            .form-control { font-size: 16px; }
+
+            .ticket-banner { padding: 14px; gap: 12px; }
+            .ticket-num { min-width: 56px; font-size: 1.9rem; }
+            .ticket-bell { display: none; }
+
+            .modal-card { padding: 16px; max-height: 90vh; overflow-y: auto; }
+            .orb-1 { width: 300px; height: 300px; }
+            .orb-2 { width: 280px; height: 280px; }
+            footer { padding: 14px; font-size: 0.7rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
     </style>
 </head>
 <body>
+
+    <div class="bg-fx" aria-hidden="true">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="ecg"></div>
+    </div>
 
     <nav class="navbar">
         <a href="/" class="brand-container">
@@ -1284,6 +1549,202 @@
         function closeBenchmarkModal() {
             el('benchmarkModal').classList.remove('active');
         }
+
+        /* ==========================================================================
+           POLISH & NEW FEATURES
+           ========================================================================== */
+        (function () {
+            const BASE_TITLE = document.title;
+            let lastUpdated = null;
+            let lastPublicKey = null;
+            let lastAdminKey = null;
+            let prevEmergencyCount = null;
+            let prevUser = null;
+            let prevState = null;
+
+            // Mobile browser address-bar color
+            if (!document.querySelector('meta[name="theme-color"]')) {
+                const m = document.createElement('meta');
+                m.name = 'theme-color';
+                m.content = '#0d0305';
+                document.head.appendChild(m);
+            }
+
+            // ---- Show / hide password buttons ----
+            document.querySelectorAll('input[type="password"]').forEach(inp => {
+                const wrap = document.createElement('div');
+                wrap.className = 'pw-wrap';
+                inp.parentNode.insertBefore(wrap, inp);
+                wrap.appendChild(inp);
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'pw-toggle';
+                btn.setAttribute('aria-label', 'Show or hide password');
+                btn.innerHTML = "<i class='bx bx-show'></i>";
+                btn.addEventListener('click', () => {
+                    const show = inp.type === 'password';
+                    inp.type = show ? 'text' : 'password';
+                    btn.innerHTML = show ? "<i class='bx bx-hide'></i>" : "<i class='bx bx-show'></i>";
+                });
+                wrap.appendChild(btn);
+            });
+
+            // ---- Live status pill on the calling board ----
+            const confBadge = document.querySelector('.badge-confidential');
+            const pill = document.createElement('span');
+            pill.className = 'live-pill';
+            pill.innerHTML = "<i class='live-dot'></i><span id='liveText'>LIVE</span>";
+            const tags = document.createElement('div');
+            tags.className = 'header-tags';
+            confBadge.parentNode.insertBefore(tags, confBadge);
+            tags.appendChild(pill);
+            tags.appendChild(confBadge);
+            const liveText = pill.querySelector('#liveText');
+
+            setInterval(() => {
+                if (!lastUpdated) return;
+                const stale = Date.now() - lastUpdated > 9000;
+                pill.classList.toggle('stale', stale);
+                liveText.textContent = stale ? 'RECONNECTING…' : 'LIVE';
+            }, 1000);
+
+            // ---- Queue count pills ----
+            const emTitle = document.querySelector('.queue-col-emergency .queue-col-title span');
+            const roTitle = document.querySelector('.queue-col-routine .queue-col-title span');
+            emTitle.insertAdjacentHTML('beforeend', "<b class='count-pill' id='emCount'>0</b>");
+            roTitle.insertAdjacentHTML('beforeend', "<b class='count-pill' id='roCount'>0</b>");
+
+            // ---- "Your ticket" banner ----
+            function maskSrcode(s) {
+                s = String(s || '');
+                if (s.length >= 8) return s.slice(0, 3) + '***' + s.slice(-2);
+                return s.length > 2 ? s.slice(0, 2) + '***' : '***';
+            }
+
+            function ensureBanner() {
+                let b = document.getElementById('ticketBanner');
+                if (!b) {
+                    b = document.createElement('div');
+                    b.id = 'ticketBanner';
+                    b.style.display = 'none';
+                    const grid = document.getElementById('studentDashboardView');
+                    grid.insertBefore(b, grid.firstChild);
+                }
+                return b;
+            }
+
+            function updateTicket(em, ro) {
+                const b = ensureBanner();
+
+                if (!currentUser || currentUser.role !== 'student') {
+                    b.style.display = 'none';
+                    b.dataset.key = '';
+                    prevUser = null;
+                    prevState = null;
+                    document.title = BASE_TITLE;
+                    return;
+                }
+
+                if (currentUser.srcode !== prevUser) {
+                    prevUser = currentUser.srcode;
+                    prevState = null;
+                }
+
+                const me = maskSrcode(currentUser.srcode);
+                const iE = em.findIndex(x => x.srcode === me);
+                const iR = ro.findIndex(x => x.srcode === me);
+                const state = iE >= 0 ? 'em' : (iR >= 0 ? 'ro' : null);
+
+                if (prevState && !state) {
+                    showNotice("It's your turn! Please proceed to the clinic now.", 'YOU ARE BEING CALLED', 'success');
+                }
+                prevState = state;
+
+                if (!state) {
+                    b.style.display = 'none';
+                    b.dataset.key = '';
+                    document.title = BASE_TITLE;
+                    return;
+                }
+
+                const pos = (state === 'em' ? iE : iR) + 1;
+                const key = state + ':' + pos;
+                document.title = '#' + pos + ' • ' + BASE_TITLE;
+                if (b.dataset.key === key) return;
+                b.dataset.key = key;
+
+                const ahead = pos - 1;
+                const text = pos === 1
+                    ? "You're next! Please head to the clinic now."
+                    : ahead + (ahead === 1 ? ' patient is' : ' patients are') + ' ahead of you.';
+
+                b.className = 'ticket-banner ' + (state === 'em' ? 'is-em' : 'is-ro') + (pos === 1 ? ' is-next' : '');
+                b.innerHTML =
+                    "<div class='ticket-num'>#" + pos + "</div>" +
+                    "<div class='ticket-info'>" +
+                        "<div class='ticket-label'>YOUR TICKET · " + (state === 'em' ? 'EMERGENCY' : 'ROUTINE') + " QUEUE</div>" +
+                        "<div class='ticket-text'>" + text + "</div>" +
+                    "</div>" +
+                    "<i class='bx bx-bell ticket-bell'></i>";
+                b.style.display = 'flex';
+            }
+
+            // ---- Alert beep for staff when a new emergency arrives ----
+            function beep() {
+                try {
+                    const Ctx = window.AudioContext || window.webkitAudioContext;
+                    const ctx = new Ctx();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = 880;
+                    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.5);
+                    setTimeout(() => ctx.close(), 700);
+                } catch (e) { /* audio not available */ }
+            }
+
+            // ---- Wrap the public board renderer ----
+            const origPublic = renderPublicQueues;
+            renderPublicQueues = function (emergency, routine) {
+                const em = emergency || [];
+                const ro = routine || [];
+                lastUpdated = Date.now();
+
+                const key = JSON.stringify([em, ro]);
+                if (key !== lastPublicKey) {
+                    lastPublicKey = key;
+                    origPublic(em, ro);
+                    document.getElementById('emCount').textContent = em.length;
+                    document.getElementById('roCount').textContent = ro.length;
+                    document.querySelector('.queue-col-emergency').classList.toggle('has-cases', em.length > 0);
+                }
+                updateTicket(em, ro);
+            };
+
+            // ---- Wrap the staff queue renderer ----
+            const origAdmin = renderAdminQueues;
+            renderAdminQueues = function (emergency, routine) {
+                const em = emergency || [];
+                const ro = routine || [];
+                lastUpdated = Date.now();
+
+                if (prevEmergencyCount !== null && em.length > prevEmergencyCount) beep();
+                prevEmergencyCount = em.length;
+
+                const key = JSON.stringify([em, ro]);
+                if (key !== lastAdminKey) {
+                    lastAdminKey = key;
+                    origAdmin(em, ro);
+                }
+            };
+        })();
     </script>
 </body>
 </html>
